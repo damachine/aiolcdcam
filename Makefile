@@ -219,7 +219,6 @@ install: check-deps-for-install $(TARGET)
 	@printf "\n"
 	@printf "$(ICON_INFO) $(CYAN)Creating directories...$(RESET)\n"
 	sudo mkdir -p /opt/aiolcdcam/bin
-	sudo mkdir -p /opt/aiolcdcam/man
 	sudo mkdir -p /opt/aiolcdcam/image
 	@printf "$(ICON_SUCCESS) $(GREEN)Directories created$(RESET)\n"
 	@printf "\n"
@@ -280,14 +279,12 @@ uninstall:
 	sudo rm -f /etc/systemd/system/aiolcdcam.service
 	sudo rm -f /usr/share/man/man1/aiolcdcam.1
 	sudo rm -f /opt/aiolcdcam/README.md
-	sudo rm -rf /opt/aiolcdcam/man/
 	sudo rm -f /opt/aiolcdcam/bin/$(TARGET)
 	sudo rm -rf /opt/aiolcdcam/bin/
 	@printf "  $(RED)✗$(RESET) Service: /etc/systemd/system/aiolcdcam.service\n"
 	@printf "  $(RED)✗$(RESET) Manual: /usr/share/man/man1/aiolcdcam.1\n"
 	@printf "  $(RED)✗$(RESET) Program: /opt/aiolcdcam/bin/$(TARGET)\n"
 	@printf "  $(RED)✗$(RESET) README: /opt/aiolcdcam/README.md\n"
-	@printf "  $(RED)✗$(RESET) Documentation: /opt/aiolcdcam/man/\n"
 	@printf "\n"
 	@printf "$(ICON_INFO) $(CYAN)Updating system...$(RESET)\n"
 	sudo mandb -q
