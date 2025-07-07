@@ -66,6 +66,30 @@ sudo systemctl start aiolcdcam.service
 systemctl status aiolcdcam
 ```
 
+> **⚠️ IMPORTANT - Device UUID Configuration:**  
+> Before first use, you **MUST** configure your device UUID in `include/config.h`:
+>
+> 1. **Find your device UUID**: `curl http://localhost:11987/devices | jq`
+> 2. **Copy the UUID** from the JSON output (long hexadecimal string)
+> 3. **Edit config.h**: Replace `KRAKEN_UID` with your device's UUID
+>
+> **Example CoolerControl API output:**
+> ```json
+> {
+>   "8d4becb03bca2a8e8d4213ac376a1094f39d2786f688549ad3b6a591c3affdf9": {
+>     "name": "NZXT Kraken",
+>     "device_type": "Liquidctl",
+>     "type_index": 0
+>   }
+> }
+> ```
+> **💡 Tip**: The long string `8d4becb03bca2a8e8d4213ac376a1094f39d2786f688549ad3b6a591c3affdf9` is your device UUID that you need to copy into `include/config.h`
+>
+> 4. **Rebuild**: `make clean && sudo make install`
+>
+> **Tested with**: NZXT Kraken 2023 (Z-Series)  
+> **Compatible with**: NZXT Kraken X, Z-Series and other LCD-capable models
+
 > **ℹ️ Note:** The compiled binary is named `aiolcdcam`, and the systemd service is now also `aiolcdcam.service` for consistency.
 
 ### Verify Setup
@@ -110,7 +134,8 @@ sudo journalctl -u aiolcdcam.service -f
 1. **Install CoolerControl**: Follow [installation guide](https://gitlab.com/coolercontrol/coolercontrol/-/blob/main/README.md)
 2. **Start CoolerControl daemon**: `sudo systemctl start coolercontrold`
 3. **Configure your LCD AIO**: Use CoolerControl GUI to detect and configure your device
-4. **Verify API access**: `curl http://localhost:11987/devices` should return your devices
+4. **Set LCD to Image mode**: In CoolerControl GUI, set your AIO LCD display to "Image" mode (not temperature or other modes)
+5. **Verify API access**: `curl http://localhost:11987/devices` should return your devices
 
 **x86-64-v3 compatibility:**
 - **Intel**: Haswell (2013) and newer
@@ -236,9 +261,12 @@ sudo systemctl status aiolcdcam.service  # Shows detailed initialization logs
 
 All important settings are located in **`include/config.h`**:
 
+> **⚠️ CRITICAL**: You **MUST** update `KRAKEN_UID` with your device's UUID before first use!  
+> Find your UUID: `curl http://localhost:11987/devices | jq`
+
 ```c
-// Device settings
-#define KRAKEN_UID "your-device-uid"
+// Device settings (MUST BE CONFIGURED!)
+#define KRAKEN_UID "your-device-uid"        // ⚠️ Replace with YOUR device UUID!
 #define DAEMON_ADDRESS "http://localhost:11987"
 #define DAEMON_PASSWORD "coolAdmin"
 
@@ -257,6 +285,29 @@ All important settings are located in **`include/config.h`**:
 #define CHANGE_TOLERANCE_TEMP 0.1f
 #define CHANGE_TOLERANCE_USAGE 0.5f
 ```
+
+### Device UUID Configuration
+
+**Step-by-step guide:**
+
+1. **Start CoolerControl**: `sudo systemctl start coolercontrold`
+2. **List devices**: `curl http://localhost:11987/devices | jq`
+3. **Find your device UUID** in the JSON output:
+   ```json
+   {
+     "8d4becb03bca2a8e8d4213ac376a1094f39d2786f688549ad3b6a591c3affdf9": {
+       "name": "NZXT Kraken",
+       "device_type": "Liquidctl",
+       "type_index": 0
+     }
+   }
+   ```
+4. **Copy the long UUID** (the key in the JSON object)
+5. **Edit** `include/config.h` and replace `KRAKEN_UID` value
+6. **Rebuild**: `make clean && sudo make install`
+
+**Tested with**: NZXT Kraken 2023 (Z-Series)  
+**Should work with**: All LCD-capable NZXT Kraken models (X-Series, Z-Series)
 
 ## 🛠️ Development & Build
 
@@ -437,8 +488,29 @@ curl http://localhost:11987/devices | jq
 ### Common Issues
 
 - **"Connection refused"**: CoolerControl daemon not running → `sudo systemctl start coolercontrold`
-- **"Device not found"**: LCD AIO not configured in CoolerControl → Use CoolerControl GUI
+- **"Device not found"**: LCD AIO not configured in CoolerControl → Use CoolerControl GUI  
 - **"Permission denied"**: Run with appropriate permissions → `sudo ./aiolcdcam def`
+- **"Empty JSON response"**: No devices found → Check CoolerControl configuration and LCD AIO connection
+- **"UUID not working"**: Wrong device UUID → Verify with `curl http://localhost:11987/devices | jq` and copy exact UUID
+
+**Finding your device UUID troubleshooting:**
+```bash
+# If curl command fails, ensure CoolerControl is running
+sudo systemctl status coolercontrold
+
+# If no devices shown, check CoolerControl GUI configuration
+# Your LCD AIO must be detected and configured in CoolerControl first
+
+# Example of what you should see:
+curl http://localhost:11987/devices | jq
+# Output should show something like:
+# {
+#   "your-device-uuid-here": {
+#     "name": "NZXT Kraken",
+#     "device_type": "Liquidctl"
+#   }
+# }
+```
 
 ## 📄 License
 

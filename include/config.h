@@ -42,10 +42,19 @@
 #define PID_FILE "/var/run/aiolcdcam.pid" // PID-Datei für den Daemon
 
 // CoolerControl Settings
+// Stellen Sie sicher, dass CoolerControl läuft: sudo systemctl start coolercontrold
+// Testen Sie die API: curl http://localhost:11987/devices
 #define DAEMON_ADDRESS "http://localhost:11987" // Adresse des CoolerControl Daemon
 #define DAEMON_PASSWORD "coolAdmin" // Passwort für CoolerControl Daemon
 
-// NZXT Kraken UID (hardcodiert für Stabilität)
+// NZXT Kraken UID (WICHTIG: Muss für Ihr Gerät angepasst werden!)
+// 
+// ⚠️  DIESE UUID MUSS FÜR IHR GERÄT GEÄNDERT WERDEN! ⚠️
+// Anleitung siehe README.md Abschnitt "Device UUID Configuration"
+//
+// Kurz: curl http://localhost:11987/devices | jq → UUID kopieren → hier einfügen
+// Getestet mit: NZXT Kraken 2023 (Z-Series)
+//
 #define KRAKEN_UID "8d4becb03bca2a8e8d4213ac376a1094f39d2786f688549ad3b6a591c3affdf9"
 
 // Colors (RGB 0-255)

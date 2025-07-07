@@ -7,14 +7,36 @@ und dieses Projekt folgt der [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ---
 
+## [0.1.2] - 2025-07-08
+
+### Added
+- **CoolerControl Setup-Anweisungen**: Detaillierte Anleitung zur korrekten LCD-Konfiguration
+- **LCD Image-Modus Requirement**: Expliziter Hinweis, dass LCD auf "Image"-Modus gestellt werden muss
+- **Erweiterte Dokumentation**: Vollständige Setup-Schritte in README und Manpage
+- **Manpage-Verbesserungen**: SETUP-Sektion mit Schritt-für-Schritt-Anleitung
+
+### Changed
+- **Binary-Name**: Von `nzxt` zu `aiolcdcam` für bessere Eindeutigkeit
+- **Service-Name**: Konsistente Benennung als `aiolcdcam.service`
+- **PID-Datei**: Von `/var/run/nzxt_cam.pid` zu `/var/run/aiolcdcam.pid`
+- **Dokumentation**: Alle Beispiele und Referenzen auf `aiolcdcam` aktualisiert
+- **Manpage**: Korrigierte Service-Namen und Binary-Referenzen
+
+### Fixed
+- **Konsistente Benennung**: Einheitliche Verwendung von `aiolcdcam` in allen Dateien
+- **Setup-Dokumentation**: Klarstellung der CoolerControl-Konfigurationsschritte
+- **Service-Referenzen**: Korrekte systemd-Service-Namen in Dokumentation
+
+---
+
 ## [0.1.1] - 2025-07-06
 
 ### Added
-- **Single-Instance-Enforcement**: Nur eine NZXT Daemon-Instanz kann gleichzeitig laufen
-- **Robuste PID-Datei-Verwaltung**: `/var/run/nzxt_cam.pid` für systemd-kompatible Prozessverwaltung
+- **Single-Instance-Enforcement**: Nur eine aiolcdcam Daemon-Instanz kann gleichzeitig laufen
+- **Robuste PID-Datei-Verwaltung**: `/var/run/aiolcdcam.pid` für systemd-kompatible Prozessverwaltung
 - **Intelligente Instanz-Koordination**: Service vs. manuelle Starts werden korrekt gehandhabt
 - **Shutdown-Image in C**: Direktes Senden des face.png Bildes beim Daemon-Stopp
-- **Makefile-Prozessmanagement**: Automatisches Beenden aller laufenden `nzxt` Prozesse vor Installation
+- **Makefile-Prozessmanagement**: Automatisches Beenden aller laufenden `aiolcdcam` Prozesse vor Installation
 - **Vollständige Englische Ausgaben**: Alle benutzerorientierten Meldungen auf Englisch
 - **Erweiterte Fehlerbehandlung**: EPERM-Behandlung für root-owned Prozesse
 - **🆕 Automatische Dependency-Installation**: `make install` erkennt automatisch Linux-Distribution und installiert fehlende Abhängigkeiten
@@ -24,7 +46,7 @@ und dieses Projekt folgt der [Semantic Versioning](https://semver.org/spec/v2.0.
 - **🆕 Robuste Paket-Installation**: Automatische Fallback-Informationen bei unbekannten Distributionen
 
 ### Changed
-- **PID-Datei-Speicherort**: Von `/tmp/nzxt_cam.pid` zu `/var/run/nzxt_cam.pid` (systemd-kompatibel)
+- **PID-Datei-Speicherort**: Von `/tmp/aiolcdcam.pid` zu `/var/run/aiolcdcam.pid` (systemd-kompatibel)
 - **Signal-Handler**: Integriertes Shutdown-Image-Versenden direkt in C
 - **Makefile**: Erweiterte Service- und Prozess-Erkennung mit `killall`
 - **Daemon-Ausgaben**: Vollständige Übersetzung deutscher Ausgaben ins Englische
@@ -83,7 +105,7 @@ und dieses Projekt folgt der [Semantic Versioning](https://semver.org/spec/v2.0.
 ## [0.0.1] - 2025-07-04
 
 ### Added
-- **Erste funktionsfähige Version**: Monolithisches C-Programm `nzxt.c`
+- **Erste funktionsfähige Version**: Monolithisches C-Programm `aiolcdcam.c`
 - **NZXT Kraken LCD-Unterstützung**: Anzeige von CPU/GPU-Temperaturen
 - **CoolerControl-Integration**: REST-API-Kommunikation über curl
 - **Cairo-basiertes Rendering**: PNG-Generierung für LCD-Display
@@ -138,6 +160,6 @@ und dieses Projekt folgt der [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ---
 
-**Autor**: damachine  
-**Lizenz**: Open Source  
-**Repository**: NZXT CAM - Modularer C-Daemon
+**Autor**: DAMACHINE (christkue79@gmail.com)  
+**Lizenz**: MIT License  
+**Repository**: LCD AIO CAM - Modularer C-Daemon

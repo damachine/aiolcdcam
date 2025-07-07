@@ -94,19 +94,19 @@ PID file for process management
 .SH EXAMPLES
 .TP
 Start program in default mode (temperatures only):
-.B nzxt def
+.B aiolcdcam def
 .TP
 Start program with vertical load bars:
-.B nzxt 1
+.B aiolcdcam 1
 .TP
 Start program with circular diagrams:
-.B nzxt 2
+.B aiolcdcam 2
 .TP
 Start program with horizontal load bars:
-.B nzxt 3
+.B aiolcdcam 3
 .TP
 Show help:
-.B nzxt --help
+.B aiolcdcam --help
 .TP
 Service management:
 .B sudo systemctl start aiolcdcam
@@ -124,14 +124,14 @@ The program provides professional systemd integration with detailed logs:
 Automatically installs the service and restarts it on updates.
 .TP
 .B Service Management
-.B sudo systemctl enable nzxt-cam
+.B sudo systemctl enable aiolcdcam.service
 .br
-.B sudo systemctl start nzxt-cam
+.B sudo systemctl start aiolcdcam.service
 .br
-.B sudo systemctl status nzxt-cam
+.B sudo systemctl status aiolcdcam.service
 .TP
 .B Detailed Logs
-.B journalctl -u nzxt-cam --since "10 minutes ago"
+.B journalctl -u aiolcdcam.service --since "10 minutes ago"
 .br
 Shows module initialization, CoolerControl connection, and operating status.
 .TP
@@ -157,21 +157,31 @@ Display updates only on significant changes (0.1°C for temperatures, 0.5% for l
 All important settings are located in the build-time configuration:
 .TP
 .I Device UID
-NZXT Kraken device identification
+NZXT Kraken device identification (found via CoolerControl API)
+.TP
+.I API Settings
+CoolerControl daemon address (default: http://localhost:11987)
 .TP
 .I Display settings
-Resolution, update intervals, layout parameters
+Resolution (240x240), update intervals, layout parameters
 .TP
 .I Temperature thresholds
-Color gradient thresholds for green/orange/red
+Color gradient thresholds for green/orange/red display
 .TP
 .I Cache intervals
 Optimization of sensor query frequency
+.TP
+.B Device UID Configuration
+The device UID can be found using:
+.B curl http://localhost:11987/devices | jq
+.br
+Update KRAKEN_UID in include/config.h with your device's UID
 .SH DEPENDENCIES
 The program requires the following components:
 .TP
 .B CoolerControl
-Must be installed and running (coolercontrold.service)
+Must be installed and running (coolercontrold.service). Follow installation guide at:
+https://gitlab.com/coolercontrol/coolercontrol/-/blob/main/README.md
 .TP
 .B NVIDIA-SMI
 For GPU temperature measurement (with NVIDIA graphics cards)
@@ -233,12 +243,50 @@ Successfully terminated
 .B 1
 Error in argument processing
 .SH BUGS
-Report bugs to: damachine@example.com
+Report bugs to: christkue79@gmail.com
 .SH AUTHOR
-Written by damachine.
+Written by DAMACHINE (christkue79@gmail.com).
 .SH SEE ALSO
 .BR systemctl (1),
 .BR coolercontrol (1),
-.BR nvidia-smi (1)
+.BR nvidia-smi (1),
+.BR journalctl (1)
+.br
+Project repository: https://github.com/damachine/aiolcdcam
 .SH COPYRIGHT
-Copyright © 2025 damachine. This is free software; see source for copying conditions.
+Copyright © 2025 DAMACHINE. This is free software; see source for copying conditions.
+Released under MIT License.
+.SH SETUP
+Before using aiolcdcam, ensure CoolerControl is properly configured:
+.TP
+.B 1. Install CoolerControl
+Follow the installation guide at: https://gitlab.com/coolercontrol/coolercontrol/-/blob/main/README.md
+.TP
+.B 2. Start CoolerControl daemon
+.B sudo systemctl start coolercontrold
+.TP
+.B 3. Configure LCD AIO device
+Use the CoolerControl GUI to detect and configure your LCD AIO device
+.TP
+.B 4. Set LCD to Image mode
+In CoolerControl GUI, set your AIO LCD display to "Image" mode (not temperature or other modes)
+.TP
+.B 5. Find your device UUID
+.B curl http://localhost:11987/devices | jq
+.br
+Copy the long UUID string from the JSON output
+.TP
+.B 6. Configure device UUID
+Edit include/config.h and replace KRAKEN_UID with your device's UUID
+.br
+Tested with: NZXT Kraken 2023 (Z-Series)
+.br
+Compatible with: NZXT Kraken X, Z-Series and other LCD-capable models
+.TP
+.B 7. Rebuild and install
+.B make clean && sudo make install
+.TP
+.B 8. Verify API access
+.B curl http://localhost:11987/devices
+.br
+Should return your configured devices
