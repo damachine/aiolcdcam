@@ -77,6 +77,7 @@ sudo systemctl enable aiolcdcam.service
 ```
 > **💡 Tip**: The long string is your device UUID that you need to copy into `include/config.h`
 
+```bash
 # Start AIOLCDCAM
 sudo systemctl start aiolcdcam.service
 ```
