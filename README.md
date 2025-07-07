@@ -5,50 +5,35 @@
 [![Platform](https://img.shields.io/badge/Platform-Linux-green.svg)](https://kernel.org/)
 [![Development Status](https://img.shields.io/badge/Status-Beta-orange.svg)](https://github.com)
 
-High-performance, modular C-based daemon for LCD AIO displays with professional systemd integration and automatic dependency management.
+## 📖 Description
+
+High-performance, modular C-based daemon for LCD AIO displays with professional systemd integration and automatic dependency management. Displays real-time CPU, GPU, and coolant temperatures on NZXT Kraken LCD screens through CoolerControl API.
 
 > **⚠️ Beta Notice:** This project is in early development stage. Features may change and bugs are expected. Please report issues and contribute to improve the software.
 
-**👨‍💻 Author:** DAMACHINE ([christkue79@gmail.com](mailto:christkue79@gmail.com))
+**👨‍💻 Author:** DAMACHINE ([christkue79@gmail.com](mailto:christkue79@gmail.com))  
+**🧪 Tested with:** NZXT Kraken 2023 (Z-Series)  
+**🔗 Compatible:** NZXT Kraken X-Series, Z-Series and other LCD-capable models
 
-**📖 Languages / Sprachen / 语言:**
-- **🇺🇸 English**: README.md (this file)
- 
 ## ✨ Features
 
-- **✅ Modular Architecture**: Professional separation of CPU, GPU, coolant, and display logic into separate modules
-- **✅ Efficient Sensor Polling**: Only necessary sensor data is queried depending on mode (def = temperatures only, 1-3 = additional load data)
-- **✅ Central Configuration**: All settings (UUID, paths, colors, layout) in `include/config.h`
-- **✅ 4 Optimized Display Modes**: From simple temperatures to complex load diagrams
-- **✅ Performance-Optimized**: Caching, change detection, minimal I/O operations, mode-dependent resource usage
-- **✅ Native CoolerControl Integration**: REST API communication without Python dependencies
-- **✅ Systemd Logs**: Detailed initialization and status messages for professional service management
-- **✅ Intelligent Installation**: Automatic service stop/start during updates via `make install`
-- **🚧 Beta Features**: Active development with regular improvements and bug fixes
+- **🏗️ Modular Architecture**: Professional separation of CPU, GPU, coolant, and display logic into separate modules
+- **⚡ Performance-Optimized**: Caching, change detection, minimal I/O operations, mode-dependent resource usage
+- **🎨 4 Display Modes**: From simple temperatures (def) to complex load diagrams (1-3)
+- **🔧 Central Configuration**: All settings (UUID, paths, colors, layout) in `include/config.h`
+- **🌐 Native CoolerControl Integration**: REST API communication without Python dependencies
+- **📊 Efficient Sensor Polling**: Only necessary sensor data is queried depending on mode
+- **� Systemd Integration**: Professional service management with detailed logs
+- **� Intelligent Installation**: Automatic dependency detection and installation for all major Linux distributions
 
-## 📑 Table of Contents
-
-- [✨ Features](#-features)
-- [🚀 Quick Start](#-quick-start)
-- [📋 System Requirements](#-system-requirements)
-- [📦 Installation & Dependencies](#-installation--dependencies)
-- [⚙️ Service Management](#️-service-management)
-- [📱 Display Modes & Usage](#-display-modes--usage)
-- [🔧 Configuration](#-configuration)
-- [🛠️ Development & Build](#️-development--build)
-- [🏗️ Project Structure](#️-project-structure)
-- [🎯 Performance Optimizations](#-performance-optimizations)
-- [🎨 Customization](#-customization)
-- [🔍 Debugging](#-debugging)
-- [📄 License](#-license)
-
-## 🚀 Quick Start
+## � Installation
 
 ### Prerequisites
 
-1. **Install CoolerControl first**: [Installation Guide](https://gitlab.com/coolercontrol/coolercontrol/-/blob/main/README.md)
+1. **Install CoolerControl**: [Installation Guide](https://gitlab.com/coolercontrol/coolercontrol/-/blob/main/README.md)
 2. **Start CoolerControl daemon**: `sudo systemctl start coolercontrold`
 3. **Configure your LCD AIO** in CoolerControl GUI
+4. **Set LCD to Image mode**: In CoolerControl GUI, set your AIO LCD display to "Image" mode
 
 ### Install LCD AIO CAM
 
@@ -58,63 +43,183 @@ git clone https://github.com/damachine/aiolcdcam.git
 cd aiolcdcam
 sudo make install
 
-# Enable autostart and start service
+# Enable autostart
 sudo systemctl enable aiolcdcam.service
-sudo systemctl start aiolcdcam.service
-
-# Check status
-systemctl status aiolcdcam
 ```
 
-> **⚠️ IMPORTANT - Device UUID Configuration:**  
-> Before first use, you **MUST** configure your device UUID in `include/config.h`:
->
-> 1. **Find your device UUID**: `curl http://localhost:11987/devices | jq`
-> 2. **Copy the UUID** from the JSON output (long hexadecimal string)
-> 3. **Edit config.h**: Replace `KRAKEN_UID` with your device's UUID
->
-> **Example CoolerControl API output:**
-> ```json
-> {
->   "8d4becb03bca2a8e8d4213ac376a1094f39d2786f688549ad3b6a591c3affdf9": {
->     "name": "NZXT Kraken",
->     "device_type": "Liquidctl",
->     "type_index": 0
->   }
-> }
-> ```
-> **💡 Tip**: The long string `8d4becb03bca2a8e8d4213ac376a1094f39d2786f688549ad3b6a591c3affdf9` is your device UUID that you need to copy into `include/config.h`
->
-> 4. **Rebuild**: `make clean && sudo make install`
->
-> **Tested with**: NZXT Kraken 2023 (Z-Series)  
-> **Compatible with**: NZXT Kraken X, Z-Series and other LCD-capable models
+**Supported Distributions (Auto-Detected):**
+- **Arch Linux / Manjaro**: `pacman -S cairo libcurl-gnutls gcc make pkg-config`
+- **Ubuntu / Debian**: `apt install libcairo2-dev libcurl4-openssl-dev gcc make pkg-config`
+- **Fedora**: `dnf install cairo-devel libcurl-devel gcc make pkg-config`
+- **RHEL / CentOS**: `yum install cairo-devel libcurl-devel gcc make pkg-config`
+- **openSUSE**: `zypper install cairo-devel libcurl-devel gcc make pkg-config`
 
-> **ℹ️ Note:** The compiled binary is named `aiolcdcam`, and the systemd service is now also `aiolcdcam.service` for consistency.
+## ⚙️ Configuration
 
-### Verify Setup
+### Device UUID Configuration (REQUIRED)
+
+> **⚠️ CRITICAL**: You **MUST** configure your device UUID before first use!
+
+1. **Find your device UUID**: `curl http://localhost:11987/devices | jq`
+2. **Copy the UUID** from the JSON output (long hexadecimal string)
+3. **Edit** `include/config.h` and replace `KRAKEN_UID` with your device's UUID
+4. **Rebuild**: `make clean && sudo make install`
+
+**Example CoolerControl API output:**
+```json
+{
+  "8d4becb03bca2a8e8d4213ac376a1094f39d2786f688549ad3b6a591c3affdf9": {
+    "name": "NZXT Kraken",
+    "device_type": "Liquidctl",
+    "type_index": 0
+  }
+}
+```
+> **💡 Tip**: The long string is your device UUID that you need to copy into `include/config.h`
+
+### Display Modes
+
+| Mode | Description | Sensor Data |
+|------|-------------|-------------|
+| `def` | Temperatures only (CPU, GPU, coolant) | Minimal I/O - temperatures only |
+| `1`   | Temperatures + vertical load bars | All sensors + CPU/RAM/GPU load |
+| `2`   | Temperatures + circular diagrams | All sensors + CPU/RAM/GPU load |
+| `3`   | Temperatures + horizontal load bars | All sensors + CPU/RAM/GPU load |
+
+### Advanced Configuration
+
+Edit `include/config.h` for customization:
+
+```c
+// Device settings (MUST BE CONFIGURED!)
+#define KRAKEN_UID "your-device-uid"        // ⚠️ Replace with YOUR device UUID!
+#define DAEMON_ADDRESS "http://localhost:11987"
+
+// Display settings
+#define DISPLAY_WIDTH 240
+#define DISPLAY_HEIGHT 240
+#define DISPLAY_REFRESH_INTERVAL_SEC 2
+
+// Temperature thresholds (color gradient)
+#define TEMP_THRESHOLD_GREEN 55.0f
+#define TEMP_THRESHOLD_ORANGE 65.0f
+#define TEMP_THRESHOLD_RED 75.0f
+```
+
+## 🔧 Usage & Service Management
+
+### Service Control
 
 ```bash
-# Check CoolerControl API
+# Service management
+sudo systemctl start aiolcdcam.service     # Start
+sudo systemctl stop aiolcdcam.service      # Stop (displays face.png automatically)
+sudo systemctl restart aiolcdcam.service   # Restart
+sudo systemctl status aiolcdcam.service    # Status + recent logs
+
+# Live logs
+sudo journalctl -u aiolcdcam.service -f
+
+# Makefile shortcuts
+make start      # systemctl start aiolcdcam
+make stop       # systemctl stop aiolcdcam
+make status     # systemctl status aiolcdcam
+make logs       # journalctl -u aiolcdcam -f
+```
+
+### Manual Usage
+
+```bash
+# Run manually (different modes)
+./aiolcdcam def      # Temperatures only (default, minimal I/O)
+./aiolcdcam 1        # Vertical bars
+./aiolcdcam 2        # Circular diagrams  
+./aiolcdcam 3        # Horizontal bars
+
+# Alternative syntax
+./aiolcdcam --mode def
+./aiolcdcam --mode 2
+
+# Installed version
+/opt/aiolcdcam/bin/aiolcdcam def
+```
+
+### Build Commands
+
+```bash
+make          # Standard build
+make clean    # Clean up
+make install  # System installation with dependency auto-detection
+make debug    # Debug build with AddressSanitizer
+make help     # Show all options
+```
+
+## 🔍 Troubleshooting
+
+### Common Issues
+
+- **"Connection refused"**: CoolerControl daemon not running → `sudo systemctl start coolercontrold`
+- **"Device not found"**: LCD AIO not configured in CoolerControl → Use CoolerControl GUI  
+- **"Permission denied"**: Run with appropriate permissions → `sudo ./aiolcdcam def`
+- **"Empty JSON response"**: No devices found → Check CoolerControl configuration and LCD AIO connection
+- **"UUID not working"**: Wrong device UUID → Verify with `curl http://localhost:11987/devices | jq` and copy exact UUID
+
+### Debugging Steps
+
+```bash
+# 1. Check CoolerControl status
+sudo systemctl status coolercontrold
 curl http://localhost:11987/devices
 
-# Check LCD AIO CAM logs
+# 2. Test LCD AIO CAM manually
+./aiolcdcam def
+
+# 3. Debug build for detailed information
+make debug && ./aiolcdcam def
+
+# 4. Check service logs
 sudo journalctl -u aiolcdcam.service -f
 ```
 
-## 📋 System Requirements
+### Finding Device UUID
 
-### Essential Requirements
+```bash
+# If curl command fails, ensure CoolerControl is running
+sudo systemctl status coolercontrold
+
+# If no devices shown, check CoolerControl GUI configuration
+# Your LCD AIO must be detected and configured in CoolerControl first
+
+# Example of expected output:
+curl http://localhost:11987/devices | jq
+# Should show:
+# {
+#   "your-device-uuid-here": {
+#     "name": "NZXT Kraken",
+#     "device_type": "Liquidctl"
+#   }
+# }
+```
+
+### System Requirements
 
 - **OS**: Linux (hwmon support required)
-- **🌐 CoolerControl**: **REQUIRED** - [CoolerControl](https://gitlab.com/coolercontrol/coolercontrol) daemon must be installed and running
-  - Provides REST API for LCD AIO communication
-  - Version 1.0+ recommended
-  - Must be configured with your LCD AIO device
-- **CPU**: x86-64-v3 compatible (Intel Haswell+ / AMD Excavator+, 2013+)
+- **CoolerControl**: Version 1.0+ (REQUIRED - must be installed and running)
+- **CPU**: x86-64-v3 compatible (Intel Haswell+ 2013+ / AMD Excavator+ 2015+)
 - **LCD**: LCD AIO displays supported by CoolerControl (NZXT Kraken, etc.)
+- **Resources**: < 5 MB RAM, < 1-2% CPU load
 
-### Hardware & Performance
+**For older CPUs**: Use `CFLAGS=-march=x86-64 make` for compatibility
+
+## 📄 License
+
+MIT License - See LICENSE file for details.
+
+---
+
+**👨‍💻 Developed by DAMACHINE for maximum efficiency, stability and professional code structure.**  
+**📧 Contact:** [christkue79@gmail.com](mailto:christkue79@gmail.com)  
+**📖 Manual:** `man aiolcdcam`
 
 - **Sensors**: hwmon temperature sensors for CPU
 - **GPU**: NVIDIA (optional, for GPU data via nvidia-smi)

@@ -53,8 +53,7 @@ $(TARGET): $(OBJDIR) $(BINDIR) $(OBJECTS) $(MAIN_SOURCE)
 	@printf "$(BLUE)CFLAGS:$(RESET) $(CFLAGS)\n"
 	@printf "$(BLUE)LIBS:$(RESET) $(LIBS)\n"
 	$(CC) $(CFLAGS) -o $(BINDIR)/$(TARGET) $(MAIN_SOURCE) $(OBJECTS) $(LIBS)
-	@printf "$(ICON_WARNING) $(YELLOW)Building without legacy version...$(RESET)\n"
-	@printf "$(ICON_SUCCESS) $(GREEN)Standard C build successful: $(BINDIR)/$(TARGET)$(RESET)\n"
+	@printf "$(ICON_SUCCESS) $(GREEN)Build successful: $(BINDIR)/$(TARGET)$(RESET)\n"
 
 # Build-Verzeichnis erstellen
 $(OBJDIR):
