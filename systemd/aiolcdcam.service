@@ -1,0 +1,34 @@
+[Unit]
+Description=LCD AIO CAM Temperature Monitor
+Documentation=man:aiolcdcam(1)
+After=network.target coolercontrold.service
+Wants=coolercontrold.service
+Requires=coolercontrold.service
+
+[Service]
+Type=simple
+ExecStartPre=/bin/sleep 10
+ExecStart=/opt/aiolcdcam/bin/aiolcdcam --mode def
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=always
+RestartSec=5
+User=root
+Group=root
+
+# Sicherheitseinstellungen
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/aiolcdcam/image /tmp
+PrivateTmp=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=aiolcdcam
+
+[Install]
+WantedBy=multi-user.target

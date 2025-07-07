@@ -1,0 +1,244 @@
+.TH AIOLCDCAM 1 "July 2025" "aiolcdcam 0.1.1" "User Commands"
+.SH NAME
+aiolcdcam \- LCD AIO CAM Temperature Monitor (Professional Modular C Daemon)
+.SH SYNOPSIS
+.B aiolcdcam
+[\fIMODE\fR]
+.br
+.B aiolcdcam
+[\fB\-\-mode\fR \fIMODE\fR]
+.br
+.B aiolcdcam
+[\fB\-h\fR|\fB\-\-help\fR]
+.SH DESCRIPTION
+.B aiolcdcam
+is a high-performance, modular C-based daemon with professional systemd integration that monitors CPU and GPU temperatures and displays them graphically on the LCD display of an NZXT Kraken water cooler. The program is fully developed in modular C99 architecture for maximum efficiency, maintainability, and production stability.
+
+The modular architecture separates CPU, GPU, coolant, and display logic into separate modules. Depending on the selected mode, only the required sensor data is queried, which significantly optimizes I/O performance (def mode uses only temperature sensors, modes 1-3 additionally load data).
+
+The program communicates with the Kraken device via the native CoolerControl REST API without Python dependencies and provides detailed systemd logs for professional service management.
+
+.SH ARCHITECTURE
+The program follows the standard C project structure:
+.TP
+.I src/
+Source code files (.c)
+.TP
+.I include/
+Header files (.h) and central configuration
+.TP
+.I build/
+Compiled object files (.o)
+.TP
+.I man/
+Documentation
+.TP
+.I src/main.c
+Daemon management and sensor coordination
+.TP
+.I include/config.h
+Central configuration (UUID, paths, colors, layout)
+.TP
+.I src/cpu_monitor.c
+CPU temperature, CPU load, and RAM monitoring
+.TP
+.I src/gpu_monitor.c
+GPU temperature and GPU load (NVIDIA)
+.TP
+.I src/coolant_monitor.c
+Coolant temperature monitoring
+.TP
+.I src/display.c
+Rendering engine, mode logic, and Cairo graphics
+.TP
+.I src/coolercontrol.c
+REST API communication and session management
+
+.SH OPTIONS
+.TP
+.I MODE
+Sets the display mode for the LCD display. Available modes:
+.RS
+.TP
+.B def
+Default mode (temperatures only) - Minimal I/O, no load data
+.TP
+.B 1
+Temperatures + vertical load bars
+.TP
+.B 2
+Temperatures + circular diagrams for load
+.TP
+.B 3
+Temperatures + horizontal load bars
+.RE
+.TP
+.BR \-h ", " \-\-help
+Shows help information and usage examples
+.SH FILES
+.TP
+.I /opt/aiolcdcam/bin/aiolcdcam
+Main program (modern modular version)
+.TP
+.I /opt/aiolcdcam/man/README.md
+Documentation
+.TP
+.I /opt/aiolcdcam/image/cpu_gpu_temp.png
+Generated temperature image
+.TP
+.I /etc/systemd/system/aiolcdcam.service
+Systemd service file
+.TP
+.I /var/run/aiolcdcam.pid
+PID file for process management
+.SH EXAMPLES
+.TP
+Start program in default mode (temperatures only):
+.B nzxt def
+.TP
+Start program with vertical load bars:
+.B nzxt 1
+.TP
+Start program with circular diagrams:
+.B nzxt 2
+.TP
+Start program with horizontal load bars:
+.B nzxt 3
+.TP
+Show help:
+.B nzxt --help
+.TP
+Service management:
+.B sudo systemctl start aiolcdcam
+.br
+.B sudo systemctl status aiolcdcam
+.br
+.B journalctl -u aiolcdcam -f
+
+.SH SYSTEMD INTEGRATION
+The program provides professional systemd integration with detailed logs:
+.TP
+.B Service Installation
+.B sudo make install
+.br
+Automatically installs the service and restarts it on updates.
+.TP
+.B Service Management
+.B sudo systemctl enable nzxt-cam
+.br
+.B sudo systemctl start nzxt-cam
+.br
+.B sudo systemctl status nzxt-cam
+.TP
+.B Detailed Logs
+.B journalctl -u nzxt-cam --since "10 minutes ago"
+.br
+Shows module initialization, CoolerControl connection, and operating status.
+.TP
+.B Makefile Service Shortcuts
+.B make start, make stop, make restart, make status, make logs
+
+.SH PERFORMANCE OPTIMIZATIONS
+The modular design offers the following performance benefits:
+.TP
+.B Mode-dependent I/O optimization
+Mode "def" reads only temperature sensors for minimal I/O.
+Modes 1-3 read additional load data with intelligent caching.
+.TP
+.B Sensor data caching
+CPU/Coolant: hwmon paths are cached at startup.
+GPU: 2-second cache with nvidia-smi.
+CPU load: Stateful between measurements.
+.TP
+.B Change detection
+Display updates only on significant changes (0.1°C for temperatures, 0.5% for load).
+
+.SH CONFIGURATION
+All important settings are located in the build-time configuration:
+.TP
+.I Device UID
+NZXT Kraken device identification
+.TP
+.I Display settings
+Resolution, update intervals, layout parameters
+.TP
+.I Temperature thresholds
+Color gradient thresholds for green/orange/red
+.TP
+.I Cache intervals
+Optimization of sensor query frequency
+.SH DEPENDENCIES
+The program requires the following components:
+.TP
+.B CoolerControl
+Must be installed and running (coolercontrold.service)
+.TP
+.B NVIDIA-SMI
+For GPU temperature measurement (with NVIDIA graphics cards)
+.TP
+.B Cairo Library
+For image generation
+.TP
+.B cURL
+For REST API communication
+.SH COMPILATION
+The program is built with the following compiler flags and libraries:
+.TP
+.B Compiler Flags:
+\-Wall \-Wextra \-O2 \-std=c99 \-march=x86-64-v3 plus Cairo-specific includes
+.TP
+.B x86-64-v3 Optimization:
+Compiled for modern CPUs (Intel Haswell+/AMD Excavator+, 2013+) with extended instruction sets (AVX2, BMI1/2, FMA)
+.TP
+.B Libraries:
+libcairo, libcurl, libm (math library)
+.TP
+.B Build Command:
+.B make
+(automatically uses x86-64-v3 optimization)
+.SH PERFORMANCE
+The program is optimized for minimal resource consumption:
+.TP
+.B Sensor Caching
+Hwmon paths are determined and cached once at startup
+.TP
+.B GPU Data Caching
+GPU data is updated only every 2 seconds
+.TP
+.B Change Detection
+PNG is regenerated only on significant temperature/load changes
+.SH CONFIGURATION
+The program reads temperatures from:
+.TP
+.I /sys/class/hwmon/*/temp*_input
+CPU and coolant temperatures
+.TP
+.B nvidia-smi
+GPU temperature and load
+.TP
+.I /proc/stat
+CPU load
+.TP
+.I /proc/meminfo
+RAM usage
+.SH SIGNALS
+.TP
+.B SIGTERM, SIGINT
+Terminates the program gracefully
+.SH EXIT STATUS
+.TP
+.B 0
+Successfully terminated
+.TP
+.B 1
+Error in argument processing
+.SH BUGS
+Report bugs to: damachine@example.com
+.SH AUTHOR
+Written by damachine.
+.SH SEE ALSO
+.BR systemctl (1),
+.BR coolercontrol (1),
+.BR nvidia-smi (1)
+.SH COPYRIGHT
+Copyright © 2025 damachine. This is free software; see source for copying conditions.
