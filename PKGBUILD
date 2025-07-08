@@ -13,7 +13,7 @@ optdepends=('nvidia-utils: for GPU temperature monitoring'
 backup=('opt/aiolcdcam/README.md')
 install=aiolcdcam.install
 source=("$pkgname-$pkgver.tar.gz::https://github.com/damachine/$pkgname/releases/download/v$pkgver/$pkgname-$pkgver.tar.gz")
-sha256sums=('7aa5443164cf013913c1db31834598c0b91eb5c4718f775f4aaf50e3b59b178c')
+sha256sums=('0019dfc4b32d63c1392aa264aed2253c1e0c2fb09216f8e2cc269bbfb8bb49b5')
 
 prepare() {
     cd "$pkgname-$pkgver"

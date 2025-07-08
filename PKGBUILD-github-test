@@ -1,0 +1,97 @@
+# Maintainer: Your Name <your.email@example.com>
+pkgname=aiolcdcam
+pkgver=1.25.07.08.2234
+pkgrel=1
+pkgdesc="AIO LCD CAM - Monitoring tool for All-in-One liquid coolers with LCD displays"
+arch=('x86_64')
+url="https://github.com/damachine/aiolcdcam"
+license=('MIT')
+depends=('systemd')
+makedepends=('gcc' 'make' 'pkg-config')
+optdepends=('nvidia-utils: for GPU temperature monitoring'
+            'lm_sensors: for additional hardware monitoring')
+backup=('opt/aiolcdcam/README.md')
+install=aiolcdcam.install
+source=("$pkgname-$pkgver.tar.gz::https://github.com/damachine/$pkgname/releases/download/v$pkgver/$pkgname-$pkgver.tar.gz")
+sha256sums=('SKIP')  # Will be updated after GitHub release
+
+prepare() {
+    cd "$pkgname-$pkgver"
+    
+    # Check if UUID is properly configured
+    if grep -q "YOUR_DEVICE_UUID_HERE" include/config.h; then
+        echo "ERROR: Device UUID not configured!"
+        echo "Please edit include/config.h and set your device UUID before building."
+        echo "Use 'lsusb' to find your device and set the UUID in config.h"
+        exit 1
+    fi
+    
+    # Check for previous manual installation and remove if found
+    if [ -f /usr/local/bin/aiolcdcam ] || [ -f /etc/systemd/system/aiolcdcam.service ]; then
+        echo "Detected previous manual installation. Cleaning up..."
+        
+        # Stop and disable service if running
+        if systemctl is-active --quiet aiolcdcam 2>/dev/null; then
+            echo "Stopping aiolcdcam service..."
+            systemctl stop aiolcdcam 2>/dev/null || true
+        fi
+        
+        if systemctl is-enabled --quiet aiolcdcam 2>/dev/null; then
+            echo "Disabling aiolcdcam service..."
+            systemctl disable aiolcdcam 2>/dev/null || true
+        fi
+        
+        # Remove manual installation files
+        rm -f /usr/local/bin/aiolcdcam
+        rm -f /etc/systemd/system/aiolcdcam.service
+        rm -f /usr/local/share/man/man1/aiolcdcam.1*
+        
+        # Reload systemd
+        systemctl daemon-reload 2>/dev/null || true
+        
+        echo "Previous manual installation cleaned up."
+    fi
+}
+
+build() {
+    cd "$pkgname-$pkgver"
+    
+    # Build with proper C99 compliance
+    make clean
+    make
+}
+
+check() {
+    cd "$pkgname-$pkgver"
+    
+    # Verify binary was built correctly
+    if [ ! -f "bin/aiolcdcam" ]; then
+        echo "ERROR: Binary not found after build!"
+        exit 1
+    fi
+    
+    # Basic syntax check
+    ./bin/aiolcdcam --help || true
+}
+
+package() {
+    cd "$pkgname-$pkgver"
+    
+    # Install binary
+    install -Dm755 bin/aiolcdcam "$pkgdir/opt/aiolcdcam/aiolcdcam"
+    
+    # Install systemd service
+    install -Dm644 systemd/aiolcdcam.service "$pkgdir/usr/lib/systemd/system/aiolcdcam.service"
+    
+    # Install documentation
+    install -Dm644 README.md "$pkgdir/opt/aiolcdcam/README.md"
+    install -Dm644 CHANGELOG.md "$pkgdir/usr/share/doc/$pkgname/CHANGELOG.md"
+    install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+    
+    # Install man page
+    install -Dm644 man/aiolcdcam.1 "$pkgdir/usr/share/man/man1/aiolcdcam.1"
+    
+    # Create symlink for system-wide access
+    install -dm755 "$pkgdir/usr/bin"
+    ln -s /opt/aiolcdcam/aiolcdcam "$pkgdir/usr/bin/aiolcdcam"
+}
