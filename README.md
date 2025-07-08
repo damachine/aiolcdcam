@@ -43,6 +43,22 @@ Transform your cooling system into an intelligent monitoring hub that keeps you 
 
 ### Install LCD AIO CAM
 
+#### Arch Linux (Recommended)
+
+```bash
+# Option 1: Install via PKGBUILD (includes automatic dependency management)
+git clone https://github.com/damachine/aiolcdcam.git
+cd aiolcdcam
+makepkg -si
+
+# Option 2: Install from AUR (when published)
+yay -S aiolcdcam
+# or
+paru -S aiolcdcam
+```
+
+#### Manual Installation (All Distributions)
+
 ```bash
 # One-command installation (auto-detects Linux distribution and installs dependencies)
 git clone https://github.com/damachine/aiolcdcam.git
@@ -58,7 +74,7 @@ sudo systemctl start aiolcdcam.service
 ```
 
 **Supported Distributions (Auto-Detected):**
-- **Arch Linux / Manjaro**: `pacman -S cairo libcurl-gnutls gcc make pkg-config`
+- **Arch Linux / Manjaro**: `pacman -S cairo libcurl-gnutls coolercontrol gcc make pkg-config`
 - **Ubuntu / Debian**: `apt install libcairo2-dev libcurl4-openssl-dev gcc make pkg-config`
 - **Fedora**: `dnf install cairo-devel libcurl-devel gcc make pkg-config`
 - **RHEL / CentOS**: `yum install cairo-devel libcurl-devel gcc make pkg-config`
@@ -172,18 +188,21 @@ make logs       # journalctl -u aiolcdcam -f
 ### Manual Usage
 
 ```bash
-# Run manually (different modes)
-./aiolcdcam def      # Temperatures only (default, minimal I/O)
-./aiolcdcam 1        # Vertical bars
-./aiolcdcam 2        # Circular diagrams  
-./aiolcdcam 3        # Horizontal bars
+# Run manually (different modes) - both work after installation
+aiolcdcam def      # System-wide command (via symlink)
+aiolcdcam 1        # Vertical bars
+aiolcdcam 2        # Circular diagrams  
+aiolcdcam 3        # Horizontal bars
+
+# Or use full path
+/opt/aiolcdcam/bin/aiolcdcam def
 
 # Alternative syntax
-./aiolcdcam --mode def
-./aiolcdcam --mode 2
+aiolcdcam --mode def
+aiolcdcam --mode 2
 
-# Installed version
-/opt/aiolcdcam/bin/aiolcdcam def
+# From project directory (before installation)
+./aiolcdcam def
 ```
 
 ### Build Commands
@@ -224,7 +243,7 @@ make help     # Show all options
 
 - **"Connection refused"**: CoolerControl daemon not running → `sudo systemctl start coolercontrold`
 - **"Device not found"**: LCD AIO not configured in CoolerControl → Use CoolerControl GUI  
-- **"Permission denied"**: Run with appropriate permissions → `sudo ./aiolcdcam def`
+- **"Permission denied"**: Run with appropriate permissions → `sudo aiolcdcam def`
 - **"Empty JSON response"**: No devices found → Check CoolerControl configuration and LCD AIO connection
 - **"UUID not working"**: Wrong device UUID → Verify with `curl http://localhost:11987/devices | jq` and copy exact UUID
 
@@ -236,10 +255,10 @@ sudo systemctl status coolercontrold
 curl http://localhost:11987/devices
 
 # 2. Test LCD AIO CAM manually
-./aiolcdcam def
+aiolcdcam def
 
 # 3. Debug build for detailed information
-make debug && ./aiolcdcam def
+make debug && aiolcdcam def
 
 # 4. Check service logs
 sudo journalctl -u aiolcdcam.service -f
@@ -273,4 +292,5 @@ MIT License - See LICENSE file for details.
 
 **👨‍💻 Developed by DAMACHINE for maximum efficiency, stability and professional code structure.**  
 **📧 Contact:** [christkue79@gmail.com](mailto:christkue79@gmail.com)  
-**📖 Manual:** `man aiolcdcam`
+**📖 Manual:** `man aiolcdcam`  
+**📍 Binary:** `/opt/aiolcdcam/bin/aiolcdcam` (also available as `aiolcdcam`)

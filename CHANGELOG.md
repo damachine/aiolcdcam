@@ -10,17 +10,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.3] - 2025-01-26
 
 ### Added
+- **Arch Linux PKGBUILD**: Complete packaging for Arch User Repository (AUR)
+  - PKGBUILD with automatic dependency management
+  - aiolcdcam.install with post-installation instructions
+  - .SRCINFO metadata file for AUR publication
+  - PKGBUILD-local for local testing without source download
+  - Installation to /opt/aiolcdcam/ with symlink to /usr/bin/aiolcdcam
 - **C99 Compliance**: Complete C99 standard conformity with explicit feature test macros
 - **Display Mode Instructions**: Detailed instructions for switching between systemd and manual operation
 - **Standardized Include Paths**: All C source files use unified `../include/` paths
 - **English Documentation**: Complete translation of all documentation to English
 - **English Code Comments**: All source code comments and descriptions translated to English
+- **MIT License**: Added MIT license file for open source distribution
 
 ### Changed
 - **Documentation Overhaul**: Complete restructuring of README.md and man page
   - Clear order: Title → Description → Features → Installation → Configuration → Usage → Troubleshooting
   - Removal of redundant and legacy content
   - Clarification of UUID configuration before installation
+  - Added Arch Linux installation section with PKGBUILD and AUR options
 - **Installation Process**: Emphasis that config.h UUID must be set before `make install`
 - **Code Structure**: All C files standardized for strict C99 compliance
 - **Makefile**: Explicit `-std=c99` flag for C99 compliance
@@ -47,6 +55,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Legacy Content**: Removal of outdated build references and redundant documentation
 - **German Documentation**: Complete migration to English documentation
 - **Duplicate Instructions**: Elimination of duplicate setup instructions
+
+### Technical
+- **Package Structure**: Professional Arch Linux packaging following AUR standards
+- **Binary Installation**: /opt/aiolcdcam/bin/aiolcdcam with symlink to /usr/bin/aiolcdcam
+- **Source Code Availability**: Complete source code included for post-installation UUID configuration
+- **Dependency Management**: Automatic detection and installation of runtime dependencies
 
 ---
 
