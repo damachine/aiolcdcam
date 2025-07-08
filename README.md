@@ -110,7 +110,7 @@ Edit `include/config.h` for customization:
 #define TEMP_THRESHOLD_RED 75.0f
 ```
 
-## 🔧 Hinweise & Nützliches
+## 🔧 Usage & Tips
 
 ### Service Management
 
