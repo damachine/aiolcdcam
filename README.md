@@ -25,8 +25,18 @@ Transform your cooling system into an intelligent monitoring hub that keeps you 
 > - Features may change or break without notice
 > - Bugs and issues are expected
 > - **Currently tested only on developer's system with NZXT Kraken 2023**
+> - **Manual configuration required** - user-friendly setup tools planned for future
+> - **Command-line focused** - GUI configuration interface planned
+> - **Technical knowledge needed** - simplified installation process coming
 > - Use at your own risk and please report any issues
 > - Contributions and feedback are highly appreciated!
+
+### 🔮 **Planned User Experience Improvements:**
+- **🎛️ Configuration GUI**: Graphical interface for UUID and settings configuration
+- **🚀 One-click installer**: Automated setup without manual config editing
+- **📱 System tray integration**: Easy mode switching and status monitoring
+- **🎨 Theme system**: Visual customization of LCD displays
+- **📊 Configuration wizard**: Step-by-step guided setup process
 
 ### 📸 **Screenshot - Current LCD Output:**
 ![CPU/GPU Temperature Display](image/cpu_gpu_temp.png)
