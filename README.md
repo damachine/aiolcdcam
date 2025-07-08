@@ -53,7 +53,10 @@ git clone https://github.com/damachine/aiolcdcam.git
 cd aiolcdcam
 
 # STEP 2: Start CoolerControl and find your device UUID
+# First, ensure CoolerControl daemon is running (if not already started)
 sudo systemctl start coolercontrold
+
+# Then find your device UUID
 curl http://localhost:11987/devices | jq
 
 # STEP 3: Configure UUID in config.h (REQUIRED)
@@ -71,18 +74,31 @@ makepkg -si
 #### Manual Installation (All Distributions)
 
 ```bash
-# One-command installation (auto-detects Linux distribution and installs dependencies)
+# STEP 1: Clone repository
 git clone https://github.com/damachine/aiolcdcam.git
 cd aiolcdcam
-nano include/config.h
+
+# STEP 2: Start CoolerControl and find your device UUID (REQUIRED)
+# First, ensure CoolerControl daemon is running (if not already started)
+sudo systemctl start coolercontrold
+
+# Then find your device UUID
+curl http://localhost:11987/devices | jq
+
+# STEP 3: Configure UUID in config.h BEFORE building (CRITICAL!)
+nano include/config.h  # Set KRAKEN_UID to your device UUID
+
+# STEP 4: Build and install (auto-detects Linux distribution and installs dependencies)
 sudo make install
 
-# Enable autostart
+# STEP 5: Enable autostart
 sudo systemctl enable aiolcdcam.service
 
-# Start AIOLCDCAM
+# STEP 6: Start AIOLCDCAM
 sudo systemctl start aiolcdcam.service
 ```
+
+> **⚠️ IMPORTANT**: You MUST configure the UUID in `include/config.h` BEFORE running `sudo make install`, otherwise the daemon will not work!
 
 **Supported Distributions (Auto-Detected):**
 - **Arch Linux / Manjaro**: `pacman -S cairo libcurl-gnutls coolercontrol gcc make pkg-config`
@@ -97,10 +113,11 @@ sudo systemctl start aiolcdcam.service
 
 > **⚠️ CRITICAL**: You **MUST** configure your device UUID before first use!
 
-1. **Find your device UUID**: `curl http://localhost:11987/devices | jq`
-2. **Copy the UUID** from the JSON output (long hexadecimal string)
-3. **Edit** `include/config.h` and replace `KRAKEN_UID` with your device's UUID
-4. **Rebuild**: `make clean && sudo make install`
+1. **Start CoolerControl (if not running)**: `sudo systemctl start coolercontrold`
+2. **Find your device UUID**: `curl http://localhost:11987/devices | jq`
+3. **Copy the UUID** from the JSON output (long hexadecimal string)
+4. **Edit** `include/config.h` and replace `KRAKEN_UID` with your device's UUID
+5. **Rebuild**: `make clean && sudo make install`
 
 **Example CoolerControl API output:**
 ```json
@@ -280,6 +297,11 @@ sudo journalctl -u aiolcdcam.service -f
 ```bash
 # If curl command fails, ensure CoolerControl is running
 sudo systemctl status coolercontrold
+# If not running, start it:
+sudo systemctl start coolercontrold
+
+# Then try again
+curl http://localhost:11987/devices | jq
 
 # If no devices shown, check CoolerControl GUI configuration
 # Your LCD AIO must be detected and configured in CoolerControl first
