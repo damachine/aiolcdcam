@@ -1,0 +1,33 @@
+# Build artifacts
+build/
+bin/
+*.o
+
+# Release tarballs (created by create-release.sh)
+aiolcdcam-*.tar.gz
+
+# Arch package files (created by makepkg)
+*.pkg.tar.zst
+*.pkg.tar.xz
+pkg/
+src/
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.log
+.makepkg/
+
+# Local test files
+PKGBUILD-test
+test-*

@@ -12,8 +12,8 @@ optdepends=('nvidia-utils: for GPU temperature monitoring'
             'lm_sensors: for additional hardware monitoring')
 backup=('opt/aiolcdcam/README.md')
 install=aiolcdcam.install
-source=("$pkgname-$pkgver.tar.gz::https://github.com/damachine/$pkgname/archive/v$pkgver.tar.gz")
-sha256sums=('SKIP')  # Replace with actual checksum when releasing
+source=("$pkgname-$pkgver.tar.gz::https://github.com/damachine/$pkgname/releases/download/v$pkgver/$pkgname-$pkgver.tar.gz")
+sha256sums=('7aa5443164cf013913c1db31834598c0b91eb5c4718f775f4aaf50e3b59b178c')
 
 prepare() {
     cd "$pkgname-$pkgver"

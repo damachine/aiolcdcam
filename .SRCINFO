@@ -15,7 +15,7 @@ pkgbase = aiolcdcam
 	optdepends = nvidia-utils: for GPU temperature monitoring
 	optdepends = lm_sensors: for additional hardware monitoring
 	backup = opt/aiolcdcam/README.md
-	source = aiolcdcam-1.25.07.08.2234.tar.gz::https://github.com/damachine/aiolcdcam/archive/v1.25.07.08.2234.tar.gz
-	sha256sums = SKIP
+	source = aiolcdcam-1.25.07.08.2234.tar.gz::https://github.com/damachine/aiolcdcam/releases/download/v1.25.07.08.2234/aiolcdcam-1.25.07.08.2234.tar.gz
+	sha256sums = 7aa5443164cf013913c1db31834598c0b91eb5c4718f775f4aaf50e3b59b178c
 
 pkgname = aiolcdcam
