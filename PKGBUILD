@@ -18,7 +18,84 @@ sha256sums=('SKIP')  # Replace with actual checksum when releasing
 prepare() {
     cd "$pkgname-$pkgver"
     
-    # Inform user about UUID configuration requirement
+    echo "================================================================"
+    echo "Checking for existing manual installation..."
+    echo "================================================================"
+    
+    # Check if manual installation exists
+    local manual_installed=0
+    local manual_service_exists=0
+    local manual_binary_exists=0
+    
+    # Check for systemd service installed by Makefile
+    if [[ -f "/etc/systemd/system/aiolcdcam.service" ]]; then
+        echo "Found manual systemd service: /etc/systemd/system/aiolcdcam.service"
+        manual_service_exists=1
+        manual_installed=1
+    fi
+    
+    # Check for binary installed by Makefile
+    if [[ -f "/opt/aiolcdcam/bin/aiolcdcam" ]] && [[ ! -L "/usr/bin/aiolcdcam" ]]; then
+        echo "Found manual binary installation: /opt/aiolcdcam/bin/aiolcdcam"
+        manual_binary_exists=1
+        manual_installed=1
+    fi
+    
+    if [[ $manual_installed -eq 1 ]]; then
+        echo ""
+        echo "WARNING: Existing manual installation detected!"
+        echo "This will conflict with the PKGBUILD installation."
+        echo ""
+        echo "Attempting automatic cleanup with 'make uninstall'..."
+        echo ""
+        
+        # Try to run make uninstall if Makefile exists
+        if [[ -f "Makefile" ]]; then
+            # Stop service if running
+            if systemctl is-active --quiet aiolcdcam.service 2>/dev/null; then
+                echo "Stopping aiolcdcam service..."
+                sudo systemctl stop aiolcdcam.service || true
+            fi
+            
+            # Run make uninstall
+            echo "Running 'sudo make uninstall'..."
+            if sudo make uninstall; then
+                echo "✅ Manual installation successfully removed"
+            else
+                echo "⚠️  Make uninstall failed, attempting manual cleanup..."
+                
+                # Manual cleanup if make uninstall fails
+                sudo systemctl stop aiolcdcam.service 2>/dev/null || true
+                sudo systemctl disable aiolcdcam.service 2>/dev/null || true
+                sudo rm -f /etc/systemd/system/aiolcdcam.service
+                sudo rm -f /usr/share/man/man1/aiolcdcam.1
+                sudo rm -f /opt/aiolcdcam/bin/aiolcdcam
+                sudo rm -f /opt/aiolcdcam/README.md
+                sudo systemctl daemon-reload
+                
+                echo "✅ Manual cleanup completed"
+            fi
+        else
+            echo "⚠️  No Makefile found, performing manual cleanup..."
+            
+            # Manual cleanup
+            sudo systemctl stop aiolcdcam.service 2>/dev/null || true
+            sudo systemctl disable aiolcdcam.service 2>/dev/null || true
+            sudo rm -f /etc/systemd/system/aiolcdcam.service
+            sudo rm -f /usr/share/man/man1/aiolcdcam.1
+            sudo rm -f /opt/aiolcdcam/bin/aiolcdcam
+            sudo rm -f /opt/aiolcdcam/README.md
+            sudo systemctl daemon-reload
+            
+            echo "✅ Manual cleanup completed"
+        fi
+        
+        echo ""
+        echo "Proceeding with PKGBUILD installation..."
+    else
+        echo "✅ No conflicting manual installation found"
+    fi
+    
     echo "================================================================"
     echo "IMPORTANT: You MUST configure your device UUID before first use!"
     echo "================================================================"
