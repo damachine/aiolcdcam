@@ -9,9 +9,6 @@ This directory contains the necessary files for publishing LCD AIO CAM to the Ar
 - `aiolcdcam.install` - Post-installation scripts and user instructions
 - `.SRCINFO` - Generated metadata file for AUR (auto-generated from PKGBUILD)
 
-### Local Testing:
-- `PKGBUILD-local` - Modified PKGBUILD for local testing without downloading sources
-
 ## Publishing to AUR
 
 ### 1. Prepare AUR Repository
@@ -57,7 +54,7 @@ sudo systemctl status aiolcdcam.service
 git add PKGBUILD aiolcdcam.install .SRCINFO
 
 # Commit with meaningful message
-git commit -m "Initial release v0.1.3 - LCD AIO CAM daemon for NZXT Kraken"
+git commit -m "Initial release 1.25.07.08.2234 - LCD AIO CAM daemon for NZXT Kraken"
 
 # Push to AUR
 git push origin master
@@ -90,7 +87,7 @@ git push origin master
 makepkg -p PKGBUILD-local -s
 
 # Install locally built package
-sudo pacman -U aiolcdcam-0.1.3-1-x86_64.pkg.tar.zst
+sudo pacman -U aiolcdcam-1.25.07.08.2234-1-x86_64.pkg.tar.zst
 ```
 
 ## Notes

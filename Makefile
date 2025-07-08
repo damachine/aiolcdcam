@@ -1,8 +1,8 @@
 # Makefile for LCD AIO CAM (Standard C Project Structure)
 # LCD AIO CAM - Kraken LCD Temperature Monitor
 
-# Version
-VERSION = v0.1.1
+# Version (Format: 1.year.month.day.hourminute)
+VERSION = 1.25.07.08.2234
 
 CC = gcc
 CFLAGS = -Wall -Wextra -O2 -std=c99 -march=x86-64-v3 -Iinclude $(shell pkg-config --cflags cairo)

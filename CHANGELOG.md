@@ -3,7 +3,33 @@
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+and this project follows a custom versioning scheme: **1.year.month.day.hourminute**
+(e.g., 1.25.07.08.1759 = Year 2025, July 8th, 17:59)
+
+---
+
+## [1.25.07.08.2234] - 2025-07-08
+
+### Changed
+- **Version Update**: Updated to 1.25.07.08.2234 (current timestamp)
+  - Synchronized version across all files: Makefile, PKGBUILD, .SRCINFO, manpage, AUR-README.md
+  - Maintained consistency in timestamp-based versioning scheme
+
+---
+
+## [1.25.07.08.1759] - 2025-07-08
+
+### Changed
+- **Versioning Scheme**: Switched from semantic versioning to timestamp-based versioning
+  - New format: 1.year.month.day.hourminute (e.g., 1.25.07.08.1759)
+  - Updated Makefile, PKGBUILD, and all documentation
+  - Consistent version propagation across all build and configuration files
+- **Documentation**: Updated version references throughout all documentation
+
+### Technical
+- Version string format updated in Makefile with explanatory comment
+- PKGBUILD version updated for AUR consistency
+- All legacy version references standardized to new scheme
 
 ---
 

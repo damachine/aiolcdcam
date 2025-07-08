@@ -1,6 +1,6 @@
 # Maintainer: DAMACHINE <christkue79@gmail.com>
 pkgname=aiolcdcam
-pkgver=0.1.3
+pkgver=1.25.07.08.2234
 pkgrel=1
 pkgdesc="LCD AIO CAM - Modular C daemon for NZXT Kraken LCD temperature monitoring via CoolerControl"
 arch=('x86_64')
