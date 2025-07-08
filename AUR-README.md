@@ -37,11 +37,11 @@ makepkg -g
 
 ### 3. Test Package Locally
 ```bash
-# Test build process
+# Test build process (automatic cleanup included)
 makepkg -s
 
 # Test installation
-sudo pacman -U aiolcdcam-X.X.X-1-x86_64.pkg.tar.zst
+sudo pacman -U aiolcdcam-1.25.07.08.2234-1-x86_64.pkg.tar.zst
 
 # Test functionality
 aiolcdcam --help
@@ -74,21 +74,36 @@ git push origin master
 - **Documentation**: man page, README, changelog
 
 ### Post-Installation:
-- Automatic UUID configuration instructions
-- CoolerControl dependency verification
-- Service setup guidance
-- Upgrade handling with configuration preservation
+- **Automatic Cleanup**: PKGBUILD automatically detects and removes conflicting manual installations
+- **UUID Configuration**: Automatic instructions for device UUID setup
+- **CoolerControl Integration**: Dependency verification and setup guidance
+- **Service Management**: systemd service setup and upgrade handling
+- **Configuration Preservation**: Source code included for post-installation UUID reconfiguration
 
 ## Local Testing Instructions
 
-### Using PKGBUILD-local:
-```bash
-# Test local build
-makepkg -p PKGBUILD-local -s
+The PKGBUILD includes automatic cleanup of manual installations:
 
-# Install locally built package
-sudo pacman -U aiolcdcam-1.25.07.08.2234-1-x86_64.pkg.tar.zst
+```bash
+# Test local build (with automatic cleanup)
+makepkg -si
+
+# The build process will:
+# 1. Detect existing manual installations
+# 2. Automatically run 'sudo make uninstall' 
+# 3. Clean up any conflicts
+# 4. Proceed with PKGBUILD installation
 ```
+
+## Automatic Conflict Resolution
+
+The PKGBUILD now includes intelligent conflict detection:
+
+- **Detection**: Automatically finds manual installations via Makefile
+- **Cleanup**: Runs `sudo make uninstall` to cleanly remove conflicts
+- **Fallback**: Manual cleanup if make uninstall fails
+- **Transparency**: Detailed progress messages during cleanup
+- **Safety**: Only removes conflicting installations, preserves user data
 
 ## Notes
 

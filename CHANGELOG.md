@@ -10,10 +10,27 @@ and this project follows a custom versioning scheme: **1.year.month.day.hourminu
 
 ## [1.25.07.08.2234] - 2025-07-08
 
+### Added
+- **PKGBUILD Auto-Cleanup**: Automatic detection and removal of conflicting manual installations
+  - Intelligent detection of existing Makefile installations
+  - Automatic execution of `sudo make uninstall` for clean removal
+  - Fallback manual cleanup if make uninstall fails
+  - Detailed progress messages and conflict resolution
+  - Prevents installation conflicts between Makefile and PKGBUILD methods
+
 ### Changed
 - **Version Update**: Updated to 1.25.07.08.2234 (current timestamp)
   - Synchronized version across all files: Makefile, PKGBUILD, .SRCINFO, manpage, AUR-README.md
   - Maintained consistency in timestamp-based versioning scheme
+- **AUR Documentation**: Updated AUR-README.md to reflect automatic cleanup functionality
+  - Removed references to deprecated PKGBUILD-local
+  - Added documentation for automatic conflict resolution
+  - Updated installation instructions with new cleanup process
+
+### Technical
+- **PKGBUILD Enhancement**: Robust conflict detection in prepare() function
+- **Installation Safety**: Ensures clean transitions from manual to package installations
+- **User Experience**: No manual intervention required for installation conflicts
 
 ---
 
