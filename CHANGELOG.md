@@ -11,6 +11,18 @@ and this project follows a custom versioning scheme: **1.year.month.day.hourminu
 ## [1.25.07.08.2234] - 2025-07-08
 
 ### Added
+- **Beta Status Clarification**: Comprehensive beta warnings and user experience roadmap
+  - Prominent beta warning section in README.md with current limitations
+  - User experience improvement roadmap with planned features
+  - Clear indication that manual configuration and technical knowledge required
+  - Future GUI configuration interface and one-click installer planned
+  - System tray integration and theme system in development
+  - Screenshot of current LCD output on NZXT Kraken 2023
+- **GitHub Release Integration**: Complete GitHub Releases workflow
+  - create-release.sh script for automated release tarball generation
+  - PKGBUILD configured to use GitHub Releases tarball as source
+  - Correct SHA256 checksum updated after GitHub upload
+  - .gitignore created to exclude build artifacts and release files
 - **PKGBUILD Auto-Cleanup**: Automatic detection and removal of conflicting manual installations
   - Intelligent detection of existing Makefile installations
   - Automatic execution of `sudo make uninstall` for clean removal
@@ -19,26 +31,36 @@ and this project follows a custom versioning scheme: **1.year.month.day.hourminu
   - Prevents installation conflicts between Makefile and PKGBUILD methods
 
 ### Changed
-- **Version Update**: Updated to 1.25.07.08.2234 (current timestamp)
-  - Synchronized version across all files: Makefile, PKGBUILD, .SRCINFO, manpage, AUR-README.md
+- **Beta Documentation**: Updated all documentation to reflect early development status
+  - README.md: Added beta warning with development stage information
+  - PKGBUILD: Added (BETA) tag in package description
+  - AUR-README.md: Added beta warning and removed premature AUR publication instructions
+  - Clear indication this is tested only on developer's NZXT Kraken 2023 system
+- **AUR Publication Status**: Clarified NOT YET PUBLISHED status
+  - Removed premature AUR publication instructions from AUR-README.md
+  - Added comprehensive checklist for future AUR publication requirements
+  - Emphasized current focus on development and testing phase
+  - Added "Help Wanted" section for community testing
+- **Version Synchronization**: Updated to 1.25.07.08.2234 across all files
+  - Synchronized version across Makefile, PKGBUILD, .SRCINFO, manpage
   - Maintained consistency in timestamp-based versioning scheme
-- **AUR Documentation**: Updated AUR-README.md to reflect automatic cleanup functionality
-  - Removed references to deprecated PKGBUILD-local
-  - Added documentation for automatic conflict resolution
-  - Updated installation instructions with new cleanup process
-- **CRITICAL FIX**: Corrected UUID configuration instructions - UUID must be set BEFORE makepkg, not after installation
-  - Updated README.md Arch Linux installation section with proper step order
-  - Updated README.md Manual Installation section with detailed UUID configuration steps
-  - Added explicit warning that UUID must be configured BEFORE `sudo make install`
-  - Updated PKGBUILD prepare() function messages to emphasize pre-build UUID configuration
-  - Clear warning that UUID must be configured before running makepkg
-  - Step-by-step instructions for proper build order
-  - Post-installation reconfiguration option documented as fallback
+- **UUID Configuration Documentation**: Enhanced clarity on UUID setup requirements
+  - Emphasized UUID must be configured BEFORE building (not after installation)
+  - Updated both Arch Linux and manual installation instructions
+  - Added explicit warnings in PKGBUILD prepare() function
+  - Clear step-by-step order for proper configuration
 
 ### Technical
-- **PKGBUILD Enhancement**: Robust conflict detection in prepare() function
-- **Installation Safety**: Ensures clean transitions from manual to package installations
-- **User Experience**: No manual intervention required for installation conflicts
+- **Release Automation**: create-release.sh script for consistent GitHub Releases
+- **Build Artifact Management**: .gitignore excludes release tarballs and build files
+- **Package Conflict Resolution**: Enhanced PKGBUILD prepare() function with automatic cleanup
+- **Development Status**: Clear beta labeling across all user-facing documentation
+- **Source Distribution**: GitHub Releases tarball as canonical source for PKGBUILD
+
+### Removed
+- **Premature AUR Instructions**: Removed "Publishing to AUR" section from AUR-README.md
+- **Test PKGBUILD Files**: Cleaned up PKGBUILD-test, PKGBUILD-local, PKGBUILD-github-test files
+- **Redundant Documentation**: Eliminated duplicate setup instructions across files
 
 ---
 
