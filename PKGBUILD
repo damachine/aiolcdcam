@@ -97,13 +97,19 @@ prepare() {
     fi
     
     echo "================================================================"
-    echo "IMPORTANT: You MUST configure your device UUID before first use!"
+    echo "IMPORTANT: UUID CONFIGURATION REQUIRED BEFORE BUILD!"
     echo "================================================================"
+    echo "You MUST configure your device UUID in include/config.h BEFORE"
+    echo "running makepkg, otherwise the daemon will not work!"
+    echo ""
+    echo "Steps to configure UUID:"
     echo "1. Start CoolerControl: sudo systemctl start coolercontrold"
     echo "2. Find your UUID: curl http://localhost:11987/devices | jq"
-    echo "3. After installation, edit: /opt/aiolcdcam/include/config.h"
-    echo "4. Set KRAKEN_UID to your device's UUID"
-    echo "5. Rebuild: cd /opt/aiolcdcam && sudo make install"
+    echo "3. Edit include/config.h and set KRAKEN_UID to your device UUID"
+    echo "4. THEN run: makepkg -si"
+    echo ""
+    echo "Post-installation reconfiguration is also possible at:"
+    echo "/opt/aiolcdcam/include/config.h (rebuild with: cd /opt/aiolcdcam && sudo make install)"
     echo "================================================================"
 }
 

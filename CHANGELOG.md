@@ -26,6 +26,12 @@ and this project follows a custom versioning scheme: **1.year.month.day.hourminu
   - Removed references to deprecated PKGBUILD-local
   - Added documentation for automatic conflict resolution
   - Updated installation instructions with new cleanup process
+- **CRITICAL FIX**: Corrected UUID configuration instructions - UUID must be set BEFORE makepkg, not after installation
+  - Updated README.md Arch Linux installation section with proper step order
+  - Updated PKGBUILD prepare() function messages to emphasize pre-build UUID configuration
+  - Clear warning that UUID must be configured before running makepkg
+  - Step-by-step instructions for proper build order
+  - Post-installation reconfiguration option documented as fallback
 
 ### Technical
 - **PKGBUILD Enhancement**: Robust conflict detection in prepare() function

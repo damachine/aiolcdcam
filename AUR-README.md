@@ -35,15 +35,23 @@ makepkg --printsrcinfo > .SRCINFO
 makepkg -g
 ```
 
-### 3. Test Package Locally
+### 3. Configure UUID and Test Package Locally
+
+**CRITICAL: Configure UUID BEFORE building!**
+
 ```bash
-# Test build process (automatic cleanup included)
+# STEP 1: Configure device UUID (REQUIRED)
+sudo systemctl start coolercontrold
+curl http://localhost:11987/devices | jq
+nano include/config.h  # Set KRAKEN_UID to your device UUID
+
+# STEP 2: Test build process (automatic cleanup included)
 makepkg -s
 
-# Test installation
+# STEP 3: Test installation
 sudo pacman -U aiolcdcam-1.25.07.08.2234-1-x86_64.pkg.tar.zst
 
-# Test functionality
+# STEP 4: Test functionality
 aiolcdcam --help
 sudo systemctl status aiolcdcam.service
 ```
@@ -82,10 +90,21 @@ git push origin master
 
 ## Local Testing Instructions
 
-The PKGBUILD includes automatic cleanup of manual installations:
+**IMPORTANT: Configure UUID BEFORE building the package!**
 
 ```bash
-# Test local build (with automatic cleanup)
+# 1. FIRST: Configure your device UUID
+# Start CoolerControl
+sudo systemctl start coolercontrold
+
+# Find your device UUID
+curl http://localhost:11987/devices | jq
+
+# Edit config.h and set your UUID
+nano include/config.h
+# Replace KRAKEN_UID with your actual device UUID
+
+# 2. THEN: Build and install the package (with automatic cleanup)
 makepkg -si
 
 # The build process will:

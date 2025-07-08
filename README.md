@@ -48,15 +48,24 @@ Transform your cooling system into an intelligent monitoring hub that keeps you 
 #### Arch Linux (Recommended)
 
 ```bash
-# Option 1: Install via PKGBUILD (includes automatic dependency management)
+# STEP 1: Clone and configure UUID FIRST
 git clone https://github.com/damachine/aiolcdcam.git
 cd aiolcdcam
+
+# STEP 2: Start CoolerControl and find your device UUID
+sudo systemctl start coolercontrold
+curl http://localhost:11987/devices | jq
+
+# STEP 3: Configure UUID in config.h (REQUIRED)
+nano include/config.h  # Set KRAKEN_UID to your device UUID
+
+# STEP 4: Build and install (includes automatic dependency management)
 makepkg -si
 
 # Option 2: Install from AUR (when published)
-yay -S aiolcdcam
+# yay -S aiolcdcam
 # or
-paru -S aiolcdcam
+# paru -S aiolcdcam
 ```
 
 #### Manual Installation (All Distributions)
