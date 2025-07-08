@@ -12,18 +12,64 @@
 
 ## Files for AUR Publication
 
-This directory contains the necessary files for publishing LCD AIO CAM to the Arch User Repository (AUR):
+This directory contains the necessary files for **future** publishing to the Arch User Repository (AUR):
 
 ### Core Files:
 - `PKGBUILD` - Main package build script for AUR
 - `aiolcdcam.install` - Post-installation scripts and user instructions
 - `.SRCINFO` - Generated metadata file for AUR (auto-generated from PKGBUILD)
 
-## Publishing to AUR
+## 🚧 **Development & Testing Phase**
 
-### 1. Prepare AUR Repository
+**Current Status: NOT YET PUBLISHED TO AUR**
+
+This package is currently in development and testing phase. Before AUR publication, extensive testing is required on multiple systems and hardware configurations.
+
+### Local Testing Only
+### Local Testing Only
+
+**For developers and testers only - NOT for general use yet!**
+
 ```bash
-# Clone AUR repository (empty at first)
+# Test the PKGBUILD locally
+git clone https://github.com/damachine/aiolcdcam.git
+cd aiolcdcam
+
+# STEP 1: Configure device UUID (REQUIRED)
+sudo systemctl start coolercontrold
+curl http://localhost:11987/devices | jq
+nano include/config.h  # Set KRAKEN_UID to your device UUID
+
+# STEP 2: Test build process
+makepkg -s
+
+# STEP 3: Test installation (local only)
+sudo pacman -U aiolcdcam-1.25.07.08.2234-1-x86_64.pkg.tar.zst
+
+# STEP 4: Test functionality
+aiolcdcam --help
+sudo systemctl start aiolcdcam.service
+sudo systemctl status aiolcdcam.service
+```
+
+## 📋 **Future AUR Publication Checklist**
+
+Before publishing to AUR, the following requirements must be met:
+
+- [ ] **Multi-System Testing**: Test on various hardware configurations
+- [ ] **Extended Hardware Support**: Test with different NZXT Kraken models  
+- [ ] **Stability Testing**: Long-term stability and reliability verification
+- [ ] **Documentation**: Complete user documentation and troubleshooting guides
+- [ ] **Issue Resolution**: Address major bugs and compatibility issues
+- [ ] **Community Feedback**: Gather feedback from beta testers
+- [ ] **Code Review**: Final code review and optimization
+
+### Future AUR Workflow
+
+**When ready for AUR publication (NOT NOW):**
+
+```bash
+# Clone AUR repository (future)
 git clone ssh://aur@aur.archlinux.org/aiolcdcam.git aur-aiolcdcam
 cd aur-aiolcdcam
 
@@ -33,54 +79,34 @@ cp ../aiolcdcam/aiolcdcam.install .
 
 # Generate .SRCINFO
 makepkg --printsrcinfo > .SRCINFO
-```
 
-### 2. Update Version and Checksums
-```bash
-# For new releases, update PKGBUILD:
-# - pkgver=X.X.X
-# - sha256sums=(run 'makepkg -g' to generate)
-
-# Generate new checksums
+# Update checksums for release
 makepkg -g
-```
 
-### 3. Configure UUID and Test Package Locally
-
-**CRITICAL: Configure UUID BEFORE building!**
-
-```bash
-# STEP 1: Configure device UUID (REQUIRED)
-sudo systemctl start coolercontrold
-curl http://localhost:11987/devices | jq
-nano include/config.h  # Set KRAKEN_UID to your device UUID
-
-# STEP 2: Test build process (automatic cleanup included)
-makepkg -s
-
-# STEP 3: Test installation
-sudo pacman -U aiolcdcam-1.25.07.08.2234-1-x86_64.pkg.tar.zst
-
-# STEP 4: Test functionality
-aiolcdcam --help
-sudo systemctl status aiolcdcam.service
-```
-
-### 4. Publish to AUR
-```bash
-# Add all files
+# Publish to AUR
 git add PKGBUILD aiolcdcam.install .SRCINFO
-
-# Commit with meaningful message
-git commit -m "Initial release 1.25.07.08.2234 - LCD AIO CAM daemon for NZXT Kraken"
-
-# Push to AUR
+git commit -m "Initial release - LCD AIO CAM daemon for NZXT Kraken"
 git push origin master
 ```
 
-## Package Features
+## 🧪 **Current Testing Phase**
 
-### Dependencies:
+## 🧪 **Current Testing Phase**
+
+**This project is currently in beta testing phase:**
+
+- **Hardware Testing**: Currently tested only on developer's NZXT Kraken 2023
+- **Need Testers**: Looking for volunteers with different NZXT Kraken models
+- **Bug Reports**: Issues expected and should be reported on GitHub
+- **Feature Development**: Core features still being developed and refined
+
+**Help Wanted:**
+- Test on different NZXT Kraken models (X-Series, Z-Series)
+- Report compatibility issues
+- Suggest features and improvements
+- Documentation feedback
+
+## Package Architecture
 - **Runtime**: cairo, libcurl-gnutls, coolercontrol
 - **Build**: gcc, make, pkg-config
 - **Optional**: nvidia-utils (GPU monitoring), lm_sensors (additional sensors)
