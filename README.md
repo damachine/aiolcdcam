@@ -17,11 +17,26 @@ Transform your cooling system into an intelligent monitoring hub that keeps you 
 
 **🔧 Built with strict C99 compliance** for maximum portability and standards conformance.
 
-> **⚠️ Beta Notice:** This project is in early development stage. Features may change and bugs are expected. Please report issues and contribute to improve the software.
+---
+
+## ⚠️ **BETA SOFTWARE - EARLY DEVELOPMENT STAGE**
+
+> **🚧 This software is in very early development stage!**  
+> - Features may change or break without notice
+> - Bugs and issues are expected
+> - **Currently tested only on developer's system with NZXT Kraken 2023**
+> - Use at your own risk and please report any issues
+> - Contributions and feedback are highly appreciated!
+
+### 📸 **Screenshot - Current LCD Output:**
+![CPU/GPU Temperature Display](image/cpu_gpu_temp.png)
+*Live temperature monitoring on NZXT Kraken 2023 LCD display*
+
+---
 
 **👨‍💻 Author:** DAMACHINE ([christkue79@gmail.com](mailto:christkue79@gmail.com))  
-**🧪 Tested with:** NZXT Kraken 2023 (Z-Series)  
-**🔗 Compatible:** NZXT Kraken X-Series, Z-Series and other LCD-capable models
+**🧪 Tested with:** NZXT Kraken 2023 (Z-Series) - Developer's personal system  
+**🔗 Compatible:** NZXT Kraken X-Series, Z-Series and other LCD-capable models *(theoretical)*
 
 ## ✨ Features
 

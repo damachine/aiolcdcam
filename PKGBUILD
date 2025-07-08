@@ -2,7 +2,7 @@
 pkgname=aiolcdcam
 pkgver=1.25.07.08.2234
 pkgrel=1
-pkgdesc="LCD AIO CAM - Modular C daemon for NZXT Kraken LCD temperature monitoring via CoolerControl"
+pkgdesc="LCD AIO CAM - Modular C daemon for NZXT Kraken LCD temperature monitoring via CoolerControl (BETA)"
 arch=('x86_64')
 url="https://github.com/damachine/aiolcdcam"
 license=('MIT')
@@ -17,6 +17,19 @@ sha256sums=('0019dfc4b32d63c1392aa264aed2253c1e0c2fb09216f8e2cc269bbfb8bb49b5')
 
 prepare() {
     cd "$pkgname-$pkgver"
+    
+    echo "================================================================"
+    echo "⚠️  BETA SOFTWARE - EARLY DEVELOPMENT STAGE"
+    echo "================================================================"
+    echo "This software is in very early development and has been tested"
+    echo "only on the developer's system with NZXT Kraken 2023."
+    echo ""
+    echo "- Features may change or break without notice"
+    echo "- Bugs and issues are expected"
+    echo "- Use at your own risk"
+    echo "- Please report issues to: https://github.com/damachine/aiolcdcam/issues"
+    echo "================================================================"
+    echo ""
     
     echo "================================================================"
     echo "Checking for existing manual installation..."

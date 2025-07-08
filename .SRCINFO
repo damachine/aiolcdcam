@@ -1,5 +1,5 @@
 pkgbase = aiolcdcam
-	pkgdesc = LCD AIO CAM - Modular C daemon for NZXT Kraken LCD temperature monitoring via CoolerControl
+	pkgdesc = LCD AIO CAM - Modular C daemon for NZXT Kraken LCD temperature monitoring via CoolerControl (BETA)
 	pkgver = 1.25.07.08.2234
 	pkgrel = 1
 	url = https://github.com/damachine/aiolcdcam

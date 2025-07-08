@@ -1,5 +1,15 @@
 # AUR Package Instructions
 
+## ⚠️ **BETA SOFTWARE WARNING**
+
+**This package is in early development stage!**
+- Currently tested only on developer's NZXT Kraken 2023
+- Features may change or break without notice
+- Use at your own risk and report issues
+
+![LCD Display Output](image/cpu_gpu_temp.png)
+*Current LCD output on NZXT Kraken 2023*
+
 ## Files for AUR Publication
 
 This directory contains the necessary files for publishing LCD AIO CAM to the Arch User Repository (AUR):
