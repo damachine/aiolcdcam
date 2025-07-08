@@ -22,6 +22,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **English Documentation**: Complete translation of all documentation to English
 - **English Code Comments**: All source code comments and descriptions translated to English
 - **MIT License**: Added MIT license file for open source distribution
+- **Donation Support**: Added cryptocurrency donation support (Bitcoin and Dogecoin)
+  - GitHub FUNDING.yml for integrated donation links
+  - README section with wallet addresses and support options
 
 ### Changed
 - **Documentation Overhaul**: Complete restructuring of README.md and man page

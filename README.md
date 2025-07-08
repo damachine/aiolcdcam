@@ -288,9 +288,26 @@ curl http://localhost:11987/devices | jq
 
 MIT License - See LICENSE file for details.
 
+## 💝 Support the Project
+
+If you find LCD AIO CAM useful and want to support its development:
+
+### 🪙 Cryptocurrency Donations:
+- **Bitcoin (BTC)**: `13WjpWQMGG5sg3vTJJnCX3cXzwf2vZddKo`
+- **Dogecoin (DOGE)**: `DRSY4cA8eCALn819MjWLbwaePFNti9oS3y`
+
+### 🤝 Other Ways to Support:
+- ⭐ **Star this repository** on GitHub
+- 🐛 **Report bugs** and suggest improvements  
+- 🔄 **Share** the project with others
+- 📝 **Contribute** code or documentation
+
+> *All donations help maintain and improve this project. Thank you for your support!*
+
 ---
 
 **👨‍💻 Developed by DAMACHINE for maximum efficiency, stability and professional code structure.**  
 **📧 Contact:** [christkue79@gmail.com](mailto:christkue79@gmail.com)  
 **📖 Manual:** `man aiolcdcam`  
-**📍 Binary:** `/opt/aiolcdcam/bin/aiolcdcam` (also available as `aiolcdcam`)
+**📍 Binary:** `/opt/aiolcdcam/bin/aiolcdcam` (also available as `aiolcdcam`)  
+**💝 Donate:** BTC: `13WjpWQMGG5sg3vTJJnCX3cXzwf2vZddKo` | DOGE: `DRSY4cA8eCALn819MjWLbwaePFNti9oS3y`
