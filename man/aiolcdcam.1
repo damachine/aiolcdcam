@@ -154,83 +154,76 @@ CPU load: Stateful between measurements.
 Display updates only on significant changes (0.1°C for temperatures, 0.5% for load).
 
 .SH CONFIGURATION
-All important settings are located in the build-time configuration:
+All important settings are located in the build-time configuration file \fBinclude/config.h\fR:
 .TP
-.I Device UID
-NZXT Kraken device identification (found via CoolerControl API)
+.B Device UID (REQUIRED)
+NZXT Kraken device identification found via: \fBcurl http://localhost:11987/devices | jq\fR
+.br
+Copy the long UUID string and replace KRAKEN_UID in include/config.h
 .TP
-.I API Settings
+.B API Settings
 CoolerControl daemon address (default: http://localhost:11987)
 .TP
-.I Display settings
+.B Display settings
 Resolution (240x240), update intervals, layout parameters
 .TP
-.I Temperature thresholds
+.B Temperature thresholds
 Color gradient thresholds for green/orange/red display
 .TP
-.I Cache intervals
+.B Cache intervals
 Optimization of sensor query frequency
-.TP
-.B Device UID Configuration
-The device UID can be found using:
-.B curl http://localhost:11987/devices | jq
-.br
-Update KRAKEN_UID in include/config.h with your device's UID
+
 .SH DEPENDENCIES
-The program requires the following components:
 .TP
-.B CoolerControl
-Must be installed and running (coolercontrold.service). Follow installation guide at:
-https://gitlab.com/coolercontrol/coolercontrol/-/blob/main/README.md
+.B CoolerControl (REQUIRED)
+Must be installed and running (coolercontrold.service)
+.br
+Installation guide: https://gitlab.com/coolercontrol/coolercontrol/-/blob/main/README.md
 .TP
-.B NVIDIA-SMI
-For GPU temperature measurement (with NVIDIA graphics cards)
-.TP
-.B Cairo Library
-For image generation
-.TP
-.B cURL
-For REST API communication
+.B System Libraries
+Cairo (graphics), cURL (HTTP), NVIDIA-SMI (GPU data), hwmon (temperature sensors)
+
 .SH COMPILATION
-The program is built with the following compiler flags and libraries:
 .TP
-.B Compiler Flags:
-\-Wall \-Wextra \-O2 \-std=c99 \-march=x86-64-v3 plus Cairo-specific includes
-.TP
-.B x86-64-v3 Optimization:
-Compiled for modern CPUs (Intel Haswell+/AMD Excavator+, 2013+) with extended instruction sets (AVX2, BMI1/2, FMA)
-.TP
-.B Libraries:
-libcairo, libcurl, libm (math library)
-.TP
-.B Build Command:
+.B Build Command
 .B make
-(automatically uses x86-64-v3 optimization)
+(automatically detects and installs dependencies for your Linux distribution)
+.TP
+.B System Installation
+.B sudo make install
+(builds, installs to /opt/aiolcdcam/, configures systemd service)
+.TP
+.B CPU Optimization
+x86-64-v3 optimized for modern CPUs (Intel Haswell+/AMD Excavator+, 2013+)
+.br
+For older CPUs: \fBCFLAGS=-march=x86-64 make\fR
+
 .SH PERFORMANCE
-The program is optimized for minimal resource consumption:
+.TP
+.B Mode-dependent I/O
+Mode "def": Only temperature sensors (minimal I/O)
+.br
+Modes 1-3: Additional CPU/GPU/RAM load data
 .TP
 .B Sensor Caching
-Hwmon paths are determined and cached once at startup
-.TP
-.B GPU Data Caching
-GPU data is updated only every 2 seconds
+Hwmon paths cached at startup, GPU data cached for 2 seconds
 .TP
 .B Change Detection
-PNG is regenerated only on significant temperature/load changes
-.SH CONFIGURATION
-The program reads temperatures from:
+PNG regenerated only on significant temperature/load changes
+
+.SH DATA SOURCES
 .TP
 .I /sys/class/hwmon/*/temp*_input
 CPU and coolant temperatures
 .TP
 .B nvidia-smi
-GPU temperature and load
+GPU temperature and load (NVIDIA cards)
 .TP
 .I /proc/stat
-CPU load
+CPU usage percentage
 .TP
 .I /proc/meminfo
-RAM usage
+RAM usage information
 .SH SIGNALS
 .TP
 .B SIGTERM, SIGINT
@@ -259,34 +252,31 @@ Released under MIT License.
 .SH SETUP
 Before using aiolcdcam, ensure CoolerControl is properly configured:
 .TP
-.B 1. Install CoolerControl
-Follow the installation guide at: https://gitlab.com/coolercontrol/coolercontrol/-/blob/main/README.md
-.TP
-.B 2. Start CoolerControl daemon
-.B sudo systemctl start coolercontrold
-.TP
-.B 3. Configure LCD AIO device
-Use the CoolerControl GUI to detect and configure your LCD AIO device
-.TP
-.B 4. Set LCD to Image mode
-In CoolerControl GUI, set your AIO LCD display to "Image" mode (not temperature or other modes)
-.TP
-.B 5. Find your device UUID
-.B curl http://localhost:11987/devices | jq
+.B 1. Install and start CoolerControl
+Follow: https://gitlab.com/coolercontrol/coolercontrol/-/blob/main/README.md
 .br
-Copy the long UUID string from the JSON output
+\fBsudo systemctl start coolercontrold\fR
 .TP
-.B 6. Configure device UUID
-Edit include/config.h and replace KRAKEN_UID with your device's UUID
-.br
-Tested with: NZXT Kraken 2023 (Z-Series)
-.br
-Compatible with: NZXT Kraken X, Z-Series and other LCD-capable models
+.B 2. Configure LCD AIO in CoolerControl GUI
+Set your AIO LCD display to "Image" mode (not temperature mode)
 .TP
-.B 7. Rebuild and install
-.B make clean && sudo make install
-.TP
-.B 8. Verify API access
-.B curl http://localhost:11987/devices
+.B 3. Configure device UUID in include/config.h
+Find UUID: \fBcurl http://localhost:11987/devices | jq\fR
 .br
-Should return your configured devices
+Copy the long UUID string and replace KRAKEN_UID in include/config.h
+.TP
+.B 4. Build and install
+\fBnano include/config.h\fR (set UUID)
+.br
+\fBsudo make install\fR
+.br
+\fBsudo systemctl enable aiolcdcam.service\fR
+.br
+\fBsudo systemctl start aiolcdcam.service\fR
+
+.TP
+.B Tested with
+NZXT Kraken 2023 (Z-Series)
+.TP
+.B Compatible with
+NZXT Kraken X-Series, Z-Series and other LCD-capable models
