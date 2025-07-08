@@ -26,7 +26,6 @@ This directory contains the necessary files for **future** publishing to the Arc
 This package is currently in development and testing phase. Before AUR publication, extensive testing is required on multiple systems and hardware configurations.
 
 ### Local Testing Only
-### Local Testing Only
 
 **For developers and testers only - NOT for general use yet!**
 
