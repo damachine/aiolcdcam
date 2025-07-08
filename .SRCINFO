@@ -1,0 +1,21 @@
+pkgbase = aiolcdcam
+	pkgdesc = LCD AIO CAM - Modular C daemon for NZXT Kraken LCD temperature monitoring via CoolerControl
+	pkgver = 0.1.3
+	pkgrel = 1
+	url = https://github.com/damachine/aiolcdcam
+	install = aiolcdcam.install
+	arch = x86_64
+	license = MIT
+	makedepends = gcc
+	makedepends = make
+	makedepends = pkg-config
+	depends = cairo
+	depends = libcurl-gnutls
+	depends = coolercontrol
+	optdepends = nvidia-utils: for GPU temperature monitoring
+	optdepends = lm_sensors: for additional hardware monitoring
+	backup = opt/aiolcdcam/README.md
+	source = aiolcdcam-0.1.3.tar.gz::https://github.com/damachine/aiolcdcam/archive/v0.1.3.tar.gz
+	sha256sums = SKIP
+
+pkgname = aiolcdcam

@@ -1,0 +1,73 @@
+post_install() {
+    echo ""
+    echo "========================================================================"
+    echo "LCD AIO CAM has been installed successfully!"
+    echo "========================================================================"
+    echo ""
+    echo "⚠️  CRITICAL: You MUST configure your device UUID before first use!"
+    echo ""
+    echo "1. Install and start CoolerControl (if not already done):"
+    echo "   sudo pacman -S coolercontrol"
+    echo "   sudo systemctl start coolercontrold"
+    echo "   sudo systemctl enable coolercontrold"
+    echo ""
+    echo "2. Configure your LCD AIO in CoolerControl GUI"
+    echo "   - Set LCD display to 'Image' mode"
+    echo ""
+    echo "3. Find your device UUID:"
+    echo "   curl http://localhost:11987/devices | jq"
+    echo ""
+    echo "4. Configure the UUID:"
+    echo "   sudo nano /opt/aiolcdcam/include/config.h"
+    echo "   - Replace KRAKEN_UID with your device's UUID"
+    echo ""
+    echo "5. Rebuild the configuration:"
+    echo "   cd /opt/aiolcdcam"
+    echo "   sudo make install"
+    echo ""
+    echo "6. Start the service:"
+    echo "   sudo systemctl enable aiolcdcam.service"
+    echo "   sudo systemctl start aiolcdcam.service"
+    echo ""
+    echo "📍 Binary: /opt/aiolcdcam/bin/aiolcdcam (also available as 'aiolcdcam')"
+    echo "📖 Manual: man aiolcdcam"
+    echo "📧 Support: christkue79@gmail.com"
+    echo "========================================================================"
+}
+
+post_upgrade() {
+    echo ""
+    echo "LCD AIO CAM has been upgraded to version $1"
+    echo ""
+    echo "⚠️  If you have configuration changes, they may need to be re-applied."
+    echo "    Check /opt/aiolcdcam/include/config.h for your UUID configuration."
+    echo ""
+    echo "📍 Binary: /opt/aiolcdcam/bin/aiolcdcam (also available as 'aiolcdcam')"
+    echo ""
+    echo "Restart the service to apply changes:"
+    echo "   sudo systemctl restart aiolcdcam.service"
+}
+
+pre_remove() {
+    # Stop service before removal
+    if systemctl is-active --quiet aiolcdcam.service; then
+        echo "Stopping aiolcdcam service..."
+        systemctl stop aiolcdcam.service
+    fi
+    
+    if systemctl is-enabled --quiet aiolcdcam.service; then
+        echo "Disabling aiolcdcam service..."
+        systemctl disable aiolcdcam.service
+    fi
+}
+
+post_remove() {
+    echo ""
+    echo "LCD AIO CAM has been removed."
+    echo ""
+    echo "Note: Configuration files in /opt/aiolcdcam/ may have been preserved."
+    echo "      Remove manually if no longer needed: sudo rm -rf /opt/aiolcdcam"
+    echo ""
+    echo "systemd service files have been removed."
+    echo "Run 'sudo systemctl daemon-reload' to refresh systemd."
+}
