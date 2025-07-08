@@ -1,5 +1,5 @@
-#define _XOPEN_SOURCE 700
-#define _GNU_SOURCE
+#define _POSIX_C_SOURCE 200112L
+#define _XOPEN_SOURCE 600
 #include <unistd.h>
 #include <signal.h>
 #include <sys/types.h>
@@ -11,30 +11,30 @@
 #include <errno.h>
 
 /**
- * LCD AIO CAM - Hauptprogramm
- * ===========================
+ * LCD AIO CAM - Main Program
+ * ==========================
  * 
- * Professioneller, modularer C-Daemon für NZXT Kraken LCD Temperature Monitor.
- * Zeigt CPU/GPU-Temperaturen und optional Auslastungsdaten auf dem LCD-Display an.
+ * Professional, modular C daemon for NZXT Kraken LCD Temperature Monitor.
+ * Displays CPU/GPU temperatures and optional load data on LCD display.
  * 
- * Kompiliert mit: make
- * Oder manuell: gcc -Wall -Wextra -O2 -std=c99 main.c cpu_monitor.c gpu_monitor.c 
+ * Compile with: make
+ * Or manually: gcc -Wall -Wextra -O2 -std=c99 main.c cpu_monitor.c gpu_monitor.c 
  *               coolant_monitor.c display.c coolercontrol.c -o aiolcdcam -lcairo -lcurl -lm
  * 
- * Modi:
- *   def - Nur Temperaturen (CPU, GPU, Coolant)
- *   1   - Temperaturen + vertikale Auslastungsbalken 
- *   2   - Temperaturen + Kreisdiagramme für Auslastung
- *   3   - Temperaturen + horizontale Auslastungsbalken
+ * Modes:
+ *   def - Temperatures only (CPU, GPU, Coolant)
+ *   1   - Temperatures + vertical load bars 
+ *   2   - Temperatures + circular diagrams for load
+ *   3   - Temperatures + horizontal load bars
  *
- * Single-Instance-Enforcement:
- *   - Nur eine Instanz von aiolcdcam kann gleichzeitig laufen
- *   - Bei manuellem Start: Fehler wenn systemd Service läuft
- *   - Bei systemd Start: Beendet vorherige manuelle Instanzen
- *   - PID-Datei koordiniert die Instanzverwaltung
+ * Single-Instance Enforcement:
+ *   - Only one aiolcdcam instance can run simultaneously
+ *   - Manual start: Error if systemd service is running
+ *   - systemd start: Terminates previous manual instances
+ *   - PID file coordinates instance management
  */
 
-// Module einbinden
+// Include modules
 #include "../include/config.h"
 #include "../include/cpu_monitor.h"
 #include "../include/gpu_monitor.h"
@@ -42,18 +42,18 @@
 #include "../include/display.h"
 #include "../include/coolercontrol.h"
 
-// Globale Variablen für Daemon-Management
-static volatile sig_atomic_t running = 1; // Flag, ob der Daemon läuft
-static volatile sig_atomic_t shutdown_sent = 0; // Flag, ob Shutdown-Image bereits gesendet wurde
-static const char *pid_file = PID_FILE; // PID-Datei für den Daemon
+// Global variables for daemon management
+static volatile sig_atomic_t running = 1; // flag whether daemon is running
+static volatile sig_atomic_t shutdown_sent = 0; // flag whether shutdown image was already sent
+static const char *pid_file = PID_FILE; // PID file for daemon
 
 /**
- * Signal-Handler für sauberes Beenden des Daemons mit Shutdown-Image
+ * Signal handler for clean daemon termination with shutdown image
  */
 static void cleanup_and_exit(int sig) {
-    (void)sig; // Parameter wird nicht verwendet
+    (void)sig; // parameter is not used
     
-    // Sende Shutdown-Image nur einmal
+    // Send shutdown image only once
     if (!shutdown_sent && is_session_initialized()) {
         const char* shutdown_image = "/opt/aiolcdcam/image/face.png";
         printf("LCD AIO CAM: Sending shutdown image to Kraken LCD...\n");
@@ -61,45 +61,45 @@ static void cleanup_and_exit(int sig) {
         
         if (send_image_to_lcd(shutdown_image, KRAKEN_UID)) {
             printf("LCD AIO CAM: Shutdown image sent successfully\n");
-            shutdown_sent = 1; // Flag setzen, damit es nur einmal gesendet wird
+            shutdown_sent = 1; // set flag so it's only sent once
         } else {
             printf("LCD AIO CAM: Warning - Could not send shutdown image\n");
         }
         fflush(stdout);
     }
     
-    unlink(pid_file); // Entferne die PID-Datei
-    running = 0; // Setze Flag zum Beenden des Daemons
+    unlink(pid_file); // remove PID file
+    running = 0; // set flag to terminate daemon
 }
 
 /**
- * Prüft auf bereits laufende Instanz und handhabe je nach Start-Typ
- * - Bei systemd Service: Beendet immer vorherige Instanz
- * - Bei manuellem Start: Verhindert Start wenn Service läuft, beendet andere manuelle Instanzen
+ * Check for existing instance and handle based on start type
+ * - systemd service: Always terminates previous instance
+ * - Manual start: Prevents start if service is running, terminates other manual instances
  */
 static int check_existing_instance_and_handle(const char *pid_file, int is_service_start) {
     FILE *f = fopen(pid_file, "r");
-    if (!f) return 0; // Keine PID-Datei gefunden - alles ok
+    if (!f) return 0; // No PID file found - all ok
     
     pid_t old_pid;
     if (fscanf(f, "%d", &old_pid) != 1) {
         fclose(f);
-        unlink(pid_file); // Ungültige PID-Datei entfernen
+        unlink(pid_file); // Remove invalid PID file
         return 0;
     }
     fclose(f);
     
-    // Prüfe, ob die PID noch aktiv ist
+    // Check if PID is still active
     if (kill(old_pid, 0) != 0) {
         if (errno == ESRCH) {
-            // Prozess existiert nicht mehr - alte PID-Datei entfernen
+            // Process no longer exists - remove old PID file
             unlink(pid_file);
             return 0;
         }
-        // Bei EPERM existiert der Prozess wahrscheinlich (root process)
+        // With EPERM process probably exists (root process)
     }
     
-    // Prüfe, ob es sich um einen systemd Service-Prozess handelt
+    // Check if it's a systemd service process
     char cmdline_path[256];
     snprintf(cmdline_path, sizeof(cmdline_path), "/proc/%d/cmdline", old_pid);
     FILE *cmdline_f = fopen(cmdline_path, "r");
@@ -108,7 +108,7 @@ static int check_existing_instance_and_handle(const char *pid_file, int is_servi
     if (cmdline_f) {
         char cmdline[512] = {0};
         if (fread(cmdline, 1, sizeof(cmdline)-1, cmdline_f) > 0) {
-            // Prüfe ob es von systemd gestartet wurde (enthält /opt/aiolcdcam/bin/aiolcdcam)
+            // Check if started by systemd (contains /opt/aiolcdcam/bin/aiolcdcam)
             if (strstr(cmdline, "/opt/aiolcdcam/bin/aiolcdcam") != NULL) {
                 is_existing_service = 1;
             }
@@ -117,17 +117,17 @@ static int check_existing_instance_and_handle(const char *pid_file, int is_servi
     }
     
     if (is_service_start) {
-        // systemd Service startet: Beende immer vorherige Instanz
+        // systemd service starting: Always terminate previous instance
         printf("LCD AIO CAM: Service starting, terminating existing instance (PID %d)...\n", old_pid);
         kill(old_pid, SIGTERM);
         
-        // Warte auf saubere Beendigung
-        for (int i = 0; i < 50; i++) { // Max 5 Sekunden warten
-            if (kill(old_pid, 0) != 0) break; // Prozess beendet
-            usleep(100000); // 100ms warten
+        // Wait for clean termination
+        for (int i = 0; i < 50; i++) { // Wait max 5 seconds
+            if (kill(old_pid, 0) != 0) break; // Process terminated
+            usleep(100000); // wait 100ms
         }
         
-        // Falls immer noch aktiv, erzwinge Beendigung
+        // If still active, force termination
         if (kill(old_pid, 0) == 0) {
             printf("LCD AIO CAM: Force-killing stubborn instance...\n");
             kill(old_pid, SIGKILL);
@@ -138,24 +138,24 @@ static int check_existing_instance_and_handle(const char *pid_file, int is_servi
         unlink(pid_file);
         return 0;
     } else {
-        // Manueller Start: Prüfe ob Service läuft
+        // Manual start: Check if service is running
         if (is_existing_service) {
             printf("LCD AIO CAM: Error - systemd service is already running (PID %d)\n", old_pid);
             printf("Stop the service first: sudo systemctl stop aiolcdcam.service\n");
             printf("Or check status: sudo systemctl status aiolcdcam.service\n");
-            return -1; // Fehler: Service läuft bereits
+            return -1; // Error: Service already running
         } else {
-            // Andere manuelle Instanz läuft: Beende sie
+            // Other manual instance running: Terminate it
             printf("LCD AIO CAM: Terminating existing manual instance (PID %d)...\n", old_pid);
             kill(old_pid, SIGTERM);
             
-            // Warte auf saubere Beendigung
-            for (int i = 0; i < 50; i++) { // Max 5 Sekunden warten
-                if (kill(old_pid, 0) != 0) break; // Prozess beendet
-                usleep(100000); // 100ms warten
+            // Wait for clean termination
+            for (int i = 0; i < 50; i++) { // Wait max 5 seconds
+                if (kill(old_pid, 0) != 0) break; // Process terminated
+                usleep(100000); // wait 100ms
             }
             
-            // Falls immer noch aktiv, erzwinge Beendigung
+            // If still active, force termination
             if (kill(old_pid, 0) == 0) {
                 printf("LCD AIO CAM: Force-killing stubborn manual instance...\n");
                 kill(old_pid, SIGKILL);
@@ -170,7 +170,7 @@ static int check_existing_instance_and_handle(const char *pid_file, int is_servi
 }
 
 /**
- * Schreibt die aktuelle PID in die PID-Datei
+ * Write current PID to PID file
  */
 static void write_pid_file(const char *pid_file) {
     FILE *f = fopen(pid_file, "w");
@@ -190,18 +190,18 @@ static int run_daemon(display_mode_t mode) {
     printf("Daemon now running silently in background...\n\n");
     fflush(stdout);
     
-    while (running) { // Hauptschleife des Daemons
-        draw_combined_image(mode); // Zeichne das kombinierte Bild basierend auf dem Modus
-        struct timespec ts = {DISPLAY_REFRESH_INTERVAL_SEC, DISPLAY_REFRESH_INTERVAL_NSEC}; // Wartezeit für die Aktualisierung
-        nanosleep(&ts, NULL); // Warten für die angegebene Zeit
+    while (running) { // Main daemon loop
+        draw_combined_image(mode); // Draw combined image based on mode
+        struct timespec ts = {DISPLAY_REFRESH_INTERVAL_SEC, DISPLAY_REFRESH_INTERVAL_NSEC}; // Wait time for update
+        nanosleep(&ts, NULL); // Wait for specified time
     }
     
-    // Stilles Beenden ohne Ausgabe
+    // Silent termination without output
     return 0;
 }
 
 /**
- * Zeigt die Hilfe an und erklärt die Verwendung des Programms
+ * Show help and explain program usage
  */
 static void show_help(const char *program_name) {
     printf("LCD AIO CAM - Complete NZXT Kraken LCD Temperature Monitor\n\n");
@@ -225,30 +225,30 @@ static void show_help(const char *program_name) {
            DISPLAY_REFRESH_INTERVAL_SEC, DISPLAY_REFRESH_INTERVAL_NSEC / 100000000);
     printf("To stop: sudo systemctl stop aiolcdcam\n");
 }/**
- * Erkennt, ob wir von systemd gestartet wurden
+ * Detect if we were started by systemd
  */
 static int is_started_by_systemd(void) {
-    // Einfache und zuverlässige Methode: Prüfe, ob unser Parent-Prozess PID 1 (init/systemd) ist
+    // Simple and reliable method: Check if our parent process is PID 1 (init/systemd)
     return (getppid() == 1);
 }
 
 /**
- * Hauptfunktion des Programms
+ * Main function
  */
 int main(int argc, char *argv[]) {
-    // Hilfe anzeigen
+    // Show help
     if (argc > 1 && (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0)) {
         show_help(argv[0]);
         return 0;
     }
     
-    // Display-Modus parsen - unterstützt beide Formate:
-    // ./aiolcdcam def      oder    ./aiolcdcam --mode def
-    // ./aiolcdcam 1        oder    ./aiolcdcam --mode 1
-    // ./aiolcdcam 2        oder    ./aiolcdcam --mode 2
-    // ./aiolcdcam 3        oder    ./aiolcdcam --mode 3
-    // Standardmodus ist "def" (nur Temperaturen, ressourcenschonend)
-    const char *mode_str = "def"; // Standard Modus
+    // Parse display mode - supports both formats:
+    // ./aiolcdcam def      or    ./aiolcdcam --mode def
+    // ./aiolcdcam 1        or    ./aiolcdcam --mode 1
+    // ./aiolcdcam 2        or    ./aiolcdcam --mode 2
+    // ./aiolcdcam 3        or    ./aiolcdcam --mode 3
+    // Default mode is "def" (temperatures only, resource-efficient)
+    const char *mode_str = "def"; // default mode
     
     if (argc > 1) { // Check if a parameter is provided
         // Check if the first parameter is --mode
@@ -299,16 +299,16 @@ int main(int argc, char *argv[]) {
     }
     fflush(stdout);
     
-    // Prüfe, ob wir von systemd gestartet wurden
+    // Check if we were started by systemd
     int is_service_start = is_started_by_systemd();
     
-    // Single-Instance-Enforcement: Prüfe und handhabe bereits laufende Instanzen
+    // Single-Instance Enforcement: Check and handle existing instances
     if (check_existing_instance_and_handle(pid_file, is_service_start) < 0) {
-        // Fehler: Service läuft bereits und wir sind manueller Start
+        // Error: Service already running and we are manual start
         return 1;
     }
     
-    // Schreibe neue PID-Datei
+    // Write new PID file
     write_pid_file(pid_file);
     
     // Register signal handlers
@@ -365,10 +365,10 @@ int main(int argc, char *argv[]) {
     printf("All modules successfully initialized!\n\n");
     fflush(stdout);
     
-    // Daemon starten
+    // Start daemon
     int result = run_daemon(mode);
     
-    // Cleanup - sende Shutdown-Image falls noch nicht gesendet (nur bei normaler Beendigung)
+    // Cleanup - send shutdown image if not sent yet (only on normal termination)
     if (!shutdown_sent && is_session_initialized()) {
         const char* shutdown_image = "/opt/aiolcdcam/image/face.png";
         printf("LCD AIO CAM: Sending final shutdown image...\n");
@@ -380,8 +380,8 @@ int main(int argc, char *argv[]) {
         fflush(stdout);
     }
     
-    cleanup_coolercontrol_session(); // CoolerControl-Session beenden
-    cleanup_and_exit(0); // PID-Datei entfernen und Daemon beenden
+    cleanup_coolercontrol_session(); // Terminate CoolerControl session
+    cleanup_and_exit(0); // Remove PID file and terminate daemon
     
     return result;
 }

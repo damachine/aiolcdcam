@@ -1,5 +1,5 @@
-#include "coolercontrol.h"
-#include "config.h"
+#include "../include/coolercontrol.h"
+#include "../include/config.h"
 #include <curl/curl.h>
 #include <stdio.h>
 #include <string.h>
@@ -26,27 +26,27 @@ static size_t write_callback(void *contents, size_t size, size_t nmemb, struct h
     return realsize;
 }
 
-// Globale Variablen für die HTTP-Session
+// Global variables for HTTP session
 static CURL *curl_handle = NULL;
 static char cookie_jar[256] = {0};
 static int session_initialized = 0;
 
 /**
- * Initialisiert cURL und authentifiziert sich beim CoolerControl Daemon
+ * Initializes cURL and authenticates with the CoolerControl daemon
  *
- * @return 1 bei Erfolg, 0 bei Fehler
+ * @return 1 on success, 0 on error
  */
 int init_coolercontrol_session(void) {
     curl_global_init(CURL_GLOBAL_DEFAULT); 
     curl_handle = curl_easy_init();
     if (!curl_handle) return 0;
     
-    // Cookie-Jar für Session-Management
+    // Cookie jar for session management
     snprintf(cookie_jar, sizeof(cookie_jar), "/tmp/nzxt_cookies_%d.txt", getpid());
     curl_easy_setopt(curl_handle, CURLOPT_COOKIEJAR, cookie_jar);
     curl_easy_setopt(curl_handle, CURLOPT_COOKIEFILE, cookie_jar);
     
-    // Login beim Daemon
+    // Login to daemon
     char login_url[128];
     snprintf(login_url, sizeof(login_url), "%s/login", DAEMON_ADDRESS);
     
@@ -58,7 +58,7 @@ int init_coolercontrol_session(void) {
     curl_easy_setopt(curl_handle, CURLOPT_USERPWD, userpwd);
     curl_easy_setopt(curl_handle, CURLOPT_POST, 1L);
     curl_easy_setopt(curl_handle, CURLOPT_POSTFIELDS, "");
-    curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, NULL); // Ignoriere Response
+    curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, NULL); // Ignore response
     
     CURLcode res = curl_easy_perform(curl_handle);
     long response_code = 0;
@@ -73,26 +73,26 @@ int init_coolercontrol_session(void) {
 }
 
 /**
- * Sendet ein Bild direkt an das LCD des CoolerControl Geräts
+ * Sends an image directly to the LCD of the CoolerControl device
  *
- * @param image_path Pfad zum Bild
- * @param device_uid Geräte-UID
- * @return 1 bei Erfolg, 0 bei Fehler
+ * @param image_path Path to the image
+ * @param device_uid Device UID
+ * @return 1 on success, 0 on error
  */
 int send_image_to_lcd(const char* image_path, const char* device_uid) {
     if (!curl_handle || !image_path || !device_uid || !session_initialized) return 0;
     
-    // Prüfe ob Datei existiert
+    // Check if file exists
     FILE *test_file = fopen(image_path, "rb");
     if (!test_file) return 0;
     fclose(test_file);
     
-    // URL für LCD-Image-Upload
+    // URL for LCD image upload
     char upload_url[256];
     snprintf(upload_url, sizeof(upload_url), 
              "%s/devices/%s/settings/lcd/lcd/images", DAEMON_ADDRESS, device_uid);
     
-    // MIME-Type bestimmen
+    // Determine MIME type
     const char* mime_type = "image/png";
     if (strstr(image_path, ".jpg") || strstr(image_path, ".jpeg")) {
         mime_type = "image/jpeg";
@@ -100,7 +100,7 @@ int send_image_to_lcd(const char* image_path, const char* device_uid) {
         mime_type = "image/gif";
     }
     
-    // Multipart Form erstellen
+    // Create multipart form
     curl_mime *form = curl_mime_init(curl_handle);
     curl_mimepart *field;
     
@@ -119,18 +119,18 @@ int send_image_to_lcd(const char* image_path, const char* device_uid) {
     curl_mime_name(field, "orientation");
     curl_mime_data(field, "0", CURL_ZERO_TERMINATED);
     
-    // images[] field (das eigentliche Bild)
+    // images[] field (the actual image)
     field = curl_mime_addpart(form);
     curl_mime_name(field, "images[]");
     curl_mime_filedata(field, image_path);
     curl_mime_type(field, mime_type);
     
-    // cURL konfigurieren
+    // Configure cURL
     curl_easy_setopt(curl_handle, CURLOPT_URL, upload_url);
     curl_easy_setopt(curl_handle, CURLOPT_MIMEPOST, form);
     curl_easy_setopt(curl_handle, CURLOPT_CUSTOMREQUEST, "PUT");
     
-    // Request ausführen
+    // Execute request
     CURLcode res = curl_easy_perform(curl_handle);
     long response_code = 0;
     curl_easy_getinfo(curl_handle, CURLINFO_RESPONSE_CODE, &response_code);
@@ -145,14 +145,14 @@ int send_image_to_lcd(const char* image_path, const char* device_uid) {
 }
 
 /**
- * Alias-Funktion für send_image_to_lcd (für bessere API-Kompatibilität)
+ * Alias function for send_image_to_lcd (for better API compatibility)
  */
 int upload_image_to_device(const char* image_path, const char* device_uid) {
     return send_image_to_lcd(image_path, device_uid);
 }
 
 /**
- * Beendet die CoolerControl Session und räumt auf
+ * Terminates the CoolerControl session and cleans up
  */
 void cleanup_coolercontrol_session(void) {
     static int cleanup_done = 0;
@@ -164,60 +164,60 @@ void cleanup_coolercontrol_session(void) {
         curl_handle = NULL;
     }
     curl_global_cleanup();
-    unlink(cookie_jar); // Cookie-Datei löschen
+    unlink(cookie_jar); // Delete cookie file
     session_initialized = 0;
 }
 
 /**
- * Gibt zurück, ob die Session initialisiert ist
+ * Returns whether the session is initialized
  *
- * @return 1 wenn initialisiert, 0 wenn nicht
+ * @return 1 if initialized, 0 if not
  */
 int is_session_initialized(void) {
     return session_initialized;
 }
 
 /**
- * Ruft den vollständigen Namen des NZXT Kraken Geräts ab
+ * Retrieves the full name of the NZXT Kraken device
  *
- * @param name_buffer Buffer für den Gerätenamen
- * @param buffer_size Größe des Buffers
- * @return 1 bei Erfolg, 0 bei Fehler
+ * @param name_buffer Buffer for the device name
+ * @param buffer_size Size of the buffer
+ * @return 1 on success, 0 on error
  */
 int get_kraken_device_name(char* name_buffer, size_t buffer_size) {
     if (!curl_handle || !name_buffer || buffer_size == 0 || !session_initialized) return 0;
     
-    // Response buffer initialisieren
+    // Initialize response buffer
     struct http_response response = {0};
     response.data = malloc(1);  // Will be grown as needed by realloc
     response.size = 0;
     if (!response.data) return 0;
     
-    // URL für Geräteliste
+    // URL for device list
     char devices_url[128];
     snprintf(devices_url, sizeof(devices_url), "%s/devices", DAEMON_ADDRESS);
     
-    // cURL für GET request konfigurieren
+    // Configure cURL for GET request
     curl_easy_setopt(curl_handle, CURLOPT_URL, devices_url);
     curl_easy_setopt(curl_handle, CURLOPT_HTTPGET, 1L);  // GET request
     curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, write_callback);
     curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, &response);
     
-    // Request ausführen
+    // Execute request
     CURLcode res = curl_easy_perform(curl_handle);
     long response_code = 0;
     curl_easy_getinfo(curl_handle, CURLINFO_RESPONSE_CODE, &response_code);
     
-    // cURL optionen zurücksetzen
+    // Reset cURL options
     curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, NULL);
     curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, NULL);
     
     int success = 0;
     if (res == CURLE_OK && response_code == 200 && response.data) {
-        // Nach NZXT Kraken Gerät suchen
+        // Search for NZXT Kraken device
         char *kraken_pos = strstr(response.data, "\"NZXT Kraken");
         if (kraken_pos) {
-            // Namen extrahieren - suche nach dem Ende des Namens
+            // Extract name - search for end of name
             char *name_start = kraken_pos + 1;  // Skip opening quote
             char *name_end = strchr(name_start, '"');
             if (name_end) {

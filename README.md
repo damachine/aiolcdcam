@@ -1,4 +1,4 @@
-# LCD AIO CAM - Modular C Daemon
+# LCD AIO CAM - For CoolerControl
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![C99](https://img.shields.io/badge/C-99-blue.svg)](https://en.wikipedia.org/wiki/C99)
@@ -8,6 +8,8 @@
 ## 📖 Description
 
 High-performance, modular C-based daemon for LCD AIO displays with professional systemd integration and automatic dependency management. Displays real-time CPU, GPU, and coolant temperatures on NZXT Kraken LCD screens through CoolerControl API.
+
+**🔧 Built with strict C99 compliance** for maximum portability and standards conformance.
 
 > **⚠️ Beta Notice:** This project is in early development stage. Features may change and bugs are expected. Please report issues and contribute to improve the software.
 
@@ -90,6 +92,38 @@ sudo systemctl start aiolcdcam.service
 | `2`   | Temperatures + circular diagrams | All sensors + CPU/RAM/GPU load |
 | `3`   | Temperatures + horizontal load bars | All sensors + CPU/RAM/GPU load |
 
+#### How to Change Display Mode
+
+**Via systemd service (recommended):**
+```bash
+# Edit systemd service file
+sudo systemctl edit aiolcdcam.service
+
+# Add this content (example for mode 2):
+[Service]
+ExecStart=
+ExecStart=/opt/aiolcdcam/bin/aiolcdcam 2
+
+# Apply changes
+sudo systemctl daemon-reload
+sudo systemctl restart aiolcdcam.service
+```
+
+**Manual execution:**
+```bash
+# Stop service first
+sudo systemctl stop aiolcdcam.service
+
+# Run manually with desired mode
+./aiolcdcam def      # Temperatures only
+./aiolcdcam 1        # Vertical bars
+./aiolcdcam 2        # Circular diagrams
+./aiolcdcam 3        # Horizontal bars
+
+# Or with --mode syntax
+./aiolcdcam --mode 2
+```
+
 ### Advanced Configuration
 
 Edit `include/config.h` for customization:
@@ -151,12 +185,17 @@ make logs       # journalctl -u aiolcdcam -f
 ### Build Commands
 
 ```bash
-make          # Standard build
+make          # Standard C99 build
 make clean    # Clean up
 make install  # System installation with dependency auto-detection
 make debug    # Debug build with AddressSanitizer
 make help     # Show all options
 ```
+
+**C99 Compliance:**
+- Compiled with `-std=c99` flag for strict standards conformance
+- Uses `_POSIX_C_SOURCE 200112L` for POSIX compliance
+- No GNU extensions or non-standard features
 
 ### Performance Notes
 

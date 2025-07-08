@@ -1,4 +1,4 @@
-# Makefile für LCD AIO CAM (Standard C-Projektstruktur)
+# Makefile for LCD AIO CAM (Standard C Project Structure)
 # LCD AIO CAM - Kraken LCD Temperature Monitor
 
 # Version
@@ -9,13 +9,13 @@ CFLAGS = -Wall -Wextra -O2 -std=c99 -march=x86-64-v3 -Iinclude $(shell pkg-confi
 LIBS = $(shell pkg-config --libs cairo) -lcurl -lm
 TARGET = aiolcdcam
 
-# Verzeichnisse
+# Directories
 SRCDIR = src
 INCDIR = include
 OBJDIR = build
 BINDIR = bin
 
-# Quellcode-Dateien
+# Source code files
 MAIN_SOURCE = $(SRCDIR)/main.c
 MODULES = $(SRCDIR)/cpu_monitor.c $(SRCDIR)/gpu_monitor.c $(SRCDIR)/coolant_monitor.c $(SRCDIR)/display.c $(SRCDIR)/coolercontrol.c
 HEADERS = $(INCDIR)/config.h $(INCDIR)/cpu_monitor.h $(INCDIR)/gpu_monitor.h $(INCDIR)/coolant_monitor.h $(INCDIR)/display.h $(INCDIR)/coolercontrol.h
@@ -26,7 +26,7 @@ SERVICE = systemd/aiolcdcam.service
 MANPAGE = man/aiolcdcam.1
 README = README.md
 
-# Farben für Terminal-Ausgabe
+# Colors for terminal output
 RED = \033[0;31m
 GREEN = \033[0;32m
 YELLOW = \033[0;33m
@@ -55,20 +55,20 @@ $(TARGET): $(OBJDIR) $(BINDIR) $(OBJECTS) $(MAIN_SOURCE)
 	$(CC) $(CFLAGS) -o $(BINDIR)/$(TARGET) $(MAIN_SOURCE) $(OBJECTS) $(LIBS)
 	@printf "$(ICON_SUCCESS) $(GREEN)Build successful: $(BINDIR)/$(TARGET)$(RESET)\n"
 
-# Build-Verzeichnis erstellen
+# Create build directory
 $(OBJDIR):
 	@mkdir -p $(OBJDIR)
 
-# Bin-Verzeichnis erstellen
+# Create bin directory
 $(BINDIR):
 	@mkdir -p $(BINDIR)
 
-# Objektdateien kompilieren (mit korrekten Pfaden)
+# Compile object files (with correct paths)
 $(OBJDIR)/%.o: $(SRCDIR)/%.c $(INCDIR)/%.h $(INCDIR)/config.h | $(OBJDIR)
 	@printf "$(ICON_BUILD) $(YELLOW)Compiling module: $<$(RESET)\n"
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# Dependencies für Header-Änderungen
+# Dependencies for header changes
 $(OBJECTS): $(HEADERS)
 
 # Clean Target

@@ -1,15 +1,15 @@
-#include "coolant_monitor.h"
-#include "config.h"
+#include "../include/coolant_monitor.h"
+#include "../include/config.h"
 #include <stdio.h>
 #include <string.h>
 #include <dirent.h>
 #include <stdlib.h>
 
-// Globale Variable für gecachten Coolant-Temperatur-Pfad
+// Global variable for cached coolant temperature path
 char coolant_temp_path[512] = {0};
 
 /**
- * Initialisiert den hwmon-Sensor-Pfad für Coolant-Temperatur beim Start (einmalig)
+ * Initializes the hwmon sensor path for coolant temperature at startup (once)
  */
 void init_coolant_sensor_path(void) {
     DIR *dir = opendir(HWMON_PATH);
@@ -27,7 +27,7 @@ void init_coolant_sensor_path(void) {
             if (!flabel) continue;
             
             if (fgets(label, sizeof(label), flabel)) {
-                // Coolant-Temperatur Pfad cachen
+                // Cache coolant temperature path
                 if ((strstr(label, "Coolant") || strstr(label, "coolant")) && strlen(coolant_temp_path) == 0) {
                     snprintf(coolant_temp_path, sizeof(coolant_temp_path), HWMON_PATH"/%s/temp%d_input", entry->d_name, i);
                     fclose(flabel);
@@ -42,9 +42,9 @@ void init_coolant_sensor_path(void) {
 }
 
 /**
- * Liest die Coolant-Temperatur aus dem gecachten hwmon-Pfad.
+ * Reads coolant temperature from cached hwmon path.
  *
- * @return Temperatur in Grad Celsius (float), 0.0f bei Fehler
+ * @return Temperature in degrees Celsius (float), 0.0f on error
  */
 float read_coolant_temp(void) {
     if (strlen(coolant_temp_path) == 0) return 0.0f;

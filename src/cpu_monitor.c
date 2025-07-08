@@ -1,15 +1,15 @@
-#include "cpu_monitor.h"
-#include "config.h"
+#include "../include/cpu_monitor.h"
+#include "../include/config.h"
 #include <stdio.h>
 #include <string.h>
 #include <dirent.h>
 #include <stdlib.h>
 
-// Globale Variable für gecachten CPU-Temperatur-Pfad
+// Global variable for cached CPU temperature path
 char cpu_temp_path[512] = {0};
 
 /**
- * Initialisiert den hwmon-Sensor-Pfad für CPU-Temperatur beim Start (einmalig)
+ * Initialize hwmon sensor path for CPU temperature at startup (once)
  */
 void init_cpu_sensor_path(void) {
     DIR *dir = opendir(HWMON_PATH);
@@ -27,7 +27,7 @@ void init_cpu_sensor_path(void) {
             if (!flabel) continue;
             
             if (fgets(label, sizeof(label), flabel)) {
-                // CPU-Temperatur Pfad cachen
+                // Cache CPU temperature path
                 if (strstr(label, "Package id 0") && strlen(cpu_temp_path) == 0) {
                     snprintf(cpu_temp_path, sizeof(cpu_temp_path), HWMON_PATH"/%s/temp%d_input", entry->d_name, i);
                     fclose(flabel);
@@ -42,9 +42,9 @@ void init_cpu_sensor_path(void) {
 }
 
 /**
- * Liest die CPU-Temperatur aus dem gecachten hwmon-Pfad.
+ * Read CPU temperature from cached hwmon path.
  *
- * @return Temperatur in Grad Celsius (float), 0.0f bei Fehler
+ * @return Temperature in degrees Celsius (float), 0.0f on error
  */
 float read_cpu_temp(void) {
     if (strlen(cpu_temp_path) == 0) return 0.0f;
@@ -62,10 +62,10 @@ float read_cpu_temp(void) {
 }
 
 /**
- * Liest CPU-Statistiken für die Auslastungsberechnung.
+ * Read CPU statistics for usage calculation.
  *
- * @param[out] stat CPU-Statistik-Struktur
- * @return 1 bei Erfolg, 0 bei Fehler
+ * @param[out] stat CPU statistics structure
+ * @return 1 on success, 0 on error
  */
 int get_cpu_stat(cpu_stat_t *stat) {
     FILE *fstat = fopen("/proc/stat", "r");
@@ -92,11 +92,11 @@ int get_cpu_stat(cpu_stat_t *stat) {
 }
 
 /**
- * Berechnet die CPU-Auslastung zwischen zwei Zeitpunkten.
+ * Calculate CPU usage between two time points.
  *
- * @param last_stat Vorherige CPU-Statistik
- * @param curr_stat Aktuelle CPU-Statistik
- * @return CPU-Auslastung in Prozent (float), -1.0f bei Fehler
+ * @param last_stat Previous CPU statistics
+ * @param curr_stat Current CPU statistics
+ * @return CPU usage in percent (float), -1.0f on error
  */
 float calculate_cpu_usage(const cpu_stat_t *last_stat, const cpu_stat_t *curr_stat) {
     if (!last_stat || !curr_stat) return -1.0f;
@@ -104,16 +104,16 @@ float calculate_cpu_usage(const cpu_stat_t *last_stat, const cpu_stat_t *curr_st
     const long totald = curr_stat->total - last_stat->total;
     const long idled = curr_stat->idle - last_stat->idle;
     
-    if (totald <= 0) return -1.0f;  // Fehler-Indikator
+    if (totald <= 0) return -1.0f;  // Error indicator
     
     const float usage = 100.0f * (float)(totald - idled) / (float)totald;
     return (usage >= 0.0f && usage <= 100.0f) ? usage : 0.0f;
 }
 
 /**
- * Liest die RAM-Auslastung aus /proc/meminfo.
+ * Read RAM usage from /proc/meminfo.
  *
- * @return RAM-Auslastung in Prozent (float), -1.0f bei Fehler
+ * @return RAM usage in percent (float), -1.0f on error
  */
 float get_ram_usage(void) {
     FILE *fmem = fopen("/proc/meminfo", "r");

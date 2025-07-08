@@ -13,9 +13,9 @@ typedef struct {
 } gpu_data_t;
 
 // GPU Functions
-int init_gpu_monitor(void);  // Initialisierung
-float read_gpu_temp(void);   // Nur Temperatur (für mode "def")
-int get_gpu_usage_data(float *usage, float *mem_usage);  // Auslastungsdaten (für Modi 1, 2, 3)
-int get_gpu_data_full(gpu_data_t *data);  // Alle Daten (komplett)
+int init_gpu_monitor(void);  // Initialization
+float read_gpu_temp(void);   // Temperature only (for mode "def")
+int get_gpu_usage_data(float *usage, float *mem_usage);  // Usage data (for modes 1, 2, 3)
+int get_gpu_data_full(gpu_data_t *data);  // All data (complete)
 
 #endif // GPU_MONITOR_H

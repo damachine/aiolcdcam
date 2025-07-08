@@ -6,23 +6,23 @@
 // =============================================================================
 
 // Display Settings
-#define DISPLAY_WIDTH 240 // 240 Pixel Breite
-#define DISPLAY_HEIGHT 240 // 240 Pixel Höhe
-#define DISPLAY_REFRESH_INTERVAL_SEC 2 // 2 Sekunden
-#define DISPLAY_REFRESH_INTERVAL_NSEC 500000000  // 0.5 Sekunden
+#define DISPLAY_WIDTH 240 // 240 pixel width
+#define DISPLAY_HEIGHT 240 // 240 pixel height
+#define DISPLAY_REFRESH_INTERVAL_SEC 2 // 2 seconds
+#define DISPLAY_REFRESH_INTERVAL_NSEC 500000000  // 0.5 seconds
 
-// Temperature Thresholds (für Farbverlauf)
-#define TEMP_THRESHOLD_GREEN 55.0f // 55 Grad Celsius
-#define TEMP_THRESHOLD_ORANGE 65.0f // 65 Grad Celsius
-#define TEMP_THRESHOLD_RED 75.0f // 75 Grad Celsius
+// Temperature Thresholds (for color gradient)
+#define TEMP_THRESHOLD_GREEN 55.0f // 55 degrees Celsius
+#define TEMP_THRESHOLD_ORANGE 65.0f // 65 degrees Celsius
+#define TEMP_THRESHOLD_RED 75.0f // 75 degrees Celsius
 
 // Layout Constants
 #define BOX_WIDTH 70 // 240 / 3.42857142857
 #define BOX_HEIGHT 60 // 240 / 4
-#define BOX_GAP 10 // Abstand zwischen den Boxen
-#define BAR_WIDTH 220 // 240 - (BOX_WIDTH * 3) - (BOX_GAP * 2) - 10 (für den Rand)
-#define BAR_HEIGHT 30 // Höhe der Balken
-#define BAR_GAP 6 // Abstand zwischen den Balken
+#define BOX_GAP 10 // spacing between boxes
+#define BAR_WIDTH 220 // 240 - (BOX_WIDTH * 3) - (BOX_GAP * 2) - 10 (for border)
+#define BAR_HEIGHT 30 // height of bars
+#define BAR_GAP 6 // spacing between bars
 
 // Font Sizes
 #define FONT_SIZE_LARGE 90.0  // BOX_HEIGHT * 1.50
@@ -31,29 +31,29 @@
 #define FONT_SIZE_LABELS 22.0 // FONT_SIZE_LARGE * 0.25
 
 // Cache Settings
-#define GPU_CACHE_INTERVAL 2 // Sekunden
-#define CHANGE_TOLERANCE_TEMP 0.1f // Temperaturänderungstoleranz in Grad Celsius
-#define CHANGE_TOLERANCE_USAGE 0.5f // Nutzungsänderungstoleranz in Prozent
+#define GPU_CACHE_INTERVAL 2 // seconds
+#define CHANGE_TOLERANCE_TEMP 0.1f // temperature change tolerance in degrees Celsius
+#define CHANGE_TOLERANCE_USAGE 0.5f // usage change tolerance in percent
 
 // Paths and Files
-#define HWMON_PATH "/sys/class/hwmon" // Pfad zu den Hardware-Monitoren
-#define IMAGE_DIR "/opt/aiolcdcam/image" // Verzeichnis für Bilder
-#define IMAGE_PATH "/opt/aiolcdcam/image/cpu_gpu_temp.png" // Pfad zum Bild für CPU/GPU-Temperaturanzeige
-#define PID_FILE "/var/run/aiolcdcam.pid" // PID-Datei für den Daemon
+#define HWMON_PATH "/sys/class/hwmon" // path to hardware monitors
+#define IMAGE_DIR "/opt/aiolcdcam/image" // directory for images
+#define IMAGE_PATH "/opt/aiolcdcam/image/cpu_gpu_temp.png" // path to CPU/GPU temperature display image
+#define PID_FILE "/var/run/aiolcdcam.pid" // PID file for daemon
 
 // CoolerControl Settings
-// Stellen Sie sicher, dass CoolerControl läuft: sudo systemctl start coolercontrold
-// Testen Sie die API: curl http://localhost:11987/devices
-#define DAEMON_ADDRESS "http://localhost:11987" // Adresse des CoolerControl Daemon
-#define DAEMON_PASSWORD "coolAdmin" // Passwort für CoolerControl Daemon
+// Make sure CoolerControl is running: sudo systemctl start coolercontrold
+// Test the API: curl http://localhost:11987/devices
+#define DAEMON_ADDRESS "http://localhost:11987" // CoolerControl daemon address
+#define DAEMON_PASSWORD "coolAdmin" // CoolerControl daemon password
 
-// NZXT Kraken UID (WICHTIG: Muss für Ihr Gerät angepasst werden!)
+// NZXT Kraken UID (IMPORTANT: Must be adapted for your device!)
 // 
-// ⚠️  DIESE UUID MUSS FÜR IHR GERÄT GEÄNDERT WERDEN! ⚠️
-// Anleitung siehe README.md Abschnitt "Device UUID Configuration"
+// ⚠️  THIS UUID MUST BE CHANGED FOR YOUR DEVICE! ⚠️
+// Instructions see README.md section "Device UUID Configuration"
 //
-// Kurz: curl http://localhost:11987/devices | jq → UUID kopieren → hier einfügen
-// Getestet mit: NZXT Kraken 2023 (Z-Series)
+// Quick: curl http://localhost:11987/devices | jq → copy UUID → paste here
+// Tested with: NZXT Kraken 2023 (Z-Series)
 //
 #define KRAKEN_UID "8d4becb03bca2a8e8d4213ac376a1094f39d2786f688549ad3b6a591c3affdf9"
 
@@ -105,21 +105,21 @@
 #define COLOR_GPU_USAGE_YELLOW_B 0.0
 
 // Bar Settings (Mode 1)
-#define VERTICAL_BAR_BASE_X 10 // Basisposition der vertikalen Balken
-#define VERTICAL_BAR_BASE_Y 10 // Basisposition der vertikalen Balken
-#define VERTICAL_BAR_WIDTH 6 // Breite der vertikalen Balken
-#define VERTICAL_BAR_HEIGHT (BOX_HEIGHT - 1) // Höhe der vertikalen Balken
-#define VERTICAL_BAR_SPACING 6 // Abstand zwischen den vertikalen Balken
+#define VERTICAL_BAR_BASE_X 10 // base position of vertical bars
+#define VERTICAL_BAR_BASE_Y 10 // base position of vertical bars
+#define VERTICAL_BAR_WIDTH 6 // width of vertical bars
+#define VERTICAL_BAR_HEIGHT (BOX_HEIGHT - 1) // height of vertical bars
+#define VERTICAL_BAR_SPACING 6 // spacing between vertical bars
 
 // Circle Settings (Mode 2)
-#define CIRCLE_CENTER_X 26.0 // X-Position des Kreismittelpunkts
-#define CIRCLE_CENTER_Y_TOP 26.0 // Y-Position des oberen Kreismittelpunkts
-#define CIRCLE_RADIUS 22.0 // Radius des Kreises
-#define CIRCLE_THICKNESS 6.0 // Dicke des Kreises
-#define CIRCLE_INNER_RADIUS (CIRCLE_RADIUS - CIRCLE_THICKNESS - 2.0) // Innerer Radius des Kreises
+#define CIRCLE_CENTER_X 26.0 // X position of circle center
+#define CIRCLE_CENTER_Y_TOP 26.0 // Y position of upper circle center
+#define CIRCLE_RADIUS 22.0 // circle radius
+#define CIRCLE_THICKNESS 6.0 // circle thickness
+#define CIRCLE_INNER_RADIUS (CIRCLE_RADIUS - CIRCLE_THICKNESS - 2.0) // inner circle radius
 
 // Small Bar Settings (Mode 3)
-#define SMALL_BAR_HEIGHT 5 // Höhe der kleinen Balken
-#define SMALL_BAR_SPACING 6 // Abstand zwischen den kleinen Balken
+#define SMALL_BAR_HEIGHT 5 // height of small bars
+#define SMALL_BAR_SPACING 6 // spacing between small bars
 
 #endif // CONFIG_H

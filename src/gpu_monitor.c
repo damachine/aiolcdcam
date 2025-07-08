@@ -1,49 +1,44 @@
-#include "gpu_monitor.h"
-#include "config.h"
+#include "../include/gpu_monitor.h"
+#include "../include/config.h"
 #include <stdio.h>
 #include <time.h>
 
-#include "gpu_monitor.h"
-#include "config.h"
-#include <stdio.h>
-#include <time.h>
-
-// Globale Variable für GPU-Verfügbarkeit
-static int gpu_available = -1;  // -1 = unbekannt, 0 = nicht verfügbar, 1 = verfügbar
+// Global variable for GPU availability
+static int gpu_available = -1;  // -1 = unknown, 0 = not available, 1 = available
 
 /**
- * Überprüft die GPU-Verfügbarkeit und initialisiert das GPU-Monitoring.
+ * Checks GPU availability and initializes GPU monitoring.
  *
- * @return 1 wenn GPU verfügbar, 0 wenn nicht
+ * @return 1 if GPU available, 0 if not
  */
 int init_gpu_monitor(void) {
     if (gpu_available != -1) {
-        return gpu_available;  // Bereits gecheckt
+        return gpu_available;  // Already checked
     }
     
     FILE *fp = popen("nvidia-smi -L 2>/dev/null", "r");
     if (fp) {
         char line[256];
         if (fgets(line, sizeof(line), fp) != NULL) {
-            gpu_available = 1;  // GPU gefunden
+            gpu_available = 1;  // GPU found
         } else {
-            gpu_available = 0;  // Keine GPU gefunden
+            gpu_available = 0;  // No GPU found
         }
         pclose(fp);
     } else {
-        gpu_available = 0;  // nvidia-smi nicht verfügbar
+        gpu_available = 0;  // nvidia-smi not available
     }
     
     return gpu_available;
 }
 
 /**
- * Liest nur die GPU-Temperatur (optimiert für mode "def").
+ * Reads only GPU temperature (optimized for mode "def").
  *
- * @return GPU-Temperatur in Grad Celsius (float), 0.0f bei Fehler
+ * @return GPU temperature in degrees Celsius (float), 0.0f on error
  */
 float read_gpu_temp(void) {
-    if (!init_gpu_monitor()) return 0.0f;  // GPU nicht verfügbar
+    if (!init_gpu_monitor()) return 0.0f;  // GPU not available
     
     static time_t last_update = 0;
     static float cached_temp = 0;
@@ -63,11 +58,11 @@ float read_gpu_temp(void) {
 }
 
 /**
- * Liest GPU-Auslastungsdaten (für Modi 1, 2, 3).
+ * Reads GPU usage data (for modes 1, 2, 3).
  *
- * @param[out] usage GPU-Auslastung in Prozent
- * @param[out] mem_usage GPU-RAM-Auslastung in Prozent
- * @return 1 bei Erfolg, 0 bei Fehler
+ * @param[out] usage GPU utilization in percent
+ * @param[out] mem_usage GPU RAM usage in percent
+ * @return 1 on success, 0 on error
  */
 int get_gpu_usage_data(float *usage, float *mem_usage) {
     if (!init_gpu_monitor() || !usage || !mem_usage) {
@@ -101,10 +96,10 @@ int get_gpu_usage_data(float *usage, float *mem_usage) {
 }
 
 /**
- * Liest alle GPU-Daten (Temperatur, Auslastung, RAM-Auslastung) mit Caching.
+ * Reads all GPU data (temperature, usage, RAM usage) with caching.
  *
- * @param[out] data Zeiger auf GPU-Daten-Struktur
- * @return 1 bei Erfolg, 0 bei Fehler
+ * @param[out] data Pointer to GPU data structure
+ * @return 1 on success, 0 on error
  */
 int get_gpu_data_full(gpu_data_t *data) {
     static time_t last_update = 0;
@@ -120,7 +115,7 @@ int get_gpu_data_full(gpu_data_t *data) {
             if (fscanf(fp, "%f, %f, %f, %f", &cached_data.temperature, &cached_data.usage, &mem_used, &mem_total) == 4) {
                 cached_data.memory_usage = (mem_total > 0) ? (100.0f * mem_used / mem_total) : 0.0f;
             } else {
-                // Fehler beim Lesen - setze auf 0
+                // Error reading - set to 0
                 cached_data.temperature = 0.0f;
                 cached_data.usage = 0.0f;
                 cached_data.memory_usage = 0.0f;
@@ -128,7 +123,7 @@ int get_gpu_data_full(gpu_data_t *data) {
             pclose(fp);
             last_update = now;
         } else {
-            // nvidia-smi nicht verfügbar
+            // nvidia-smi not available
             cached_data.temperature = 0.0f;
             cached_data.usage = 0.0f;
             cached_data.memory_usage = 0.0f;
