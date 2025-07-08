@@ -28,6 +28,8 @@ and this project follows a custom versioning scheme: **1.year.month.day.hourminu
   - Updated installation instructions with new cleanup process
 - **CRITICAL FIX**: Corrected UUID configuration instructions - UUID must be set BEFORE makepkg, not after installation
   - Updated README.md Arch Linux installation section with proper step order
+  - Updated README.md Manual Installation section with detailed UUID configuration steps
+  - Added explicit warning that UUID must be configured BEFORE `sudo make install`
   - Updated PKGBUILD prepare() function messages to emphasize pre-build UUID configuration
   - Clear warning that UUID must be configured before running makepkg
   - Step-by-step instructions for proper build order
