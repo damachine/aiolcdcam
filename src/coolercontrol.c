@@ -214,11 +214,11 @@ int get_aio_device_name(char* name_buffer, size_t buffer_size) {
     
     int success = 0;
     if (res == CURLE_OK && response_code == 200 && response.data) {
-        // Search for NZXT Kraken device
-        char *kraken_pos = strstr(response.data, "\"NZXT Kraken");
-        if (kraken_pos) {
+        // Search for AIO device
+        char *aio_pos = strstr(response.data, "\"NZXT Kraken");
+        if (aio_pos) {
             // Extract name - search for end of name
-            char *name_start = kraken_pos + 1;  // Skip opening quote
+            char *name_start = aio_pos + 1;  // Skip opening quote
             char *name_end = strchr(name_start, '"');
             if (name_end) {
                 size_t name_length = name_end - name_start;

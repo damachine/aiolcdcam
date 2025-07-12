@@ -14,7 +14,7 @@
  * LCD AIO CAM - Main Program
  * ==========================
  * 
- * Professional, modular C daemon for NZXT Kraken LCD Temperature Monitor.
+ * Professional, modular C daemon for AIO LCD Temperature Monitor.
  * Displays CPU/GPU temperatures and optional load data on LCD display.
  * 
  * Compile with: make
@@ -56,7 +56,7 @@ static void cleanup_and_exit(int sig) {
     // Send shutdown image only once
     if (!shutdown_sent && is_session_initialized()) {
         const char* shutdown_image = "/opt/aiolcdcam/images/face.png";
-        printf("LCD AIO CAM: Sending shutdown image to Kraken LCD...\n");
+        printf("LCD AIO CAM: Sending shutdown image to AIO LCD...\n");
         fflush(stdout);
         
         if (send_image_to_lcd(shutdown_image, AIO_UUID)) {
@@ -204,7 +204,7 @@ static int run_daemon(display_mode_t mode) {
  * Show help and explain program usage
  */
 static void show_help(const char *program_name) {
-    printf("LCD AIO CAM - Complete NZXT Kraken LCD Temperature Monitor\n\n");
+    printf("LCD AIO CAM - Complete AIO LCD Temperature Monitor\n\n");
     printf("Usage: %s [MODE] or %s --mode [MODE]\n\n", program_name, program_name);
     printf("Modes:\n");
     printf("  def  - Temperatures only (default, resource-efficient)\n");

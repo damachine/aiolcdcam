@@ -40,13 +40,13 @@ Transform your cooling system into an intelligent monitoring hub that keeps you 
 
 ### 📸 **Screenshot - Current LCD Output:**
 ![CPU/GPU Temperature Display](images/aiolcdcam.png)
-*Live temperature monitoring on NZXT Kraken 2023 LCD display*
+*Live temperature monitoring on NZXT AIO LCD display*
 
 ---
 
 **👨‍💻 Author:** DAMACHINE ([christkue79@gmail.com](mailto:christkue79@gmail.com))  
-**🧪 Tested with:** NZXT Kraken 2023 (Z-Series) - Developer's personal system  
-**🔗 Compatible:** NZXT Kraken X-Series, Z-Series and other LCD-capable models *(theoretical)*
+**🧪 Tested with:** NZXT AIO Kraken 2023 (Z-Series) - Developer's personal system  
+**🔗 Compatible:** NZXT AIO Kraken X-Series, Z-Series and other LCD-capable models *(theoretical)*
 
 ## ✨ Features
 
@@ -285,7 +285,7 @@ make help     # Show all options
 - **OS**: Linux (hwmon support required)
 - **CoolerControl**: Version 1.0+ (REQUIRED - must be installed and running)
 - **CPU**: x86-64-v3 compatible (Intel Haswell+ 2013+ / AMD Excavator+ 2015+)
-- **LCD**: LCD AIO displays supported by CoolerControl (NZXT Kraken, etc.)
+- **LCD**: LCD AIO displays supported by CoolerControl (NZXT AIO, etc.)
 - **Resources**: < 5 MB RAM, < 1-2% CPU load
 
 **For older CPUs**: Use `CFLAGS=-march=x86-64 make` for compatibility

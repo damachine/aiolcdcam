@@ -1,5 +1,5 @@
 # Makefile for LCD AIO CAM (Standard C Project Structure)
-# LCD AIO CAM - Kraken LCD Temperature Monitor
+# LCD AIO CAM - AIO LCD Temperature Monitor
 
 # Version (Format: 1.year.month.day.hourminute)
 VERSION = 1.25.07.08.2234

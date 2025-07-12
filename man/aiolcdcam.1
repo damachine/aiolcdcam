@@ -12,11 +12,11 @@ aiolcdcam \- LCD AIO CAM Temperature Monitor (Professional Modular C Daemon)
 [\fB\-h\fR|\fB\-\-help\fR]
 .SH DESCRIPTION
 .B aiolcdcam
-is a high-performance, modular C-based daemon with professional systemd integration that monitors CPU and GPU temperatures and displays them graphically on the LCD display of an NZXT Kraken water cooler. The program is fully developed in modular C99 architecture for maximum efficiency, maintainability, and production stability.
+is a high-performance, modular C-based daemon with professional systemd integration that monitors CPU and GPU temperatures and displays them graphically on the LCD display of an NZXT AIO water cooler. The program is fully developed in modular C99 architecture for maximum efficiency, maintainability, and production stability.
 
 The modular architecture separates CPU, GPU, coolant, and display logic into separate modules. Depending on the selected mode, only the required sensor data is queried, which significantly optimizes I/O performance (def mode uses only temperature sensors, modes 1-3 additionally load data).
 
-The program communicates with the Kraken device via the native CoolerControl REST API without Python dependencies and provides detailed systemd logs for professional service management.
+The program communicates with the AIO device via the native CoolerControl REST API without Python dependencies and provides detailed systemd logs for professional service management.
 
 .SH ARCHITECTURE
 The program follows the standard C project structure:
@@ -157,7 +157,7 @@ Display updates only on significant changes (0.1°C for temperatures, 0.5% for l
 All important settings are located in the build-time configuration file \fBinclude/config.h\fR:
 .TP
 .B Device UID (REQUIRED)
-NZXT Kraken device identification found via: \fBcurl http://localhost:11987/devices | jq\fR
+NZXT AIO device identification found via: \fBcurl http://localhost:11987/devices | jq\fR
 .br
 Copy the long UUID string and replace AIO_UUID in include/config.h
 .TP
@@ -276,7 +276,7 @@ Copy the long UUID string and replace AIO_UUID in include/config.h
 
 .TP
 .B Tested with
-NZXT Kraken 2023 (Z-Series)
+NZXT AIO Kraken 2023 (Z-Series)
 .TP
 .B Compatible with
-NZXT Kraken X-Series, Z-Series and other LCD-capable models
+NZXT AIO Kraken X-Series, Z-Series and other LCD-capable models

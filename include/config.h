@@ -53,7 +53,7 @@
 // Instructions see README.md section "Device UUID Configuration"
 //
 // Quick: curl http://localhost:11987/devices | jq → copy UUID → paste here
-// Tested with: NZXT Kraken 2023 (Z-Series)
+// Tested with: NZXT AIO Kraken 2023 (Z-Series)
 //
 #define AIO_UUID "8d4becb03bca2a8e8d4213ac376a1094f39d2786f688549ad3b6a591c3affdf9"
 
