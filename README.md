@@ -97,23 +97,17 @@ makepkg -si
 git clone https://github.com/damachine/aiolcdcam.git
 cd aiolcdcam
 
-# STEP 2: Start CoolerControl and find your device UUID (REQUIRED)
-# First, ensure CoolerControl daemon is running (if not already started)
+# STEP 2: Start CoolerControl daemon
+# The AIO device UUID is now automatically detected at runtime!
 sudo systemctl start coolercontrold
 
-# Then find your device UUID
-curl http://localhost:11987/devices | jq
-
-# STEP 3: Configure UUID in config.h BEFORE building (CRITICAL!)
-nano include/config.h  # Set AIO_UUID to your device UUID
-
-# STEP 4: Build and install (auto-detects Linux distribution and installs dependencies)
+# STEP 3: Build and install (auto-detects Linux distribution and installs dependencies)
 sudo make install
 
-# STEP 5: Enable autostart
+# STEP 4: Enable autostart
 sudo systemctl enable aiolcdcam.service
 
-# STEP 6: Start AIOLCDCAM
+# STEP 5: Start AIOLCDCAM
 sudo systemctl start aiolcdcam.service
 ```
 

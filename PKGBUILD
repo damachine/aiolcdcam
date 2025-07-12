@@ -110,19 +110,17 @@ prepare() {
     fi
     
     echo "================================================================"
-    echo "IMPORTANT: UUID CONFIGURATION REQUIRED BEFORE BUILD!"
+    echo "✅ NEW: AUTOMATIC DEVICE DETECTION - NO CONFIGURATION REQUIRED!"
     echo "================================================================"
-    echo "You MUST configure your device UUID in include/config.h BEFORE"
-    echo "running makepkg, otherwise the daemon will not work!"
+    echo "This version automatically detects your AIO device UUID at runtime."
+    echo "No manual UUID configuration is needed anymore!"
     echo ""
-    echo "Steps to configure UUID:"
+    echo "Prerequisites:"
     echo "1. Start CoolerControl: sudo systemctl start coolercontrold"
-    echo "2. Find your UUID: curl http://localhost:11987/devices | jq"
-    echo "3. Start the daemon and check if your device UUID is automatically detected"
-    echo "4. THEN run: makepkg -si"
+    echo "2. Ensure your AIO device is connected and detected by CoolerControl"
+    echo "3. Run: makepkg -si"
     echo ""
-    echo "Post-installation reconfiguration is also possible at:"
-    echo "/opt/aiolcdcam/include/config.h (rebuild with: cd /opt/aiolcdcam && sudo make install)"
+    echo "The daemon will automatically find and use your AIO LCD device!"
     echo "================================================================"
 }
 
@@ -162,7 +160,7 @@ package() {
     # Install binary
     install -Dm755 "bin/aiolcdcam" "$pkgdir/opt/aiolcdcam/bin/aiolcdcam"
     
-    # Install source code for UUID configuration
+    # Install source code for reference and potential customization
     install -Dm644 include/*.h "$pkgdir/opt/aiolcdcam/include/"
     install -Dm644 src/*.c "$pkgdir/opt/aiolcdcam/src/"
     install -Dm644 Makefile "$pkgdir/opt/aiolcdcam/"
