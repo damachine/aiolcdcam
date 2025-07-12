@@ -37,8 +37,8 @@
 
 // Paths and Files
 #define HWMON_PATH "/sys/class/hwmon" // path to hardware monitors
-#define IMAGE_DIR "/opt/aiolcdcam/image" // directory for images
-#define IMAGE_PATH "/opt/aiolcdcam/image/cpu_gpu_temp.png" // path to CPU/GPU temperature display image
+#define IMAGE_DIR "/opt/aiolcdcam/images" // directory for images
+#define IMAGE_PATH "/opt/aiolcdcam/images/cpu_gpu_temp.png" // path to CPU/GPU temperature display image
 #define PID_FILE "/var/run/aiolcdcam.pid" // PID file for daemon
 
 // CoolerControl Settings
@@ -47,7 +47,7 @@
 #define DAEMON_ADDRESS "http://localhost:11987" // CoolerControl daemon address
 #define DAEMON_PASSWORD "coolAdmin" // CoolerControl daemon password
 
-// NZXT Kraken UID (IMPORTANT: Must be adapted for your device!)
+// AIO LCD Device UID (IMPORTANT: Must be adapted for your device!)
 // 
 // ⚠️  THIS UUID MUST BE CHANGED FOR YOUR DEVICE! ⚠️
 // Instructions see README.md section "Device UUID Configuration"
@@ -55,7 +55,7 @@
 // Quick: curl http://localhost:11987/devices | jq → copy UUID → paste here
 // Tested with: NZXT Kraken 2023 (Z-Series)
 //
-#define KRAKEN_UID "8d4becb03bca2a8e8d4213ac376a1094f39d2786f688549ad3b6a591c3affdf9"
+#define AIO_UUID "8d4becb03bca2a8e8d4213ac376a1094f39d2786f688549ad3b6a591c3affdf9"
 
 // Colors (RGB 0-255)
 #define COLOR_GREEN_R 0

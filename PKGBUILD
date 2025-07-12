@@ -118,7 +118,7 @@ prepare() {
     echo "Steps to configure UUID:"
     echo "1. Start CoolerControl: sudo systemctl start coolercontrold"
     echo "2. Find your UUID: curl http://localhost:11987/devices | jq"
-    echo "3. Edit include/config.h and set KRAKEN_UID to your device UUID"
+    echo "3. Edit include/config.h and set AIO_UUID to your device UUID"
     echo "4. THEN run: makepkg -si"
     echo ""
     echo "Post-installation reconfiguration is also possible at:"
@@ -168,8 +168,8 @@ package() {
     install -Dm644 Makefile "$pkgdir/opt/aiolcdcam/"
     
     # Install default image
-    if [[ -f "image/face.png" ]]; then
-        install -Dm644 "image/face.png" "$pkgdir/opt/aiolcdcam/image/face.png"
+    if [[ -f "images/face.png" ]]; then
+        install -Dm644 "images/face.png" "$pkgdir/opt/aiolcdcam/images/face.png"
     fi
     
     # Install systemd service

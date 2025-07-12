@@ -22,7 +22,7 @@ cp -r src/ "$RELEASE_DIR/"
 cp -r include/ "$RELEASE_DIR/"
 cp -r systemd/ "$RELEASE_DIR/"
 cp -r man/ "$RELEASE_DIR/"
-cp -r image/ "$RELEASE_DIR/" 2>/dev/null || true  # Optional directory
+cp -r images/ "$RELEASE_DIR/" 2>/dev/null || true  # Optional directory
 cp Makefile "$RELEASE_DIR/"
 cp README.md "$RELEASE_DIR/"
 cp LICENSE "$RELEASE_DIR/"

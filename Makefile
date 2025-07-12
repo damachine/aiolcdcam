@@ -218,16 +218,16 @@ install: check-deps-for-install $(TARGET)
 	@printf "\n"
 	@printf "$(ICON_INFO) $(CYAN)Creating directories...$(RESET)\n"
 	sudo mkdir -p /opt/aiolcdcam/bin
-	sudo mkdir -p /opt/aiolcdcam/image
+	sudo mkdir -p /opt/aiolcdcam/images
 	@printf "$(ICON_SUCCESS) $(GREEN)Directories created$(RESET)\n"
 	@printf "\n"
 	@printf "$(ICON_INFO) $(CYAN)Copying files...$(RESET)\n"
 	sudo cp $(BINDIR)/$(TARGET) /opt/aiolcdcam/bin/
 	sudo chmod +x /opt/aiolcdcam/bin/$(TARGET)
-	sudo cp image/face.png /opt/aiolcdcam/image/ 2>/dev/null || true
+	sudo cp images/face.png /opt/aiolcdcam/images/ 2>/dev/null || true
 	sudo cp $(README) /opt/aiolcdcam/
 	@printf "  $(GREEN)→$(RESET) Program: /opt/aiolcdcam/bin/$(TARGET)\n"
-	@printf "  $(GREEN)→$(RESET) Shutdown image: /opt/aiolcdcam/image/face.png\n"
+	@printf "  $(GREEN)→$(RESET) Shutdown image: /opt/aiolcdcam/images/face.png\n"
 	@printf "  $(GREEN)→$(RESET) README: /opt/aiolcdcam/README.md\n"
 	@printf "\n"
 	@printf "$(ICON_SERVICE) $(CYAN)Installing service & documentation...$(RESET)\n"
@@ -291,7 +291,7 @@ uninstall:
 	@printf "\n"
 	@printf "$(ICON_SUCCESS) $(WHITE)═══ UNINSTALLATION COMPLETE ═══$(RESET)\n"
 	@printf "\n"
-	@printf "$(ICON_INFO) $(BLUE)Note:$(RESET) /opt/aiolcdcam/image/ remains (may contain images)\n"
+	@printf "$(ICON_INFO) $(BLUE)Note:$(RESET) /opt/aiolcdcam/images/ remains (may contain images)\n"
 	@printf "\n"
 
 # Debug Build

@@ -39,7 +39,7 @@ Transform your cooling system into an intelligent monitoring hub that keeps you 
 - **📊 Configuration wizard**: Step-by-step guided setup process
 
 ### 📸 **Screenshot - Current LCD Output:**
-![CPU/GPU Temperature Display](image/cpu_gpu_temp.png)
+![CPU/GPU Temperature Display](images/cpu_gpu_temp.png)
 *Live temperature monitoring on NZXT Kraken 2023 LCD display*
 
 ---
@@ -85,7 +85,7 @@ sudo systemctl start coolercontrold
 curl http://localhost:11987/devices | jq
 
 # STEP 3: Configure UUID in config.h (REQUIRED)
-nano include/config.h  # Set KRAKEN_UID to your device UUID
+nano include/config.h  # Set AIO_UUID to your device UUID
 
 # STEP 4: Build and install (includes automatic dependency management)
 makepkg -si
@@ -111,7 +111,7 @@ sudo systemctl start coolercontrold
 curl http://localhost:11987/devices | jq
 
 # STEP 3: Configure UUID in config.h BEFORE building (CRITICAL!)
-nano include/config.h  # Set KRAKEN_UID to your device UUID
+nano include/config.h  # Set AIO_UUID to your device UUID
 
 # STEP 4: Build and install (auto-detects Linux distribution and installs dependencies)
 sudo make install
@@ -141,7 +141,7 @@ sudo systemctl start aiolcdcam.service
 1. **Start CoolerControl (if not running)**: `sudo systemctl start coolercontrold`
 2. **Find your device UUID**: `curl http://localhost:11987/devices | jq`
 3. **Copy the UUID** from the JSON output (long hexadecimal string)
-4. **Edit** `include/config.h` and replace `KRAKEN_UID` with your device's UUID
+4. **Edit** `include/config.h` and replace `AIO_UUID` with your device's UUID
 5. **Rebuild**: `make clean && sudo make install`
 
 **Example CoolerControl API output:**
@@ -203,7 +203,7 @@ Edit `include/config.h` for customization:
 
 ```c
 // Device settings (MUST BE CONFIGURED!)
-#define KRAKEN_UID "your-device-uid"        // ⚠️ Replace with YOUR device UUID!
+#define AIO_UUID "your-device-uid"        // ⚠️ Replace with YOUR device UUID!
 #define DAEMON_ADDRESS "http://localhost:11987"
 
 // Display settings

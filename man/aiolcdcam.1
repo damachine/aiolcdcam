@@ -83,7 +83,7 @@ Main program (modern modular version)
 .I /opt/aiolcdcam/man/README.md
 Documentation
 .TP
-.I /opt/aiolcdcam/image/cpu_gpu_temp.png
+.I /opt/aiolcdcam/images/cpu_gpu_temp.png
 Generated temperature image
 .TP
 .I /etc/systemd/system/aiolcdcam.service
@@ -159,7 +159,7 @@ All important settings are located in the build-time configuration file \fBinclu
 .B Device UID (REQUIRED)
 NZXT Kraken device identification found via: \fBcurl http://localhost:11987/devices | jq\fR
 .br
-Copy the long UUID string and replace KRAKEN_UID in include/config.h
+Copy the long UUID string and replace AIO_UUID in include/config.h
 .TP
 .B API Settings
 CoolerControl daemon address (default: http://localhost:11987)
@@ -263,7 +263,7 @@ Set your AIO LCD display to "Image" mode (not temperature mode)
 .B 3. Configure device UUID in include/config.h
 Find UUID: \fBcurl http://localhost:11987/devices | jq\fR
 .br
-Copy the long UUID string and replace KRAKEN_UID in include/config.h
+Copy the long UUID string and replace AIO_UUID in include/config.h
 .TP
 .B 4. Build and install
 \fBnano include/config.h\fR (set UUID)

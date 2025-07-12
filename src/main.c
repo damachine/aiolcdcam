@@ -55,11 +55,11 @@ static void cleanup_and_exit(int sig) {
     
     // Send shutdown image only once
     if (!shutdown_sent && is_session_initialized()) {
-        const char* shutdown_image = "/opt/aiolcdcam/image/face.png";
+        const char* shutdown_image = "/opt/aiolcdcam/images/face.png";
         printf("LCD AIO CAM: Sending shutdown image to Kraken LCD...\n");
         fflush(stdout);
         
-        if (send_image_to_lcd(shutdown_image, KRAKEN_UID)) {
+        if (send_image_to_lcd(shutdown_image, AIO_UUID)) {
             printf("LCD AIO CAM: Shutdown image sent successfully\n");
             shutdown_sent = 1; // set flag so it's only sent once
         } else {
@@ -344,12 +344,12 @@ int main(int argc, char *argv[]) {
     if (init_coolercontrol_session()) { // Check return value
         printf("✓ CoolerControl session initialized\n");
         
-        // Get and display full Kraken device name
+        // Get and display full AIO device name
         char device_name[128] = {0};
-        if (get_kraken_device_name(device_name, sizeof(device_name))) {
+        if (get_aio_device_name(device_name, sizeof(device_name))) {
             printf("CoolerControl: Connected to %s\n", device_name);
         } else {
-            printf("CoolerControl: Connected to Kraken LCD\n");
+            printf("CoolerControl: Connected to AIO LCD\n");
         }
         fflush(stdout);
     } else {
@@ -370,11 +370,11 @@ int main(int argc, char *argv[]) {
     
     // Cleanup - send shutdown image if not sent yet (only on normal termination)
     if (!shutdown_sent && is_session_initialized()) {
-        const char* shutdown_image = "/opt/aiolcdcam/image/face.png";
+        const char* shutdown_image = "/opt/aiolcdcam/images/face.png";
         printf("LCD AIO CAM: Sending final shutdown image...\n");
         fflush(stdout);
         
-        if (send_image_to_lcd(shutdown_image, KRAKEN_UID)) {
+        if (send_image_to_lcd(shutdown_image, AIO_UUID)) {
             printf("LCD AIO CAM: Final shutdown image sent successfully\n");
         }
         fflush(stdout);

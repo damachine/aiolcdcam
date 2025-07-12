@@ -132,7 +132,7 @@ int render_display(const sensor_data_t *data, display_mode_t mode) {
         // Send image 2x to display (fixes a bug)
         if (is_session_initialized()) {
             for (int i = 0; i < 2; ++i) {
-                send_image_to_lcd(IMAGE_PATH, KRAKEN_UID);
+                send_image_to_lcd(IMAGE_PATH, AIO_UUID);
             }
         }
     }
@@ -497,5 +497,5 @@ void draw_combined_image(display_mode_t mode) {
     }
     
     // Send image to NZXT LCD (silent, without error messages)
-    upload_image_to_device(IMAGE_PATH, KRAKEN_UID);
+    upload_image_to_device(IMAGE_PATH, AIO_UUID);
 }

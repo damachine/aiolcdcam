@@ -7,7 +7,7 @@
 - Features may change or break without notice
 - Use at your own risk and report issues
 
-![LCD Display Output](image/cpu_gpu_temp.png)
+![LCD Display Output](images/cpu_gpu_temp.png)
 *Current LCD output on NZXT Kraken 2023*
 
 ## Files for AUR Publication
@@ -37,7 +37,7 @@ cd aiolcdcam
 # STEP 1: Configure device UUID (REQUIRED)
 sudo systemctl start coolercontrold
 curl http://localhost:11987/devices | jq
-nano include/config.h  # Set KRAKEN_UID to your device UUID
+nano include/config.h  # Set AIO_UUID to your device UUID
 
 # STEP 2: Test build process
 makepkg -s
@@ -137,7 +137,7 @@ curl http://localhost:11987/devices | jq
 
 # Edit config.h and set your UUID
 nano include/config.h
-# Replace KRAKEN_UID with your actual device UUID
+# Replace AIO_UUID with your actual device UUID
 
 # 2. THEN: Build and install the package (with automatic cleanup)
 makepkg -si

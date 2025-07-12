@@ -178,13 +178,13 @@ int is_session_initialized(void) {
 }
 
 /**
- * Retrieves the full name of the NZXT Kraken device
+ * Retrieves the full name of the AIO LCD device
  *
  * @param name_buffer Buffer for the device name
  * @param buffer_size Size of the buffer
  * @return 1 on success, 0 on error
  */
-int get_kraken_device_name(char* name_buffer, size_t buffer_size) {
+int get_aio_device_name(char* name_buffer, size_t buffer_size) {
     if (!curl_handle || !name_buffer || buffer_size == 0 || !session_initialized) return 0;
     
     // Initialize response buffer

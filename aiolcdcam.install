@@ -19,7 +19,7 @@ post_install() {
     echo ""
     echo "4. Configure the UUID:"
     echo "   sudo nano /opt/aiolcdcam/include/config.h"
-    echo "   - Replace KRAKEN_UID with your device's UUID"
+    echo "   - Replace AIO_UUID with your device's UUID"
     echo ""
     echo "5. Rebuild the configuration:"
     echo "   cd /opt/aiolcdcam"
