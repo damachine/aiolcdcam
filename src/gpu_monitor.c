@@ -2,9 +2,20 @@
 #include "../include/config.h"
 #include <stdio.h>
 #include <time.h>
+#include <sys/time.h>
 
 // Global variable for GPU availability
 static int gpu_available = -1;  // -1 = unknown, 0 = not available, 1 = available
+
+/**
+ * Get current time in milliseconds
+ * @return Current time in milliseconds
+ */
+static long long get_current_time_ms(void) {
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return (long long)(tv.tv_sec) * 1000 + (long long)(tv.tv_usec) / 1000;
+}
 
 /**
  * Checks GPU availability and initializes GPU monitoring.
@@ -40,18 +51,19 @@ int init_gpu_monitor(void) {
 float read_gpu_temp(void) {
     if (!init_gpu_monitor()) return 0.0f;  // GPU not available
     
-    static time_t last_update = 0;
+    static long long last_update_ms = 0;
     static float cached_temp = 0;
-    time_t now = time(NULL);
+    long long now_ms = get_current_time_ms();
+    long long cache_interval_ms = (long long)(GPU_CACHE_INTERVAL * 1000);
     
-    if (now - last_update >= GPU_CACHE_INTERVAL) {
+    if (now_ms - last_update_ms >= cache_interval_ms) {
         FILE *fp = popen("nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader,nounits 2>/dev/null", "r");
         if (fp) {
             if (fscanf(fp, "%f", &cached_temp) != 1) {
                 cached_temp = 0.0f;
             }
             pclose(fp);
-            last_update = now;
+            last_update_ms = now_ms;
         }
     }
     return cached_temp;
@@ -71,11 +83,12 @@ int get_gpu_usage_data(float *usage, float *mem_usage) {
         return 0;
     }
     
-    static time_t last_update = 0;
+    static long long last_update_ms = 0;
     static float cached_usage = 0, cached_mem_usage = 0;
-    time_t now = time(NULL);
+    long long now_ms = get_current_time_ms();
+    long long cache_interval_ms = (long long)(GPU_CACHE_INTERVAL * 1000);
     
-    if (now - last_update >= GPU_CACHE_INTERVAL) {
+    if (now_ms - last_update_ms >= cache_interval_ms) {
         FILE *fp = popen("nvidia-smi --query-gpu=utilization.gpu,memory.used,memory.total --format=csv,noheader,nounits 2>/dev/null", "r");
         if (fp) {
             float mem_total = 0, mem_used = 0;
@@ -86,7 +99,7 @@ int get_gpu_usage_data(float *usage, float *mem_usage) {
                 cached_mem_usage = 0.0f;
             }
             pclose(fp);
-            last_update = now;
+            last_update_ms = now_ms;
         }
     }
     
@@ -102,13 +115,14 @@ int get_gpu_usage_data(float *usage, float *mem_usage) {
  * @return 1 on success, 0 on error
  */
 int get_gpu_data_full(gpu_data_t *data) {
-    static time_t last_update = 0;
+    static long long last_update_ms = 0;
     static gpu_data_t cached_data = {0};
-    time_t now = time(NULL);
+    long long now_ms = get_current_time_ms();
+    long long cache_interval_ms = (long long)(GPU_CACHE_INTERVAL * 1000);
     
     if (!data) return 0;
     
-    if (now - last_update >= GPU_CACHE_INTERVAL) {
+    if (now_ms - last_update_ms >= cache_interval_ms) {
         FILE *fp = popen("nvidia-smi --query-gpu=temperature.gpu,utilization.gpu,memory.used,memory.total --format=csv,noheader,nounits 2>/dev/null", "r");
         if (fp) {
             float mem_total = 0, mem_used = 0;
@@ -121,7 +135,7 @@ int get_gpu_data_full(gpu_data_t *data) {
                 cached_data.memory_usage = 0.0f;
             }
             pclose(fp);
-            last_update = now;
+            last_update_ms = now_ms;
         } else {
             // nvidia-smi not available
             cached_data.temperature = 0.0f;
