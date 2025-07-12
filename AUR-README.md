@@ -7,7 +7,7 @@
 - Features may change or break without notice
 - Use at your own risk and report issues
 
-![LCD Display Output](images/cpu_gpu_temp.png)
+![LCD Display Output](images/aiolcdcam.png)
 *Current LCD output on NZXT Kraken 2023*
 
 ## Files for AUR Publication

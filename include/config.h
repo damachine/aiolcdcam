@@ -38,7 +38,7 @@
 // Paths and Files
 #define HWMON_PATH "/sys/class/hwmon" // path to hardware monitors
 #define IMAGE_DIR "/opt/aiolcdcam/images" // directory for images
-#define IMAGE_PATH "/opt/aiolcdcam/images/cpu_gpu_temp.png" // path to CPU/GPU temperature display image
+#define IMAGE_PATH "/opt/aiolcdcam/images/aiolcdcam.png" // path to CPU/GPU temperature display image
 #define PID_FILE "/var/run/aiolcdcam.pid" // PID file for daemon
 
 // CoolerControl Settings

@@ -225,9 +225,11 @@ install: check-deps-for-install $(TARGET)
 	sudo cp $(BINDIR)/$(TARGET) /opt/aiolcdcam/bin/
 	sudo chmod +x /opt/aiolcdcam/bin/$(TARGET)
 	sudo cp images/face.png /opt/aiolcdcam/images/ 2>/dev/null || true
+	sudo cp images/cpu_gpu_temp.png /opt/aiolcdcam/images/aiolcdcam.png 2>/dev/null || true
 	sudo cp $(README) /opt/aiolcdcam/
 	@printf "  $(GREEN)→$(RESET) Program: /opt/aiolcdcam/bin/$(TARGET)\n"
 	@printf "  $(GREEN)→$(RESET) Shutdown image: /opt/aiolcdcam/images/face.png\n"
+	@printf "  $(GREEN)→$(RESET) Sensor image: /opt/aiolcdcam/images/aiolcdcam.png\n"
 	@printf "  $(GREEN)→$(RESET) README: /opt/aiolcdcam/README.md\n"
 	@printf "\n"
 	@printf "$(ICON_SERVICE) $(CYAN)Installing service & documentation...$(RESET)\n"

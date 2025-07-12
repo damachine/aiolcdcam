@@ -39,7 +39,7 @@ Transform your cooling system into an intelligent monitoring hub that keeps you 
 - **📊 Configuration wizard**: Step-by-step guided setup process
 
 ### 📸 **Screenshot - Current LCD Output:**
-![CPU/GPU Temperature Display](images/cpu_gpu_temp.png)
+![CPU/GPU Temperature Display](images/aiolcdcam.png)
 *Live temperature monitoring on NZXT Kraken 2023 LCD display*
 
 ---
