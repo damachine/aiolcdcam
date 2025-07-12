@@ -275,8 +275,8 @@ int get_aio_device_uuid(char* uuid_buffer, size_t buffer_size) {
     
     int success = 0;
     if (res == CURLE_OK && response_code == 200 && response.data) {
-        // Search for AIO device with LCD capability
-        // Look for devices that have "lcd" in their settings or are AIO coolers
+        // Search for Liquidctl devices (AIO controllers)
+        // Liquidctl devices are the most reliable indicator for AIO systems
         char *search_pos = response.data;
         char *uuid_start = NULL;
         
@@ -299,8 +299,8 @@ int get_aio_device_uuid(char* uuid_buffer, size_t buffer_size) {
             strncpy(temp_uuid, uuid_start, uuid_length);
             temp_uuid[uuid_length] = '\0';
             
-            // Check if this device is an AIO with LCD
-            // Look for "type_id" indicating it's a cooler and has LCD capability
+            // Check if this device is a Liquidctl AIO device
+            // Look for "type": "Liquidctl" which indicates an AIO controller
             char *device_start = search_pos;
             while (device_start > response.data && *device_start != '{') device_start--;
             char *device_end = strchr(search_pos, '}');
@@ -313,13 +313,10 @@ int get_aio_device_uuid(char* uuid_buffer, size_t buffer_size) {
                 strncpy(device_section, device_start, section_length);
                 device_section[section_length] = '\0';
                 
-                // Check for AIO indicators: "Kraken", "AIO", "lcd", or type_id 4 (cooler)
-                if (strstr(device_section, "Kraken") || 
-                    strstr(device_section, "\"type_id\":4") ||
-                    strstr(device_section, "\"lcd\"") ||
-                    strstr(device_section, "\"LCD\"")) {
+                // Check for Liquidctl type - this is the most reliable indicator for AIO devices
+                if (strstr(device_section, "\"type\":\"Liquidctl\"")) {
                     
-                    // Found an AIO device with LCD
+                    // Found a Liquidctl device (AIO controller)
                     if (uuid_length < buffer_size) {
                         strncpy(uuid_buffer, temp_uuid, uuid_length);
                         uuid_buffer[uuid_length] = '\0';
