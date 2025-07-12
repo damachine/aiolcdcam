@@ -1,6 +1,6 @@
 # Maintainer: DAMACHINE <christkue79@gmail.com>
 pkgname=aiolcdcam
-pkgver=1.25.07.12.2333
+pkgver=1.25.07.13.1200
 pkgrel=1
 pkgdesc="LCD AIO CAM - Modular C daemon for AIO LCD temperature monitoring via CoolerControl (BETA)"
 arch=('x86_64')
@@ -12,12 +12,10 @@ optdepends=('nvidia-utils: for GPU temperature monitoring'
             'lm_sensors: for additional hardware monitoring')
 backup=('opt/aiolcdcam/README.md')
 install=aiolcdcam.install
-source=("$pkgname-$pkgver.tar.gz::https://github.com/damachine/$pkgname/releases/download/v$pkgver/$pkgname-$pkgver.tar.gz")
-sha256sums=('0019dfc4b32d63c1392aa264aed2253c1e0c2fb09216f8e2cc269bbfb8bb49b5')
+source=()
+sha256sums=()
 
 prepare() {
-    cd "$pkgname-$pkgver"
-    
     echo "================================================================"
     echo "⚠️  BETA SOFTWARE - EARLY DEVELOPMENT STAGE"
     echo "================================================================"
@@ -84,6 +82,7 @@ prepare() {
                 sudo rm -f /usr/share/man/man1/aiolcdcam.1
                 sudo rm -f /opt/aiolcdcam/bin/aiolcdcam
                 sudo rm -f /opt/aiolcdcam/README.md
+                sudo rm -rf /opt/aiolcdcam/images/
                 sudo systemctl daemon-reload
                 
                 echo "✅ Manual cleanup completed"
@@ -98,6 +97,7 @@ prepare() {
             sudo rm -f /usr/share/man/man1/aiolcdcam.1
             sudo rm -f /opt/aiolcdcam/bin/aiolcdcam
             sudo rm -f /opt/aiolcdcam/README.md
+            sudo rm -rf /opt/aiolcdcam/images/
             sudo systemctl daemon-reload
             
             echo "✅ Manual cleanup completed"
@@ -122,10 +122,20 @@ prepare() {
     echo ""
     echo "The daemon will automatically find and use your AIO LCD device!"
     echo "================================================================"
+    
+    # Additional cleanup for any remaining conflicting files
+    echo "Performing final cleanup of any conflicting files..."
+    sudo rm -f /opt/aiolcdcam/images/aiolcdcam.png 2>/dev/null || true
+    sudo rm -f /opt/aiolcdcam/images/face.png 2>/dev/null || true
+    echo "✅ Final cleanup completed"
 }
 
 build() {
-    cd "$pkgname-$pkgver"
+    # For local build: use current directory directly
+    cd "$startdir"
+    
+    # Clean any previous builds
+    make clean || true
     
     # Build with Arch Linux specific optimizations
     make CC=gcc CFLAGS="-Wall -Wextra -O2 -std=c99 -march=x86-64-v3 -Iinclude $(pkg-config --cflags cairo)" \
@@ -133,7 +143,7 @@ build() {
 }
 
 check() {
-    cd "$pkgname-$pkgver"
+    cd "$startdir"
     
     # Basic functionality test
     if [[ -f "bin/aiolcdcam" ]]; then
@@ -146,11 +156,11 @@ check() {
 }
 
 package() {
-    cd "$pkgname-$pkgver"
+    cd "$startdir"
     
     # Create directory structure
     install -dm755 "$pkgdir/opt/aiolcdcam/bin"
-    install -dm755 "$pkgdir/opt/aiolcdcam/image"
+    install -dm755 "$pkgdir/opt/aiolcdcam/images"
     install -dm755 "$pkgdir/opt/aiolcdcam/include"
     install -dm755 "$pkgdir/opt/aiolcdcam/src"
     install -dm755 "$pkgdir/usr/lib/systemd/system"
@@ -168,6 +178,11 @@ package() {
     # Install default image
     if [[ -f "images/face.png" ]]; then
         install -Dm644 "images/face.png" "$pkgdir/opt/aiolcdcam/images/face.png"
+    fi
+    
+    # Install aiolcdcam sensor image
+    if [[ -f "images/aiolcdcam.png" ]]; then
+        install -Dm644 "images/aiolcdcam.png" "$pkgdir/opt/aiolcdcam/images/aiolcdcam.png"
     fi
     
     # Install systemd service
