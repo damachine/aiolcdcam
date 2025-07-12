@@ -37,7 +37,7 @@ cd aiolcdcam
 # STEP 1: Configure device UUID (REQUIRED)
 sudo systemctl start coolercontrold
 curl http://localhost:11987/devices | jq
-nano include/config.h  # Set AIO_UUID to your device UUID
+nano include/config.h  # Optional: customize settings (UUID auto-detected)
 
 # STEP 2: Test build process
 makepkg -s
@@ -128,16 +128,8 @@ git push origin master
 **IMPORTANT: Configure UUID BEFORE building the package!**
 
 ```bash
-# 1. FIRST: Configure your device UUID
-# Start CoolerControl
+# 1. FIRST: Start CoolerControl daemon
 sudo systemctl start coolercontrold
-
-# Find your device UUID
-curl http://localhost:11987/devices | jq
-
-# Edit config.h and set your UUID
-nano include/config.h
-# Replace AIO_UUID with your actual device UUID
 
 # 2. THEN: Build and install the package (with automatic cleanup)
 makepkg -si
@@ -147,6 +139,7 @@ makepkg -si
 # 2. Automatically run 'sudo make uninstall' 
 # 3. Clean up any conflicts
 # 4. Proceed with PKGBUILD installation
+# 5. Automatically detect AIO device UUID at runtime
 ```
 
 ## Automatic Conflict Resolution

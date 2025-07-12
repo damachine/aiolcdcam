@@ -131,8 +131,11 @@ int render_display(const sensor_data_t *data, display_mode_t mode) {
         
         // Send image 2x to display (fixes a bug)
         if (is_session_initialized()) {
-            for (int i = 0; i < 2; ++i) {
-                send_image_to_lcd(IMAGE_PATH, AIO_UUID);
+            const char* device_uuid = get_cached_aio_uuid();
+            if (device_uuid) {
+                for (int i = 0; i < 2; ++i) {
+                    send_image_to_lcd(IMAGE_PATH, device_uuid);
+                }
             }
         }
     }
@@ -496,6 +499,9 @@ void draw_combined_image(display_mode_t mode) {
         return;
     }
     
-    // Send image to NZXT LCD (silent, without error messages)
-    upload_image_to_device(IMAGE_PATH, AIO_UUID);
+    // Send image to AIO LCD (silent, without error messages)
+    const char* device_uuid = get_cached_aio_uuid();
+    if (device_uuid) {
+        upload_image_to_device(IMAGE_PATH, device_uuid);
+    }
 }

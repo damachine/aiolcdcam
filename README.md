@@ -77,17 +77,11 @@ Transform your cooling system into an intelligent monitoring hub that keeps you 
 git clone https://github.com/damachine/aiolcdcam.git
 cd aiolcdcam
 
-# STEP 2: Start CoolerControl and find your device UUID
-# First, ensure CoolerControl daemon is running (if not already started)
+# STEP 2: Start CoolerControl daemon
+# The AIO device UUID is now automatically detected at runtime!
 sudo systemctl start coolercontrold
 
-# Then find your device UUID
-curl http://localhost:11987/devices | jq
-
-# STEP 3: Configure UUID in config.h (REQUIRED)
-nano include/config.h  # Set AIO_UUID to your device UUID
-
-# STEP 4: Build and install (includes automatic dependency management)
+# STEP 3: Build and install (includes automatic dependency management)
 makepkg -si
 
 # Option 2: Install from AUR (when published)
@@ -123,7 +117,7 @@ sudo systemctl enable aiolcdcam.service
 sudo systemctl start aiolcdcam.service
 ```
 
-> **⚠️ IMPORTANT**: You MUST configure the UUID in `include/config.h` BEFORE running `sudo make install`, otherwise the daemon will not work!
+> **ℹ️ NEW**: Device UUID is now automatically detected at runtime! No manual configuration required.
 
 **Supported Distributions (Auto-Detected):**
 - **Arch Linux / Manjaro**: `pacman -S cairo libcurl-gnutls coolercontrol gcc make pkg-config`
@@ -134,15 +128,23 @@ sudo systemctl start aiolcdcam.service
 
 ## ⚙️ Configuration
 
-### Device UUID Configuration (REQUIRED)
+### Device Configuration (Automatic)
 
-> **⚠️ CRITICAL**: You **MUST** configure your device UUID before first use!
+> **✅ NEW**: Device UUID is now **automatically detected** at runtime - no manual configuration required!
 
-1. **Start CoolerControl (if not running)**: `sudo systemctl start coolercontrold`
-2. **Find your device UUID**: `curl http://localhost:11987/devices | jq`
-3. **Copy the UUID** from the JSON output (long hexadecimal string)
-4. **Edit** `include/config.h` and replace `AIO_UUID` with your device's UUID
-5. **Rebuild**: `make clean && sudo make install`
+The daemon will:
+1. **Connect to CoolerControl** daemon at startup
+2. **Automatically detect** your AIO LCD device UUID
+3. **Display the detected device** in the startup logs
+
+**For troubleshooting**, you can manually check devices:
+```bash
+# Start CoolerControl (if not running)
+sudo systemctl start coolercontrold
+
+# Check available devices
+curl http://localhost:11987/devices | jq
+```
 
 **Example CoolerControl API output:**
 ```json
@@ -154,7 +156,7 @@ sudo systemctl start aiolcdcam.service
   }
 }
 ```
-> **💡 Tip**: The long string is your device UUID that you need to copy into `include/config.h`
+> **💡 Note**: The daemon automatically finds and uses AIO devices with LCD capability.
 
 ### Display Modes
 
@@ -202,8 +204,8 @@ sudo systemctl stop aiolcdcam.service
 Edit `include/config.h` for customization:
 
 ```c
-// Device settings (MUST BE CONFIGURED!)
-#define AIO_UUID "your-device-uid"        // ⚠️ Replace with YOUR device UUID!
+// Device settings (automatically detected at runtime)
+// #define AIO_UUID "auto-detected"      // ✅ UUID is now automatically detected!
 #define DAEMON_ADDRESS "http://localhost:11987"
 
 // Display settings

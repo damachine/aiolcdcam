@@ -56,14 +56,17 @@ static void cleanup_and_exit(int sig) {
     // Send shutdown image only once
     if (!shutdown_sent && is_session_initialized()) {
         const char* shutdown_image = "/opt/aiolcdcam/images/face.png";
+        const char* device_uuid = get_cached_aio_uuid();
+        
         printf("LCD AIO CAM: Sending shutdown image to AIO LCD...\n");
         fflush(stdout);
         
-        if (send_image_to_lcd(shutdown_image, AIO_UUID)) {
+        if (device_uuid && send_image_to_lcd(shutdown_image, device_uuid)) {
             printf("LCD AIO CAM: Shutdown image sent successfully\n");
             shutdown_sent = 1; // set flag so it's only sent once
         } else {
-            printf("LCD AIO CAM: Warning - Could not send shutdown image\n");
+            printf("LCD AIO CAM: Warning - Could not send shutdown image%s\n", 
+                   device_uuid ? "" : " (device UUID not detected)");
         }
         fflush(stdout);
     }
@@ -344,6 +347,20 @@ int main(int argc, char *argv[]) {
     if (init_coolercontrol_session()) { // Check return value
         printf("✓ CoolerControl session initialized\n");
         
+        // Get and display AIO device UUID
+        char device_uuid[128] = {0};
+        if (get_aio_device_uuid(device_uuid, sizeof(device_uuid))) {
+            printf("CoolerControl: Detected AIO device UUID: %.20s...\n", device_uuid);
+        } else {
+            fprintf(stderr, "Error: Could not detect AIO device UUID\n");
+            fprintf(stderr, "Please check:\n");
+            fprintf(stderr, "  - Is your AIO device connected?\n");
+            fprintf(stderr, "  - Does your device support LCD display?\n");
+            fprintf(stderr, "  - Run 'curl http://localhost:11987/devices' to see available devices\n");
+            fflush(stderr);
+            return 1;
+        }
+        
         // Get and display full AIO device name
         char device_name[128] = {0};
         if (get_aio_device_name(device_name, sizeof(device_name))) {
@@ -371,11 +388,16 @@ int main(int argc, char *argv[]) {
     // Cleanup - send shutdown image if not sent yet (only on normal termination)
     if (!shutdown_sent && is_session_initialized()) {
         const char* shutdown_image = "/opt/aiolcdcam/images/face.png";
+        const char* device_uuid = get_cached_aio_uuid();
+        
         printf("LCD AIO CAM: Sending final shutdown image...\n");
         fflush(stdout);
         
-        if (send_image_to_lcd(shutdown_image, AIO_UUID)) {
+        if (device_uuid && send_image_to_lcd(shutdown_image, device_uuid)) {
             printf("LCD AIO CAM: Final shutdown image sent successfully\n");
+        } else {
+            printf("LCD AIO CAM: Warning - Could not send final shutdown image%s\n",
+                   device_uuid ? "" : " (device UUID not detected)");
         }
         fflush(stdout);
     }

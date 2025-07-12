@@ -156,10 +156,10 @@ Display updates only on significant changes (0.1°C for temperatures, 0.5% for l
 .SH CONFIGURATION
 All important settings are located in the build-time configuration file \fBinclude/config.h\fR:
 .TP
-.B Device UID (REQUIRED)
-NZXT AIO device identification found via: \fBcurl http://localhost:11987/devices | jq\fR
+.B Device UID (AUTOMATIC)
+AIO device identification is automatically detected at runtime via CoolerControl API
 .br
-Copy the long UUID string and replace AIO_UUID in include/config.h
+No manual configuration required - device UUID is discovered automatically
 .TP
 .B API Settings
 CoolerControl daemon address (default: http://localhost:11987)
@@ -260,19 +260,14 @@ Follow: https://gitlab.com/coolercontrol/coolercontrol/-/blob/main/README.md
 .B 2. Configure LCD AIO in CoolerControl GUI
 Set your AIO LCD display to "Image" mode (not temperature mode)
 .TP
-.B 3. Configure device UUID in include/config.h
-Find UUID: \fBcurl http://localhost:11987/devices | jq\fR
-.br
-Copy the long UUID string and replace AIO_UUID in include/config.h
-.TP
-.B 4. Build and install
-\fBnano include/config.h\fR (set UUID)
-.br
+.B 3. Build and install (automatic device detection)
 \fBsudo make install\fR
 .br
 \fBsudo systemctl enable aiolcdcam.service\fR
 .br
 \fBsudo systemctl start aiolcdcam.service\fR
+.br
+Device UUID is automatically detected at startup
 
 .TP
 .B Tested with

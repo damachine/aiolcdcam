@@ -19,7 +19,7 @@ post_install() {
     echo ""
     echo "4. Configure the UUID:"
     echo "   sudo nano /opt/aiolcdcam/include/config.h"
-    echo "   - Replace AIO_UUID with your device's UUID"
+    echo "   - Device UUID is automatically detected at runtime"
     echo ""
     echo "5. Rebuild the configuration:"
     echo "   cd /opt/aiolcdcam"

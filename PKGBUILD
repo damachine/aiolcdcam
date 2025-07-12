@@ -118,7 +118,7 @@ prepare() {
     echo "Steps to configure UUID:"
     echo "1. Start CoolerControl: sudo systemctl start coolercontrold"
     echo "2. Find your UUID: curl http://localhost:11987/devices | jq"
-    echo "3. Edit include/config.h and set AIO_UUID to your device UUID"
+    echo "3. Start the daemon and check if your device UUID is automatically detected"
     echo "4. THEN run: makepkg -si"
     echo ""
     echo "Post-installation reconfiguration is also possible at:"

@@ -47,15 +47,15 @@
 #define DAEMON_ADDRESS "http://localhost:11987" // CoolerControl daemon address
 #define DAEMON_PASSWORD "coolAdmin" // CoolerControl daemon password
 
-// AIO LCD Device UID (IMPORTANT: Must be adapted for your device!)
+// AIO LCD Device UID - AUTOMATICALLY DETECTED AT RUNTIME
 // 
-// ⚠️  THIS UUID MUST BE CHANGED FOR YOUR DEVICE! ⚠️
-// Instructions see README.md section "Device UUID Configuration"
+// ℹ️  The device UUID is now automatically detected by querying the CoolerControl API
+// No manual configuration required! The daemon will find your AIO LCD device automatically.
 //
-// Quick: curl http://localhost:11987/devices | jq → copy UUID → paste here
-// Tested with: NZXT AIO Kraken 2023 (Z-Series)
+// For troubleshooting, you can manually check devices with:
+// curl http://localhost:11987/devices | jq
 //
-#define AIO_UUID "8d4becb03bca2a8e8d4213ac376a1094f39d2786f688549ad3b6a591c3affdf9"
+// Note: Tested with NZXT AIO Kraken 2023 (Z-Series) and compatible devices
 
 // Colors (RGB 0-255)
 #define COLOR_GREEN_R 0

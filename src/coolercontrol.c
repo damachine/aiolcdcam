@@ -30,6 +30,7 @@ static size_t write_callback(void *contents, size_t size, size_t nmemb, struct h
 static CURL *curl_handle = NULL;
 static char cookie_jar[256] = {0};
 static int session_initialized = 0;
+static char cached_aio_uuid[128] = {0};  // Cache for detected AIO UUID
 
 /**
  * Initializes cURL and authenticates with the CoolerControl daemon
@@ -235,4 +236,131 @@ int get_aio_device_name(char* name_buffer, size_t buffer_size) {
     if (response.data) free(response.data);
     
     return success;
+}
+
+/**
+ * Retrieves the UUID of the first AIO LCD device found
+ *
+ * @param uuid_buffer Buffer for the device UUID
+ * @param buffer_size Size of the buffer
+ * @return 1 on success, 0 on error
+ */
+int get_aio_device_uuid(char* uuid_buffer, size_t buffer_size) {
+    if (!curl_handle || !uuid_buffer || buffer_size == 0 || !session_initialized) return 0;
+    
+    // Initialize response buffer
+    struct http_response response = {0};
+    response.data = malloc(1);  // Will be grown as needed by realloc
+    response.size = 0;
+    if (!response.data) return 0;
+    
+    // URL for device list
+    char devices_url[128];
+    snprintf(devices_url, sizeof(devices_url), "%s/devices", DAEMON_ADDRESS);
+    
+    // Configure cURL for GET request
+    curl_easy_setopt(curl_handle, CURLOPT_URL, devices_url);
+    curl_easy_setopt(curl_handle, CURLOPT_HTTPGET, 1L);  // GET request
+    curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, write_callback);
+    curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, &response);
+    
+    // Execute request
+    CURLcode res = curl_easy_perform(curl_handle);
+    long response_code = 0;
+    curl_easy_getinfo(curl_handle, CURLINFO_RESPONSE_CODE, &response_code);
+    
+    // Reset cURL options
+    curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, NULL);
+    curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, NULL);
+    
+    int success = 0;
+    if (res == CURLE_OK && response_code == 200 && response.data) {
+        // Search for AIO device with LCD capability
+        // Look for devices that have "lcd" in their settings or are AIO coolers
+        char *search_pos = response.data;
+        char *uuid_start = NULL;
+        
+        while ((search_pos = strstr(search_pos, "\"uid\":\"")) != NULL) {
+            // Found a UID, check if this device is an AIO with LCD
+            uuid_start = search_pos + 7;  // Skip "uid":"
+            char *uuid_end = strchr(uuid_start, '"');
+            if (!uuid_end) {
+                search_pos = uuid_start;
+                continue;
+            }
+            
+            // Extract the UUID
+            size_t uuid_length = uuid_end - uuid_start;
+            char temp_uuid[128];
+            if (uuid_length >= sizeof(temp_uuid)) {
+                search_pos = uuid_end;
+                continue;
+            }
+            strncpy(temp_uuid, uuid_start, uuid_length);
+            temp_uuid[uuid_length] = '\0';
+            
+            // Check if this device is an AIO with LCD
+            // Look for "type_id" indicating it's a cooler and has LCD capability
+            char *device_start = search_pos;
+            while (device_start > response.data && *device_start != '{') device_start--;
+            char *device_end = strchr(search_pos, '}');
+            if (!device_end) device_end = response.data + response.size;
+            
+            // Look for indicators that this is an AIO LCD device
+            char device_section[4096];
+            size_t section_length = device_end - device_start;
+            if (section_length < sizeof(device_section)) {
+                strncpy(device_section, device_start, section_length);
+                device_section[section_length] = '\0';
+                
+                // Check for AIO indicators: "Kraken", "AIO", "lcd", or type_id 4 (cooler)
+                if (strstr(device_section, "Kraken") || 
+                    strstr(device_section, "\"type_id\":4") ||
+                    strstr(device_section, "\"lcd\"") ||
+                    strstr(device_section, "\"LCD\"")) {
+                    
+                    // Found an AIO device with LCD
+                    if (uuid_length < buffer_size) {
+                        strncpy(uuid_buffer, temp_uuid, uuid_length);
+                        uuid_buffer[uuid_length] = '\0';
+                        
+                        // Cache the UUID for future use
+                        if (uuid_length < sizeof(cached_aio_uuid)) {
+                            strcpy(cached_aio_uuid, uuid_buffer);
+                        }
+                        
+                        success = 1;
+                        break;
+                    }
+                }
+            }
+            
+            search_pos = uuid_end;
+        }
+    }
+    
+    // Cleanup
+    if (response.data) free(response.data);
+    
+    return success;
+}
+
+/**
+ * Returns the cached AIO UUID (automatically detected at runtime)
+ * This function will attempt to detect the UUID on first call if not cached
+ *
+ * @return Pointer to cached UUID string, or NULL on error
+ */
+const char* get_cached_aio_uuid(void) {
+    // If already cached, return it
+    if (cached_aio_uuid[0] != '\0') {
+        return cached_aio_uuid;
+    }
+    
+    // Try to detect the UUID
+    if (get_aio_device_uuid(cached_aio_uuid, sizeof(cached_aio_uuid))) {
+        return cached_aio_uuid;
+    }
+    
+    return NULL;  // Detection failed
 }

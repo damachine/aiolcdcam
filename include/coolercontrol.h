@@ -15,6 +15,8 @@ void cleanup_coolercontrol_session(void);
 
 // Device Information Functions
 int get_aio_device_name(char* name_buffer, size_t buffer_size);
+int get_aio_device_uuid(char* uuid_buffer, size_t buffer_size);
+const char* get_cached_aio_uuid(void);
 
 // Session Status
 int is_session_initialized(void);
