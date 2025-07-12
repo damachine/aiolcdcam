@@ -263,7 +263,7 @@ static void draw_temperature_displays(cairo_t *cr, const sensor_data_t *data, di
     // Degree symbol for CPU
     cairo_set_font_size(cr, FONT_SIZE_DEGREE);
     cairo_text_extents(cr, "°", &deg_ext);
-    cairo_move_to(cr, cpu_temp_x + ext.width + 8, cpu_temp_y - deg_ext.height + 4);
+    cairo_move_to(cr, cpu_temp_x + ext.width + 8, cpu_temp_y - deg_ext.height - 2);
     cairo_show_text(cr, "°");
 
     // Coolant temperature display (only if CPU <= 99°C)
@@ -279,7 +279,7 @@ static void draw_temperature_displays(cairo_t *cr, const sensor_data_t *data, di
         // Degree symbol for coolant
         cairo_set_font_size(cr, FONT_SIZE_DEGREE * 0.30);
         cairo_text_extents(cr, "°", &deg_ext_cool);
-        cairo_move_to(cr, cool_x + cool_ext.width + 8, cool_y - deg_ext_cool.height - 2);
+        cairo_move_to(cr, cool_x + cool_ext.width + 8, cool_y - deg_ext_cool.height + 2);
         cairo_show_text(cr, "°");
     }
 
@@ -295,7 +295,7 @@ static void draw_temperature_displays(cairo_t *cr, const sensor_data_t *data, di
     // Degree symbol for GPU
     cairo_set_font_size(cr, FONT_SIZE_DEGREE);
     cairo_text_extents(cr, "°", &deg_ext_gpu);
-    cairo_move_to(cr, gpu_temp_x + ext.width + 8, gpu_temp_y - deg_ext_gpu.height + 4);
+    cairo_move_to(cr, gpu_temp_x + ext.width + 8, gpu_temp_y - deg_ext_gpu.height - 2);
     cairo_show_text(cr, "°");
 }
 
