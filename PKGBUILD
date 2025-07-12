@@ -1,6 +1,6 @@
 # Maintainer: DAMACHINE <christkue79@gmail.com>
 pkgname=aiolcdcam
-pkgver=1.25.07.08.2234
+pkgver=1.25.07.12.2333
 pkgrel=1
 pkgdesc="LCD AIO CAM - Modular C daemon for AIO LCD temperature monitoring via CoolerControl (BETA)"
 arch=('x86_64')
