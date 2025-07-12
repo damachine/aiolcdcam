@@ -25,7 +25,7 @@ Transform your cooling system into an intelligent monitoring hub that keeps you 
 > - Features may change or break without notice
 > - Bugs and issues are expected
 > - **Currently tested only on developer's system with NZXT Kraken 2023**
-> - **Manual configuration required** - user-friendly setup tools planned for future
+> - **Technical knowledge needed** - simplified installation process coming
 > - **Command-line focused** - GUI configuration interface planned
 > - **Technical knowledge needed** - simplified installation process coming
 > - Use at your own risk and please report any issues
@@ -161,6 +161,12 @@ curl http://localhost:11987/devices | jq
 | `2`   | Temperatures + circular diagrams | All sensors + CPU/RAM/GPU load |
 | `3`   | Temperatures + horizontal load bars | All sensors + CPU/RAM/GPU load |
 
+> **🎨 Temperature Colors**: 4-stage gradient based on temperature:
+> - **≤55°C**: 🟢 Green (cool)
+> - **≤65°C**: 🟠 Orange (warm)  
+> - **≤75°C**: 🔥 Hot Orange (hot)
+> - **>75°C**: 🔴 Red (critical)
+
 #### How to Change Display Mode
 
 **Via systemd service (recommended):**
@@ -207,10 +213,10 @@ Edit `include/config.h` for customization:
 #define DISPLAY_HEIGHT 240
 #define DISPLAY_REFRESH_INTERVAL_SEC 2
 
-// Temperature thresholds (color gradient)
-#define TEMP_THRESHOLD_GREEN 55.0f
-#define TEMP_THRESHOLD_ORANGE 65.0f
-#define TEMP_THRESHOLD_RED 75.0f
+// Temperature thresholds (4-stage color gradient)
+#define TEMP_THRESHOLD_GREEN 55.0f    // ≤55°C: Green
+#define TEMP_THRESHOLD_ORANGE 65.0f   // ≤65°C: Orange  
+#define TEMP_THRESHOLD_RED 75.0f      // ≤75°C: Hot Orange (>75°C: Red)
 ```
 
 ## 🔧 Usage & Tips

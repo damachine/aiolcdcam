@@ -1,6 +1,9 @@
 post_install() {
+    ech    echo "💡 Troubleshooting (if device not detected):"
+    echo "   curl http://localhost:11987/devices | jq  # Check available devices"
+    echo "   # Make sure your AIO device uses Liquidctl driver"
     echo ""
-    echo "========================================================================"
+    echo "📍 Binary: /opt/aiolcdcam/bin/aiolcdcam (also available as 'aiolcdcam')"    echo "========================================================================"
     echo "LCD AIO CAM has been installed successfully!"
     echo "========================================================================"
     echo ""

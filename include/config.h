@@ -11,10 +11,14 @@
 #define DISPLAY_REFRESH_INTERVAL_SEC 2 // 2 seconds
 #define DISPLAY_REFRESH_INTERVAL_NSEC 500000000  // 0.5 seconds
 
-// Temperature Thresholds (for color gradient)
-#define TEMP_THRESHOLD_GREEN 55.0f // 55 degrees Celsius
-#define TEMP_THRESHOLD_ORANGE 65.0f // 65 degrees Celsius
-#define TEMP_THRESHOLD_RED 75.0f // 75 degrees Celsius
+// Temperature Thresholds (4-stage color gradient: green → orange → hot orange → red)
+// Stage 1: Green (≤55°C) - Cool operating temperature
+// Stage 2: Orange (≤65°C) - Warm operating temperature  
+// Stage 3: Hot Orange (≤75°C) - Hot but acceptable temperature
+// Stage 4: Red (>75°C) - Critical temperature warning
+#define TEMP_THRESHOLD_GREEN 55.0f // 55°C - Green threshold
+#define TEMP_THRESHOLD_ORANGE 65.0f // 65°C - Orange threshold  
+#define TEMP_THRESHOLD_RED 75.0f // 75°C - Hot Orange threshold (above this = Red)
 
 // Layout Constants
 #define BOX_WIDTH 70 // 240 / 3.42857142857
@@ -49,13 +53,17 @@
 
 // AIO LCD Device UID - AUTOMATICALLY DETECTED AT RUNTIME
 // 
-// ℹ️  The device UUID is now automatically detected by querying the CoolerControl API
-// No manual configuration required! The daemon will find your AIO LCD device automatically.
+// ✅ The device UUID is now automatically detected by querying the CoolerControl API
+// ✅ No manual configuration required! The daemon finds your AIO LCD device automatically.
+// ✅ Works with all CoolerControl-compatible AIO devices with LCD displays.
 //
-// For troubleshooting, you can manually check devices with:
-// curl http://localhost:11987/devices | jq
+// 🔍 For troubleshooting, you can manually check devices with:
+//    curl http://localhost:11987/devices | jq
 //
-// Note: Tested with NZXT AIO Kraken 2023 (Z-Series) and compatible devices
+// 📝 Technical: The daemon searches for devices with "type": "Liquidctl" in the API response
+//    and automatically selects the first compatible AIO device found.
+//
+// 🧪 Tested with: NZXT AIO Kraken 2023 (Z-Series) and compatible devices
 
 // Colors (RGB 0-255)
 #define COLOR_GREEN_R 0
