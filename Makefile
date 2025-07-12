@@ -2,7 +2,7 @@
 # LCD AIO CAM - AIO LCD Temperature Monitor
 
 # Version (Format: 1.year.month.day.hourminute)
-VERSION = 1.25.07.08.2234
+VERSION = 1.25.07.13.1200
 
 CC = gcc
 CFLAGS = -Wall -Wextra -O2 -std=c99 -march=x86-64-v3 -Iinclude $(shell pkg-config --cflags cairo)

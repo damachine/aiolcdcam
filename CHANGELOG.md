@@ -8,6 +8,42 @@ and this project follows a custom versioning scheme: **1.year.month.day.hourminu
 
 ---
 
+## [1.25.07.13.XXXX] - 2025-07-13
+
+### Added
+- **Automatic AIO Device Detection**: Runtime UUID detection via CoolerControl API - no manual configuration required
+- **Millisecond-precision GPU cache interval**: GPU_CACHE_INTERVAL now supports float values (e.g. 2.5f) for accurate caching
+- **Helper function get_current_time_ms()** for precise time measurement
+- **4-stage temperature color gradient documentation**: Clear thresholds (≤55°C Green, ≤65°C Orange, ≤75°C Hot Orange, >75°C Red)
+
+### Changed
+- **Removed manual UUID configuration**: Device UUID is now automatically detected at runtime using CoolerControl API
+- **All GPU monitoring functions** (read_gpu_temp, get_gpu_usage_data, get_gpu_data_full) now use millisecond-based caching
+- **Display layout improvements**: Font sizes increased and horizontal bars made smaller for better readability
+- **Degree symbol (°) positioning** optimized for CPU, GPU, and coolant temperature displays
+- **Documentation overhaul**: All references to manual UUID configuration removed from README, install scripts, and manpages
+- **Installation process simplified**: No more manual config.h editing required before installation
+- **Terminology consistency**: All "Kraken" references replaced with neutral "AIO" or "AIO LCD" terminology
+- **Image filename standardized**: All references now use `aiolcdcam.png` consistently
+
+### Fixed
+- **GPU cache interval bug**: Now truly supports 2.5 seconds with millisecond precision (was rounding to 2 seconds)
+- **Function declaration order** in gpu_monitor.c for successful compilation
+- **Automatic device detection**: Robust UUID detection using `"type": "Liquidctl"` as reliable indicator
+
+### Removed
+- **Manual UUID configuration requirement**: No longer need to edit config.h before installation
+- **Static AIO_UUID define**: Replaced with runtime detection system
+- **Hardware-specific output**: Generic "AIO LCD" terminology instead of device-specific references
+
+### Technical
+- **Dynamic UUID detection system**: Queries CoolerControl API and caches detected UUID
+- **get_cached_aio_uuid() function**: Provides runtime-detected UUID throughout application
+- **Automatic compatibility**: Works with all CoolerControl-compatible AIO devices with LCD displays
+- **All changes committed and tested**: Ready for production use
+
+---
+
 ## [1.25.07.08.2234] - 2025-07-08
 
 ### Added
