@@ -26,13 +26,13 @@
 #define BOX_GAP 10 // spacing between boxes
 #define BAR_WIDTH 220 // 240 - (BOX_WIDTH * 3) - (BOX_GAP * 2) - 10 (for border)
 #define BAR_HEIGHT 25 // height of bars
-#define BAR_GAP 4 // spacing between bars
+#define BAR_GAP 2 // spacing between bars
 
 // Font Sizes
 #define FONT_SIZE_LARGE 95.0  // BOX_HEIGHT * 1.50
-#define FONT_SIZE_DEGREE 67.5 // FONT_SIZE_LARGE * 0.75
-#define FONT_SIZE_COOLANT 24.0 // FONT_SIZE_LARGE * 0.30
-#define FONT_SIZE_LABELS 22.0 // FONT_SIZE_LARGE * 0.25
+#define FONT_SIZE_DEGREE 72.0 // FONT_SIZE_LARGE * 0.75
+#define FONT_SIZE_COOLANT 26.0 // FONT_SIZE_LARGE * 0.30
+#define FONT_SIZE_LABELS 28.0 // FONT_SIZE_LARGE * 0.25
 
 // Cache Settings
 #define GPU_CACHE_INTERVAL 2.5f // seconds (supports decimal values with millisecond precision)
