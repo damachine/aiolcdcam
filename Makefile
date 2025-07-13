@@ -1,5 +1,5 @@
-# Makefile for LCD AIO CAM (Standard C Project Structure)
-# LCD AIO CAM - AIO LCD Temperature Monitor
+# Makefile for CoolerDash (Standard C Project Structure)
+# CoolerDash - AIO LCD Temperature Monitor
 
 # Version (Format: 1.year.month.day.hourminute)
 VERSION = 1.25.07.13.1200
@@ -7,7 +7,7 @@ VERSION = 1.25.07.13.1200
 CC = gcc
 CFLAGS = -Wall -Wextra -O2 -std=c99 -march=x86-64-v3 -Iinclude $(shell pkg-config --cflags cairo)
 LIBS = $(shell pkg-config --libs cairo) -lcurl -lm
-TARGET = aiolcdcam
+TARGET = coolerdash
 
 # Directories
 SRCDIR = src
@@ -22,8 +22,8 @@ HEADERS = $(INCDIR)/config.h $(INCDIR)/cpu_monitor.h $(INCDIR)/gpu_monitor.h $(I
 OBJECTS = $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(MODULES))
 ALL_SOURCES = $(MAIN_SOURCE) $(MODULES)
 
-SERVICE = systemd/aiolcdcam.service
-MANPAGE = man/aiolcdcam.1
+SERVICE = systemd/coolerdash.service
+MANPAGE = man/coolerdash.1
 README = README.md
 
 # Colors for terminal output
@@ -187,106 +187,106 @@ check-deps-for-install:
 		}; \
 	fi
 
-# Install Target - Installs to /opt/aiolcdcam/ (with automatic dependency check and service management)
+# Install Target - Installs to /opt/coolerdash/ (with automatic dependency check and service management)
 install: check-deps-for-install $(TARGET)
 	@printf "\n"
-	@printf "$(ICON_INSTALL) $(WHITE)═══ LCD AIO CAM INSTALLATION ═══$(RESET)\n"
+	@printf "$(ICON_INSTALL) $(WHITE)═══ COOLERDASH INSTALLATION ═══$(RESET)\n"
 	@printf "\n"
 	@printf "$(ICON_SERVICE) $(CYAN)Checking running service and processes...$(RESET)\n"
-	@if sudo systemctl is-active --quiet aiolcdcam.service; then \
+	@if sudo systemctl is-active --quiet coolerdash.service; then \
 		printf "  $(YELLOW)→$(RESET) Service running, stopping for update...\n"; \
-		sudo systemctl stop aiolcdcam.service; \
+		sudo systemctl stop coolerdash.service; \
 		printf "  $(GREEN)→$(RESET) Service stopped\n"; \
 	else \
 		printf "  $(BLUE)→$(RESET) Service not running\n"; \
 	fi
-	@# Check for manual aiolcdcam processes and terminate them
-	@AIOLCDCAM_COUNT=$$(pgrep -x aiolcdcam 2>/dev/null | wc -l); \
-	if [ "$$AIOLCDCAM_COUNT" -gt 0 ]; then \
-		printf "  $(YELLOW)→$(RESET) Found $$AIOLCDCAM_COUNT manual aiolcdcam process(es), terminating...\n"; \
-		sudo killall -TERM aiolcdcam 2>/dev/null || true; \
+	@# Check for manual coolerdash processes and terminate them
+	@COOLERDASH_COUNT=$$(pgrep -x coolerdash 2>/dev/null | wc -l); \
+	if [ "$$COOLERDASH_COUNT" -gt 0 ]; then \
+		printf "  $(YELLOW)→$(RESET) Found $$COOLERDASH_COUNT manual coolerdash process(es), terminating...\n"; \
+		sudo killall -TERM coolerdash 2>/dev/null || true; \
 		sleep 2; \
-		REMAINING_COUNT=$$(pgrep -x aiolcdcam 2>/dev/null | wc -l); \
+		REMAINING_COUNT=$$(pgrep -x coolerdash 2>/dev/null | wc -l); \
 		if [ "$$REMAINING_COUNT" -gt 0 ]; then \
 			printf "  $(RED)→$(RESET) Force killing $$REMAINING_COUNT remaining process(es)...\n"; \
-			sudo killall -KILL aiolcdcam 2>/dev/null || true; \
+			sudo killall -KILL coolerdash 2>/dev/null || true; \
 		fi; \
 		printf "  $(GREEN)→$(RESET) Manual processes terminated\n"; \
 	else \
-		printf "  $(BLUE)→$(RESET) No manual aiolcdcam processes found\n"; \
+		printf "  $(BLUE)→$(RESET) No manual coolerdash processes found\n"; \
 	fi
 	@printf "\n"
 	@printf "$(ICON_INFO) $(CYAN)Creating directories...$(RESET)\n"
-	sudo mkdir -p /opt/aiolcdcam/bin
-	sudo mkdir -p /opt/aiolcdcam/images
+	sudo mkdir -p /opt/coolerdash/bin
+	sudo mkdir -p /opt/coolerdash/images
 	@printf "$(ICON_SUCCESS) $(GREEN)Directories created$(RESET)\n"
 	@printf "\n"
 	@printf "$(ICON_INFO) $(CYAN)Copying files...$(RESET)\n"
-	sudo cp $(BINDIR)/$(TARGET) /opt/aiolcdcam/bin/
-	sudo chmod +x /opt/aiolcdcam/bin/$(TARGET)
-	sudo cp images/face.png /opt/aiolcdcam/images/ 2>/dev/null || true
-	sudo cp $(README) /opt/aiolcdcam/
-	@printf "  $(GREEN)→$(RESET) Program: /opt/aiolcdcam/bin/$(TARGET)\n"
-	@printf "  $(GREEN)→$(RESET) Shutdown image: /opt/aiolcdcam/images/face.png\n"
-	@printf "  $(GREEN)→$(RESET) Sensor image: will be created at runtime as aiolcdcam.png\n"
-	@printf "  $(GREEN)→$(RESET) README: /opt/aiolcdcam/README.md\n"
+	sudo cp $(BINDIR)/$(TARGET) /opt/coolerdash/bin/
+	sudo chmod +x /opt/coolerdash/bin/$(TARGET)
+	sudo cp images/face.png /opt/coolerdash/images/ 2>/dev/null || true
+	sudo cp $(README) /opt/coolerdash/
+	@printf "  $(GREEN)→$(RESET) Program: /opt/coolerdash/bin/$(TARGET)\n"
+	@printf "  $(GREEN)→$(RESET) Shutdown image: /opt/coolerdash/images/face.png\n"
+	@printf "  $(GREEN)→$(RESET) Sensor image: will be created at runtime as coolerdash.png\n"
+	@printf "  $(GREEN)→$(RESET) README: /opt/coolerdash/README.md\n"
 	@printf "\n"
 	@printf "$(ICON_SERVICE) $(CYAN)Installing service & documentation...$(RESET)\n"
 	sudo cp $(SERVICE) /etc/systemd/system/
 	sudo cp $(MANPAGE) /usr/share/man/man1/
 	sudo mandb -q
 	sudo systemctl daemon-reload
-	@printf "  $(GREEN)→$(RESET) Service: /etc/systemd/system/aiolcdcam.service\n"
-	@printf "  $(GREEN)→$(RESET) Manual: /usr/share/man/man1/aiolcdcam.1\n"
+	@printf "  $(GREEN)→$(RESET) Service: /etc/systemd/system/coolerdash.service\n"
+	@printf "  $(GREEN)→$(RESET) Manual: /usr/share/man/man1/coolerdash.1\n"
 	@printf "\n"
 	@printf "$(ICON_SERVICE) $(CYAN)Restarting service...$(RESET)\n"
-	@if sudo systemctl is-enabled --quiet aiolcdcam.service; then \
-		sudo systemctl start aiolcdcam.service; \
+	@if sudo systemctl is-enabled --quiet coolerdash.service; then \
+		sudo systemctl start coolerdash.service; \
 		printf "  $(GREEN)→$(RESET) Service started\n"; \
-		printf "  $(GREEN)→$(RESET) Status: $$(sudo systemctl is-active aiolcdcam.service)\n"; \
+		printf "  $(GREEN)→$(RESET) Status: $$(sudo systemctl is-active coolerdash.service)\n"; \
 	else \
 		printf "  $(YELLOW)→$(RESET) Service not enabled\n"; \
-		printf "  $(YELLOW)→$(RESET) Enable with: sudo systemctl enable aiolcdcam.service\n"; \
+		printf "  $(YELLOW)→$(RESET) Enable with: sudo systemctl enable coolerdash.service\n"; \
 	fi
 	@printf "\n"
 	@printf "$(ICON_SUCCESS) $(WHITE)═══ INSTALLATION SUCCESSFUL ═══$(RESET)\n"
 	@printf "\n"
 	@printf "$(YELLOW)📋 Next steps:$(RESET)\n"
-	@if sudo systemctl is-enabled --quiet aiolcdcam.service; then \
+	@if sudo systemctl is-enabled --quiet coolerdash.service; then \
 		printf "  $(GREEN)✓$(RESET) Service enabled and started\n"; \
-		printf "  $(PURPLE)Check status:$(RESET)        sudo systemctl status aiolcdcam.service\n"; \
+		printf "  $(PURPLE)Check status:$(RESET)        sudo systemctl status coolerdash.service\n"; \
 	else \
-		printf "  $(PURPLE)Enable service:$(RESET)      sudo systemctl enable aiolcdcam.service\n"; \
-		printf "  $(PURPLE)Start service:$(RESET)       sudo systemctl start aiolcdcam.service\n"; \
+		printf "  $(PURPLE)Enable service:$(RESET)      sudo systemctl enable coolerdash.service\n"; \
+		printf "  $(PURPLE)Start service:$(RESET)       sudo systemctl start coolerdash.service\n"; \
 	fi
-	@printf "  $(PURPLE)Show manual:$(RESET)         man aiolcdcam\n"
+	@printf "  $(PURPLE)Show manual:$(RESET)         man coolerdash\n"
 	@printf "\n"
 	@printf "$(YELLOW)🔄 Available version:$(RESET)\n"
-	@printf "  $(GREEN)Program:$(RESET) /opt/aiolcdcam/bin/aiolcdcam [mode]\n"
+	@printf "  $(GREEN)Program:$(RESET) /opt/coolerdash/bin/coolerdash [mode]\n"
 	@printf "\n"
 
 # Uninstall Target
 uninstall:
 	@printf "\n"
-	@printf "$(ICON_UNINSTALL) $(WHITE)═══ LCD AIO CAM UNINSTALLATION ═══$(RESET)\n"
+	@printf "$(ICON_UNINSTALL) $(WHITE)═══ COOLERDASH UNINSTALLATION ═══$(RESET)\n"
 	@printf "\n"
 	@printf "$(ICON_WARNING) $(YELLOW)Stopping and disabling service...$(RESET)\n"
-	sudo systemctl stop aiolcdcam.service || true
-	sudo systemctl disable aiolcdcam.service || true
+	sudo systemctl stop coolerdash.service || true
+	sudo systemctl disable coolerdash.service || true
 	@printf "$(ICON_SUCCESS) $(GREEN)Service stopped$(RESET)\n"
 	@printf "\n"
 	@printf "$(ICON_INFO) $(CYAN)Removing files...$(RESET)\n"
-	sudo rm -f /etc/systemd/system/aiolcdcam.service
-	sudo rm -f /usr/share/man/man1/aiolcdcam.1
-	sudo rm -f /opt/aiolcdcam/README.md
-	sudo rm -f /opt/aiolcdcam/bin/$(TARGET)
-	sudo rm -rf /opt/aiolcdcam/bin/
-	sudo rm -rf /var/cache/aiolcdcam/
-	@printf "  $(RED)✗$(RESET) Service: /etc/systemd/system/aiolcdcam.service\n"
-	@printf "  $(RED)✗$(RESET) Manual: /usr/share/man/man1/aiolcdcam.1\n"
-	@printf "  $(RED)✗$(RESET) Program: /opt/aiolcdcam/bin/$(TARGET)\n"
-	@printf "  $(RED)✗$(RESET) README: /opt/aiolcdcam/README.md\n"
-	@printf "  $(RED)✗$(RESET) Cache: /var/cache/aiolcdcam/\n"
+	sudo rm -f /etc/systemd/system/coolerdash.service
+	sudo rm -f /usr/share/man/man1/coolerdash.1
+	sudo rm -f /opt/coolerdash/README.md
+	sudo rm -f /opt/coolerdash/bin/$(TARGET)
+	sudo rm -rf /opt/coolerdash/bin/
+	sudo rm -rf /var/cache/coolerdash/
+	@printf "  $(RED)✗$(RESET) Service: /etc/systemd/system/coolerdash.service\n"
+	@printf "  $(RED)✗$(RESET) Manual: /usr/share/man/man1/coolerdash.1\n"
+	@printf "  $(RED)✗$(RESET) Program: /opt/coolerdash/bin/$(TARGET)\n"
+	@printf "  $(RED)✗$(RESET) README: /opt/coolerdash/README.md\n"
+	@printf "  $(RED)✗$(RESET) Cache: /var/cache/coolerdash/\n"
 	@printf "\n"
 	@printf "$(ICON_INFO) $(CYAN)Updating system...$(RESET)\n"
 	sudo mandb -q
@@ -294,7 +294,7 @@ uninstall:
 	@printf "\n"
 	@printf "$(ICON_SUCCESS) $(WHITE)═══ UNINSTALLATION COMPLETE ═══$(RESET)\n"
 	@printf "\n"
-	@printf "$(ICON_INFO) $(BLUE)Note:$(RESET) /opt/aiolcdcam/images/ remains (may contain images)\n"
+	@printf "$(ICON_INFO) $(BLUE)Note:$(RESET) /opt/coolerdash/images/ remains (may contain images)\n"
 	@printf "\n"
 
 # Debug Build
@@ -305,43 +305,43 @@ debug: $(TARGET)
 
 # Service Management Targets
 start:
-	@printf "$(ICON_SERVICE) $(GREEN)Starting aiolcdcam service...$(RESET)\n"
-	sudo systemctl start aiolcdcam.service
+	@printf "$(ICON_SERVICE) $(GREEN)Starting coolerdash service...$(RESET)\n"
+	sudo systemctl start coolerdash.service
 	@printf "$(ICON_SUCCESS) $(GREEN)Service started$(RESET)\n"
 
 stop:
-	@printf "$(ICON_SERVICE) $(YELLOW)Stopping aiolcdcam service...$(RESET)\n"
-	sudo systemctl stop aiolcdcam.service
+	@printf "$(ICON_SERVICE) $(YELLOW)Stopping coolerdash service...$(RESET)\n"
+	sudo systemctl stop coolerdash.service
 	@printf "$(ICON_SUCCESS) $(GREEN)Service stopped$(RESET)\n"
 
 restart:
-	@printf "$(ICON_SERVICE) $(CYAN)Restarting aiolcdcam service...$(RESET)\n"
-	sudo systemctl restart aiolcdcam.service
+	@printf "$(ICON_SERVICE) $(CYAN)Restarting coolerdash service...$(RESET)\n"
+	sudo systemctl restart coolerdash.service
 	@printf "$(ICON_SUCCESS) $(GREEN)Service restarted$(RESET)\n"
 
 status:
 	@printf "$(ICON_INFO) $(CYAN)Service Status:$(RESET)\n"
-	sudo systemctl status aiolcdcam.service
+	sudo systemctl status coolerdash.service
 
 enable:
 	@printf "$(ICON_SERVICE) $(GREEN)Enabling autostart...$(RESET)\n"
-	sudo systemctl enable aiolcdcam.service
+	sudo systemctl enable coolerdash.service
 	@printf "$(ICON_SUCCESS) $(GREEN)Service will start automatically at boot$(RESET)\n"
 
 disable:
 	@printf "$(ICON_SERVICE) $(YELLOW)Disabling autostart...$(RESET)\n"
-	sudo systemctl disable aiolcdcam.service
+	sudo systemctl disable coolerdash.service
 	@printf "$(ICON_SUCCESS) $(GREEN)Boot autostart disabled$(RESET)\n"
 
 logs:
 	@printf "$(ICON_INFO) $(CYAN)Live logs (Ctrl+C to exit):$(RESET)\n"
-	sudo journalctl -u aiolcdcam.service -f
+	sudo journalctl -u coolerdash.service -f
 
 # Help
 help:
 	@printf "\n"
 	@printf "$(WHITE)════════════════════════════════════════$(RESET)\n"
-	@printf "$(WHITE)         LCD AIO CAM BUILD SYSTEM       $(RESET)\n"
+	@printf "$(WHITE)         COOLERDASH BUILD SYSTEM        $(RESET)\n"
 	@printf "$(WHITE)════════════════════════════════════════$(RESET)\n"
 	@printf "\n"
 	@printf "$(YELLOW)🔨 Build Targets:$(RESET)\n"
@@ -350,29 +350,29 @@ help:
 	@printf "  $(GREEN)make debug$(RESET)    - Debug build with AddressSanitizer\n"
 	@printf "\n"
 	@printf "$(YELLOW)📦 Installation:$(RESET)\n"
-	@printf "  $(GREEN)make install$(RESET)  - Installs to /opt/aiolcdcam/bin/ (auto-installs dependencies)\n"
+	@printf "  $(GREEN)make install$(RESET)  - Installs to /opt/coolerdash/bin/ (auto-installs dependencies)\n"
 	@printf "  $(GREEN)make uninstall$(RESET)- Uninstalls the program\n"
 	@printf "\n"
 	@printf "$(YELLOW)⚙️  Service Management:$(RESET)\n"
-	@printf "  $(GREEN)sudo systemctl start aiolcdcam.service$(RESET)    - Starts the service\n"
-	@printf "  $(GREEN)sudo systemctl stop aiolcdcam.service$(RESET)     - Stops the service (sends face.png to LCD automatically)\n"
-	@printf "  $(GREEN)sudo systemctl restart aiolcdcam.service$(RESET)  - Restarts the service\n"
-	@printf "  $(GREEN)sudo systemctl status aiolcdcam.service$(RESET)   - Shows service status\n"
-	@printf "  $(GREEN)sudo systemctl enable aiolcdcam.service$(RESET)   - Enables autostart\n"
-	@printf "  $(GREEN)sudo systemctl disable aiolcdcam.service$(RESET)  - Disables autostart\n"
-	@printf "  $(GREEN)sudo journalctl -u aiolcdcam.service -f$(RESET)   - Shows live logs\n"
+	@printf "  $(GREEN)sudo systemctl start coolerdash.service$(RESET)    - Starts the service\n"
+	@printf "  $(GREEN)sudo systemctl stop coolerdash.service$(RESET)     - Stops the service (sends face.png to LCD automatically)\n"
+	@printf "  $(GREEN)sudo systemctl restart coolerdash.service$(RESET)  - Restarts the service\n"
+	@printf "  $(GREEN)sudo systemctl status coolerdash.service$(RESET)   - Shows service status\n"
+	@printf "  $(GREEN)sudo systemctl enable coolerdash.service$(RESET)   - Enables autostart\n"
+	@printf "  $(GREEN)sudo systemctl disable coolerdash.service$(RESET)  - Disables autostart\n"
+	@printf "  $(GREEN)sudo journalctl -u coolerdash.service -f$(RESET)   - Shows live logs\n"
 	@printf "  $(BLUE)Note:$(RESET) Shortcuts available: make start/stop/restart/status/enable/disable/logs\n"
 	@printf "  $(BLUE)Shutdown:$(RESET) Service automatically displays face.png when stopped (integrated in C code)\n"
 	@printf "\n"
 	@printf "$(YELLOW)📚 Documentation:$(RESET)\n"
-	@printf "  $(GREEN)man aiolcdcam$(RESET) - Shows manual page\n"
+	@printf "  $(GREEN)man coolerdash$(RESET) - Shows manual page\n"
 	@printf "  $(GREEN)make help$(RESET)     - Shows this help\n"
 	@printf "\n"
 	@printf "$(YELLOW)🌍 README:$(RESET)\n"
 	@printf "  $(GREEN)README.md$(RESET)         - 🇺🇸 English (main documentation)\n"
 	@printf "\n"
 	@printf "$(YELLOW)🔄 Version Usage:$(RESET)\n"
-	@printf "  $(GREEN)Program:$(RESET) /opt/aiolcdcam/bin/aiolcdcam [mode]\n"
+	@printf "  $(GREEN)Program:$(RESET) /opt/coolerdash/bin/coolerdash [mode]\n"
 	@printf "\n"
 	@printf "$(BLUE)Compiler Flags:$(RESET) $(CFLAGS)\n"
 	@printf "$(BLUE)Libraries:$(RESET) $(LIBS)\n"

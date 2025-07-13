@@ -11,15 +11,15 @@
 #include <errno.h>
 
 /**
- * LCD AIO CAM - Main Program
- * ==========================
+ * CoolerDash - Main Program
+ * =========================
  * 
  * Professional, modular C daemon for AIO LCD Temperature Monitor.
  * Displays CPU/GPU temperatures and optional load data on LCD display.
  * 
  * Compile with: make
  * Or manually: gcc -Wall -Wextra -O2 -std=c99 main.c cpu_monitor.c gpu_monitor.c 
- *               coolant_monitor.c display.c coolercontrol.c -o aiolcdcam -lcairo -lcurl -lm
+ *               coolant_monitor.c display.c coolercontrol.c -o coolerdash -lcairo -lcurl -lm
  * 
  * Modes:
  *   def - Temperatures only (CPU, GPU, Coolant)
@@ -28,7 +28,7 @@
  *   3   - Temperatures + horizontal load bars
  *
  * Single-Instance Enforcement:
- *   - Only one aiolcdcam instance can run simultaneously
+ *   - Only one coolerdash instance can run simultaneously
  *   - Manual start: Error if systemd service is running
  *   - systemd start: Terminates previous manual instances
  *   - PID file coordinates instance management
@@ -55,7 +55,7 @@ static void cleanup_and_exit(int sig) {
     
     // Send shutdown image only once
     if (!shutdown_sent && is_session_initialized()) {
-        const char* shutdown_image = "/opt/aiolcdcam/images/face.png";
+        const char* shutdown_image = "/opt/coolerdash/images/face.png";
         const char* device_uuid = get_cached_aio_uuid();
         
         printf("LCD AIO CAM: Sending shutdown image to AIO LCD...\n");
@@ -111,8 +111,8 @@ static int check_existing_instance_and_handle(const char *pid_file, int is_servi
     if (cmdline_f) {
         char cmdline[512] = {0};
         if (fread(cmdline, 1, sizeof(cmdline)-1, cmdline_f) > 0) {
-            // Check if started by systemd (contains /opt/aiolcdcam/bin/aiolcdcam)
-            if (strstr(cmdline, "/opt/aiolcdcam/bin/aiolcdcam") != NULL) {
+            // Check if started by systemd (contains /opt/coolerdash/bin/coolerdash)
+            if (strstr(cmdline, "/opt/coolerdash/bin/coolerdash") != NULL) {
                 is_existing_service = 1;
             }
         }
@@ -144,8 +144,8 @@ static int check_existing_instance_and_handle(const char *pid_file, int is_servi
         // Manual start: Check if service is running
         if (is_existing_service) {
             printf("LCD AIO CAM: Error - systemd service is already running (PID %d)\n", old_pid);
-            printf("Stop the service first: sudo systemctl stop aiolcdcam.service\n");
-            printf("Or check status: sudo systemctl status aiolcdcam.service\n");
+            printf("Stop the service first: sudo systemctl stop coolerdash.service\n");
+            printf("Or check status: sudo systemctl status coolerdash.service\n");
             return -1; // Error: Service already running
         } else {
             // Other manual instance running: Terminate it
@@ -187,7 +187,7 @@ static void write_pid_file(const char *pid_file) {
  * Main daemon loop
  */
 static int run_daemon(display_mode_t mode) {
-    printf("LCD AIO CAM daemon started (Mode: %d)\n", mode); // Show mode
+    printf("CoolerDash daemon started (Mode: %d)\n", mode); // Show mode
     printf("Sensor data updated every %d.%d seconds\n", 
            DISPLAY_REFRESH_INTERVAL_SEC, DISPLAY_REFRESH_INTERVAL_NSEC / 100000000);
     printf("Daemon now running silently in background...\n\n");
@@ -207,7 +207,7 @@ static int run_daemon(display_mode_t mode) {
  * Show help and explain program usage
  */
 static void show_help(const char *program_name) {
-    printf("LCD AIO CAM - Complete AIO LCD Temperature Monitor\n\n");
+    printf("CoolerDash - Complete AIO LCD Temperature Monitor\n\n");
     printf("Usage: %s [MODE] or %s --mode [MODE]\n\n", program_name, program_name);
     printf("Modes:\n");
     printf("  def  - Temperatures only (default, resource-efficient)\n");
@@ -226,7 +226,7 @@ static void show_help(const char *program_name) {
     printf("  %s --mode 3     # With horizontal bars\n\n", program_name);
     printf("The daemon runs in background and updates the LCD every %d.%d seconds.\n",
            DISPLAY_REFRESH_INTERVAL_SEC, DISPLAY_REFRESH_INTERVAL_NSEC / 100000000);
-    printf("To stop: sudo systemctl stop aiolcdcam\n");
+    printf("To stop: sudo systemctl stop coolerdash\n");
 }/**
  * Detect if we were started by systemd
  */
@@ -246,17 +246,17 @@ int main(int argc, char *argv[]) {
     }
     
     // Parse display mode - supports both formats:
-    // ./aiolcdcam def      or    ./aiolcdcam --mode def
-    // ./aiolcdcam 1        or    ./aiolcdcam --mode 1
-    // ./aiolcdcam 2        or    ./aiolcdcam --mode 2
-    // ./aiolcdcam 3        or    ./aiolcdcam --mode 3
+    // ./coolerdash def      or    ./coolerdash --mode def
+    // ./coolerdash 1        or    ./coolerdash --mode 1
+    // ./coolerdash 2        or    ./coolerdash --mode 2
+    // ./coolerdash 3        or    ./coolerdash --mode 3
     // Default mode is "def" (temperatures only, resource-efficient)
     const char *mode_str = "def"; // default mode
     
     if (argc > 1) { // Check if a parameter is provided
         // Check if the first parameter is --mode
         if (strcmp(argv[1], "--mode") == 0) { // --mode parameter
-            // --mode parameter format: ./aiolcdcam --mode def
+            // --mode parameter format: ./coolerdash --mode def
             // Check if a mode is specified
             if (argc > 2) {
                 if (strcmp(argv[2], "def") == 0 || 
@@ -276,7 +276,7 @@ int main(int argc, char *argv[]) {
                 mode_str = "def";  // Fallback
             }
         } else {
-            // Direct parameter format: ./aiolcdcam def
+            // Direct parameter format: ./coolerdash def
             // Check if the parameter is valid
             if (strcmp(argv[1], "def") == 0 || 
                 strcmp(argv[1], "1") == 0 || 
@@ -387,7 +387,7 @@ int main(int argc, char *argv[]) {
     
     // Cleanup - send shutdown image if not sent yet (only on normal termination)
     if (!shutdown_sent && is_session_initialized()) {
-        const char* shutdown_image = "/opt/aiolcdcam/images/face.png";
+        const char* shutdown_image = "/opt/coolerdash/images/face.png";
         const char* device_uuid = get_cached_aio_uuid();
         
         printf("LCD AIO CAM: Sending final shutdown image...\n");

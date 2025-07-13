@@ -1,17 +1,17 @@
-.TH AIOLCDCAM 1 "July 2025" "aiolcdcam 1.25.07.08.2234" "User Commands"
+.TH COOLERDASH 1 "July 2025" "coolerdash 1.25.07.13.1200" "User Commands"
 .SH NAME
-aiolcdcam \- LCD AIO CAM Temperature Monitor (Professional Modular C Daemon)
+coolerdash \- CoolerDash Temperature Monitor (Professional Modular C Daemon)
 .SH SYNOPSIS
-.B aiolcdcam
+.B coolerdash
 [\fIMODE\fR]
 .br
-.B aiolcdcam
+.B coolerdash
 [\fB\-\-mode\fR \fIMODE\fR]
 .br
-.B aiolcdcam
+.B coolerdash
 [\fB\-h\fR|\fB\-\-help\fR]
 .SH DESCRIPTION
-.B aiolcdcam
+.B coolerdash
 is a high-performance, modular C-based daemon with professional systemd integration that monitors CPU and GPU temperatures and displays them graphically on the LCD display of an NZXT AIO water cooler. The program is fully developed in modular C99 architecture for maximum efficiency, maintainability, and production stability.
 
 The modular architecture separates CPU, GPU, coolant, and display logic into separate modules. Depending on the selected mode, only the required sensor data is queried, which significantly optimizes I/O performance (def mode uses only temperature sensors, modes 1-3 additionally load data).
@@ -77,43 +77,43 @@ Temperatures + horizontal load bars
 Shows help information and usage examples
 .SH FILES
 .TP
-.I /opt/aiolcdcam/bin/aiolcdcam
+.I /opt/coolerdash/bin/coolerdash
 Main program (modern modular version)
 .TP
-.I /opt/aiolcdcam/man/README.md
+.I /opt/coolerdash/man/README.md
 Documentation
 .TP
-.I /opt/aiolcdcam/images/aiolcdcam.png
+.I /opt/coolerdash/images/coolerdash.png
 Generated temperature image
 .TP
-.I /etc/systemd/system/aiolcdcam.service
+.I /etc/systemd/system/coolerdash.service
 Systemd service file
 .TP
-.I /var/run/aiolcdcam.pid
+.I /var/run/coolerdash.pid
 PID file for process management
 .SH EXAMPLES
 .TP
 Start program in default mode (temperatures only):
-.B aiolcdcam def
+.B coolerdash def
 .TP
 Start program with vertical load bars:
-.B aiolcdcam 1
+.B coolerdash 1
 .TP
 Start program with circular diagrams:
-.B aiolcdcam 2
+.B coolerdash 2
 .TP
 Start program with horizontal load bars:
-.B aiolcdcam 3
+.B coolerdash 3
 .TP
 Show help:
-.B aiolcdcam --help
+.B coolerdash --help
 .TP
 Service management:
-.B sudo systemctl start aiolcdcam
+.B sudo systemctl start coolerdash
 .br
-.B sudo systemctl status aiolcdcam
+.B sudo systemctl status coolerdash
 .br
-.B journalctl -u aiolcdcam -f
+.B journalctl -u coolerdash -f
 
 .SH SYSTEMD INTEGRATION
 The program provides professional systemd integration with detailed logs:
@@ -124,14 +124,14 @@ The program provides professional systemd integration with detailed logs:
 Automatically installs the service and restarts it on updates.
 .TP
 .B Service Management
-.B sudo systemctl enable aiolcdcam.service
+.B sudo systemctl enable coolerdash.service
 .br
-.B sudo systemctl start aiolcdcam.service
+.B sudo systemctl start coolerdash.service
 .br
-.B sudo systemctl status aiolcdcam.service
+.B sudo systemctl status coolerdash.service
 .TP
 .B Detailed Logs
-.B journalctl -u aiolcdcam.service --since "10 minutes ago"
+.B journalctl -u coolerdash.service --since "10 minutes ago"
 .br
 Shows module initialization, CoolerControl connection, and operating status.
 .TP
@@ -191,7 +191,7 @@ Cairo (graphics), cURL (HTTP), NVIDIA-SMI (GPU data), hwmon (temperature sensors
 .TP
 .B System Installation
 .B sudo make install
-(builds, installs to /opt/aiolcdcam/, configures systemd service)
+(builds, installs to /opt/coolerdash/, configures systemd service)
 .TP
 .B CPU Optimization
 x86-64-v3 optimized for modern CPUs (Intel Haswell+/AMD Excavator+, 2013+)
@@ -245,12 +245,12 @@ Written by DAMACHINE (christkue79@gmail.com).
 .BR nvidia-smi (1),
 .BR journalctl (1)
 .br
-Project repository: https://github.com/damachine/aiolcdcam
+Project repository: https://github.com/damachine/coolerdash
 .SH COPYRIGHT
 Copyright © 2025 DAMACHINE. This is free software; see source for copying conditions.
 Released under MIT License.
 .SH SETUP
-Before using aiolcdcam, ensure CoolerControl is properly configured:
+Before using coolerdash, ensure CoolerControl is properly configured:
 .TP
 .B 1. Install and start CoolerControl
 Follow: https://gitlab.com/coolercontrol/coolercontrol/-/blob/main/README.md
@@ -263,9 +263,9 @@ Set your AIO LCD display to "Image" mode (not temperature mode)
 .B 3. Build and install (automatic device detection)
 \fBsudo make install\fR
 .br
-\fBsudo systemctl enable aiolcdcam.service\fR
+\fBsudo systemctl enable coolerdash.service\fR
 .br
-\fBsudo systemctl start aiolcdcam.service\fR
+\fBsudo systemctl start coolerdash.service\fR
 .br
 Device UUID is automatically detected at startup
 

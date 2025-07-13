@@ -4,7 +4,7 @@ bin/
 *.o
 
 # Release tarballs (created by create-release.sh)
-aiolcdcam-*.tar.gz
+coolerdash-*.tar.gz
 
 # Arch package files (created by makepkg)
 *.pkg.tar.zst

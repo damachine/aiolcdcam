@@ -1,17 +1,17 @@
 # Maintainer: DAMACHINE <christkue79@gmail.com>
-pkgname=aiolcdcam
+pkgname=coolerdash
 pkgver=1.25.07.13.1200
 pkgrel=1
-pkgdesc="LCD AIO CAM - Modular C daemon for AIO LCD temperature monitoring via CoolerControl (BETA)"
+pkgdesc="CoolerDash - Modular C daemon for AIO LCD temperature monitoring via CoolerControl (BETA)"
 arch=('x86_64')
-url="https://github.com/damachine/aiolcdcam"
+url="https://github.com/damachine/coolerdash"
 license=('MIT')
 depends=('cairo' 'libcurl-gnutls' 'coolercontrol')
 makedepends=('gcc' 'make' 'pkg-config')
 optdepends=('nvidia-utils: for GPU temperature monitoring'
             'lm_sensors: for additional hardware monitoring')
-backup=('opt/aiolcdcam/README.md')
-install=aiolcdcam.install
+backup=('opt/coolerdash/README.md')
+install=coolerdash.install
 source=()
 sha256sums=()
 
@@ -25,7 +25,7 @@ prepare() {
     echo "- Features may change or break without notice"
     echo "- Bugs and issues are expected"
     echo "- Use at your own risk"
-    echo "- Please report issues to: https://github.com/damachine/aiolcdcam/issues"
+    echo "- Please report issues to: https://github.com/damachine/coolerdash/issues"
     echo "================================================================"
     echo ""
     
@@ -39,15 +39,15 @@ prepare() {
     local manual_binary_exists=0
     
     # Check for systemd service installed by Makefile
-    if [[ -f "/etc/systemd/system/aiolcdcam.service" ]]; then
-        echo "Found manual systemd service: /etc/systemd/system/aiolcdcam.service"
+    if [[ -f "/etc/systemd/system/coolerdash.service" ]]; then
+        echo "Found manual systemd service: /etc/systemd/system/coolerdash.service"
         manual_service_exists=1
         manual_installed=1
     fi
     
     # Check for binary installed by Makefile
-    if [[ -f "/opt/aiolcdcam/bin/aiolcdcam" ]] && [[ ! -L "/usr/bin/aiolcdcam" ]]; then
-        echo "Found manual binary installation: /opt/aiolcdcam/bin/aiolcdcam"
+    if [[ -f "/opt/coolerdash/bin/coolerdash" ]] && [[ ! -L "/usr/bin/coolerdash" ]]; then
+        echo "Found manual binary installation: /opt/coolerdash/bin/coolerdash"
         manual_binary_exists=1
         manual_installed=1
     fi
@@ -63,9 +63,9 @@ prepare() {
         # Try to run make uninstall if Makefile exists
         if [[ -f "Makefile" ]]; then
             # Stop service if running
-            if systemctl is-active --quiet aiolcdcam.service 2>/dev/null; then
-                echo "Stopping aiolcdcam service..."
-                sudo systemctl stop aiolcdcam.service || true
+            if systemctl is-active --quiet coolerdash.service 2>/dev/null; then
+                echo "Stopping coolerdash service..."
+                sudo systemctl stop coolerdash.service || true
             fi
             
             # Run make uninstall
@@ -76,13 +76,13 @@ prepare() {
                 echo "⚠️  Make uninstall failed, attempting manual cleanup..."
                 
                 # Manual cleanup if make uninstall fails
-                sudo systemctl stop aiolcdcam.service 2>/dev/null || true
-                sudo systemctl disable aiolcdcam.service 2>/dev/null || true
-                sudo rm -f /etc/systemd/system/aiolcdcam.service
-                sudo rm -f /usr/share/man/man1/aiolcdcam.1
-                sudo rm -f /opt/aiolcdcam/bin/aiolcdcam
-                sudo rm -f /opt/aiolcdcam/README.md
-                sudo rm -rf /opt/aiolcdcam/images/
+                sudo systemctl stop coolerdash.service 2>/dev/null || true
+                sudo systemctl disable coolerdash.service 2>/dev/null || true
+                sudo rm -f /etc/systemd/system/coolerdash.service
+                sudo rm -f /usr/share/man/man1/coolerdash.1
+                sudo rm -f /opt/coolerdash/bin/coolerdash
+                sudo rm -f /opt/coolerdash/README.md
+                sudo rm -rf /opt/coolerdash/images/
                 sudo systemctl daemon-reload
                 
                 echo "✅ Manual cleanup completed"
@@ -91,13 +91,13 @@ prepare() {
             echo "⚠️  No Makefile found, performing manual cleanup..."
             
             # Manual cleanup
-            sudo systemctl stop aiolcdcam.service 2>/dev/null || true
-            sudo systemctl disable aiolcdcam.service 2>/dev/null || true
-            sudo rm -f /etc/systemd/system/aiolcdcam.service
-            sudo rm -f /usr/share/man/man1/aiolcdcam.1
-            sudo rm -f /opt/aiolcdcam/bin/aiolcdcam
-            sudo rm -f /opt/aiolcdcam/README.md
-            sudo rm -rf /opt/aiolcdcam/images/
+            sudo systemctl stop coolerdash.service 2>/dev/null || true
+            sudo systemctl disable coolerdash.service 2>/dev/null || true
+            sudo rm -f /etc/systemd/system/coolerdash.service
+            sudo rm -f /usr/share/man/man1/coolerdash.1
+            sudo rm -f /opt/coolerdash/bin/coolerdash
+            sudo rm -f /opt/coolerdash/README.md
+            sudo rm -rf /opt/coolerdash/images/
             sudo systemctl daemon-reload
             
             echo "✅ Manual cleanup completed"
@@ -125,8 +125,8 @@ prepare() {
     
     # Additional cleanup for any remaining conflicting files
     echo "Performing final cleanup of any conflicting files..."
-    sudo rm -f /opt/aiolcdcam/images/aiolcdcam.png 2>/dev/null || true
-    sudo rm -f /opt/aiolcdcam/images/face.png 2>/dev/null || true
+    sudo rm -f /opt/coolerdash/images/coolerdash.png 2>/dev/null || true
+    sudo rm -f /opt/coolerdash/images/face.png 2>/dev/null || true
     echo "✅ Final cleanup completed"
 }
 
@@ -146,9 +146,9 @@ check() {
     cd "$startdir"
     
     # Basic functionality test
-    if [[ -f "bin/aiolcdcam" ]]; then
+    if [[ -f "bin/coolerdash" ]]; then
         echo "Build successful - binary created"
-        ./bin/aiolcdcam --help > /dev/null && echo "Help function works"
+        ./bin/coolerdash --help > /dev/null && echo "Help function works"
     else
         echo "ERROR: Binary not found"
         return 1
@@ -159,37 +159,37 @@ package() {
     cd "$startdir"
     
     # Create directory structure
-    install -dm755 "$pkgdir/opt/aiolcdcam/bin"
-    install -dm755 "$pkgdir/opt/aiolcdcam/images"
+    install -dm755 "$pkgdir/opt/coolerdash/bin"
+    install -dm755 "$pkgdir/opt/coolerdash/images"
     install -dm755 "$pkgdir/usr/lib/systemd/system"
     install -dm755 "$pkgdir/usr/share/man/man1"
     install -dm755 "$pkgdir/usr/bin"
-    install -dm755 "$pkgdir/var/cache/aiolcdcam"
+    install -dm755 "$pkgdir/var/cache/coolerdash"
     
     # Install binary
-    install -Dm755 "bin/aiolcdcam" "$pkgdir/opt/aiolcdcam/bin/aiolcdcam"
+    install -Dm755 "bin/coolerdash" "$pkgdir/opt/coolerdash/bin/coolerdash"
     
     # Install default image
     if [[ -f "images/face.png" ]]; then
-        install -Dm644 "images/face.png" "$pkgdir/opt/aiolcdcam/images/face.png"
+        install -Dm644 "images/face.png" "$pkgdir/opt/coolerdash/images/face.png"
     fi
     
-    # Install aiolcdcam sensor image
-    if [[ -f "images/aiolcdcam.png" ]]; then
-        install -Dm644 "images/aiolcdcam.png" "$pkgdir/opt/aiolcdcam/images/aiolcdcam.png"
+    # Install coolerdash sensor image
+    if [[ -f "images/coolerdash.png" ]]; then
+        install -Dm644 "images/coolerdash.png" "$pkgdir/opt/coolerdash/images/coolerdash.png"
     fi
     
     # Install systemd service
-    install -Dm644 "systemd/aiolcdcam.service" "$pkgdir/usr/lib/systemd/system/aiolcdcam.service"
+    install -Dm644 "systemd/coolerdash.service" "$pkgdir/usr/lib/systemd/system/coolerdash.service"
     
     # Install man page
-    install -Dm644 "man/aiolcdcam.1" "$pkgdir/usr/share/man/man1/aiolcdcam.1"
+    install -Dm644 "man/coolerdash.1" "$pkgdir/usr/share/man/man1/coolerdash.1"
     
     # Install documentation
-    install -Dm644 README.md "$pkgdir/opt/aiolcdcam/README.md"
-    install -Dm644 LICENSE "$pkgdir/opt/aiolcdcam/LICENSE"
-    install -Dm644 CHANGELOG.md "$pkgdir/opt/aiolcdcam/CHANGELOG.md"
+    install -Dm644 README.md "$pkgdir/opt/coolerdash/README.md"
+    install -Dm644 LICENSE "$pkgdir/opt/coolerdash/LICENSE"
+    install -Dm644 CHANGELOG.md "$pkgdir/opt/coolerdash/CHANGELOG.md"
     
     # Create symlink for system-wide access
-    ln -sf "/opt/aiolcdcam/bin/aiolcdcam" "$pkgdir/usr/bin/aiolcdcam"
+    ln -sf "/opt/coolerdash/bin/coolerdash" "$pkgdir/usr/bin/coolerdash"
 }

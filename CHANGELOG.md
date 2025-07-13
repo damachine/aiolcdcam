@@ -8,10 +8,20 @@ and this project follows a custom versioning scheme: **1.year.month.day.hourminu
 
 ---
 
-## [1.25.07.13.XXXX] - 2025-07-13
+## [1.25.07.13.1200] - 2025-07-13
+
+### Changed
+- **Complete Project Rename**: Project renamed from "aiolcdcam" to "coolerdash" everywhere
+  - Binary renamed: `/opt/coolerdash/bin/coolerdash`
+  - Service renamed: `coolerdash.service`
+  - Manpage renamed: `man coolerdash`
+  - Cache directory: `/var/cache/coolerdash/`
+  - Image files: `coolerdash.png`
+  - All documentation and installation scripts updated
+  - GitHub repository: https://github.com/damachine/coolerdash
 
 ### Added
-- **Persistent UUID Caching System**: After first-run automatic detection, UUID is cached to `/var/cache/aiolcdcam/device.uuid` for fast startup
+- **Persistent UUID Caching System**: After first-run automatic detection, UUID is cached to `/var/cache/coolerdash/device.uuid` for fast startup
 - **Automatic AIO Device Detection**: Runtime UUID detection via CoolerControl API - no manual configuration required
 - **UUID Cache Validation**: On startup, cached UUID is validated against current device list to ensure compatibility
 - **Memory UUID Cache**: Detected UUID is cached in memory to minimize CoolerControl API calls during runtime
@@ -28,12 +38,12 @@ and this project follows a custom versioning scheme: **1.year.month.day.hourminu
 - **Documentation overhaul**: All references to manual UUID configuration removed from README, install scripts, and manpages
 - **Installation process simplified**: No more manual config.h editing required before installation
 - **Terminology consistency**: All "Kraken" references replaced with neutral "AIO" or "AIO LCD" terminology
-- **Image filename standardized**: All references now use `aiolcdcam.png` consistently
+- **Image filename standardized**: All references now use `coolerdash.png` consistently
 - **BOX_GAP constant updated**: Refined spacing between layout boxes for improved visual alignment
 - **Display rendering logic**: Adjusted spacing for temperature bars and labels to enhance readability
 
 ### Fixed
-- **Installation script error**: Fixed typo "ech" should be "echo" in aiolcdcam.install causing PKGBUILD installation failure
+- **Installation script error**: Fixed typo "ech" should be "echo" in coolerdash.install causing PKGBUILD installation failure
 - **Unicode characters in install messages**: Repaired broken Unicode symbols in post-installation output
 - **GPU cache interval bug**: Now truly supports 2.5 seconds with millisecond precision (was rounding to 2 seconds)
 - **Function declaration order** in gpu_monitor.c for successful compilation
@@ -45,12 +55,12 @@ and this project follows a custom versioning scheme: **1.year.month.day.hourminu
 - **Hardware-specific output**: Generic "AIO LCD" terminology instead of device-specific references
 
 ### Technical
-- **Persistent UUID Caching**: First-run detection saves UUID to `/var/cache/aiolcdcam/device.uuid` for instant subsequent startups
+- **Persistent UUID Caching**: First-run detection saves UUID to `/var/cache/coolerdash/device.uuid` for instant subsequent startups
 - **Dynamic UUID detection system**: Queries CoolerControl API and caches detected UUID
 - **Cache validation on startup**: Ensures cached UUID still exists in current device list before use
 - **get_cached_aio_uuid() function**: Provides runtime-detected UUID throughout application with memory caching
 - **Automatic compatibility**: Works with all CoolerControl-compatible AIO devices with LCD displays
-- **Cache directory management**: Makefile and PKGBUILD handle `/var/cache/aiolcdcam/` creation and cleanup
+- **Cache directory management**: Makefile and PKGBUILD handle `/var/cache/coolerdash/` creation and cleanup
 - **systemd service permissions**: ReadWritePaths configured for cache directory access
 - **All changes committed and tested**: Ready for production use
 
@@ -133,10 +143,10 @@ and this project follows a custom versioning scheme: **1.year.month.day.hourminu
 ### Added
 - **Arch Linux PKGBUILD**: Complete packaging for Arch User Repository (AUR)
   - PKGBUILD with automatic dependency management
-  - aiolcdcam.install with post-installation instructions
+  - coolerdash.install with post-installation instructions
   - .SRCINFO metadata file for AUR publication
   - PKGBUILD-local for local testing without source download
-  - Installation to /opt/aiolcdcam/ with symlink to /usr/bin/aiolcdcam
+  - Installation to /opt/coolerdash/ with symlink to /usr/bin/coolerdash
 - **C99 Compliance**: Complete C99 standard conformity with explicit feature test macros
 - **Display Mode Instructions**: Detailed instructions for switching between systemd and manual operation
 - **Standardized Include Paths**: All C source files use unified `../include/` paths
@@ -182,7 +192,7 @@ and this project follows a custom versioning scheme: **1.year.month.day.hourminu
 
 ### Technical
 - **Package Structure**: Professional Arch Linux packaging following AUR standards
-- **Binary Installation**: /opt/aiolcdcam/bin/aiolcdcam with symlink to /usr/bin/aiolcdcam
+- **Binary Installation**: /opt/coolerdash/bin/coolerdash with symlink to /usr/bin/coolerdash
 - **Source Code Availability**: Complete source code included for post-installation UUID configuration
 - **Dependency Management**: Automatic detection and installation of runtime dependencies
 
@@ -197,14 +207,14 @@ and this project follows a custom versioning scheme: **1.year.month.day.hourminu
 - **Man Page Improvements**: SETUP section with step-by-step guide
 
 ### Changed
-- **Binary Name**: From `nzxt` to `aiolcdcam` for better uniqueness
-- **Service Name**: Consistent naming as `aiolcdcam.service`
-- **PID File**: From `/var/run/nzxt_cam.pid` to `/var/run/aiolcdcam.pid`
-- **Documentation**: All examples and references updated to `aiolcdcam`
+- **Binary Name**: From `nzxt` to `coolerdash` for better uniqueness
+- **Service Name**: Consistent naming as `coolerdash.service`
+- **PID File**: From `/var/run/nzxt_cam.pid` to `/var/run/coolerdash.pid`
+- **Documentation**: All examples and references updated to `coolerdash`
 - **Man Page**: Corrected service names and binary references
 
 ### Fixed
-- **Consistent Naming**: Unified use of `aiolcdcam` in all files
+- **Consistent Naming**: Unified use of `coolerdash` in all files
 - **Setup Documentation**: Clarification of CoolerControl configuration steps
 - **Service References**: Correct systemd service names in documentation
 
@@ -213,11 +223,11 @@ and this project follows a custom versioning scheme: **1.year.month.day.hourminu
 ## [0.1.1] - 2025-07-06
 
 ### Added
-- **Single-Instance Enforcement**: Only one aiolcdcam daemon instance can run simultaneously
-- **Robust PID File Management**: `/var/run/aiolcdcam.pid` for systemd-compatible process management
+- **Single-Instance Enforcement**: Only one coolerdash daemon instance can run simultaneously
+- **Robust PID File Management**: `/var/run/coolerdash.pid` for systemd-compatible process management
 - **Intelligent Instance Coordination**: Service vs. manual starts are handled correctly
 - **Shutdown Image in C**: Direct sending of face.png image on daemon stop
-- **Makefile Process Management**: Automatic termination of all running `aiolcdcam` processes before installation
+- **Makefile Process Management**: Automatic termination of all running `coolerdash` processes before installation
 - **Complete English Output**: All user-facing messages in English
 - **Extended Error Handling**: EPERM handling for root-owned processes
 - **🆕 Automatic Dependency Installation**: `make install` automatically detects Linux distribution and installs missing dependencies
@@ -227,7 +237,7 @@ and this project follows a custom versioning scheme: **1.year.month.day.hourminu
 - **🆕 Robust Package Installation**: Automatic fallback information for unknown distributions
 
 ### Changed
-- **PID File Location**: From `/tmp/aiolcdcam.pid` to `/var/run/aiolcdcam.pid` (systemd-compatible)
+- **PID File Location**: From `/tmp/coolerdash.pid` to `/var/run/coolerdash.pid` (systemd-compatible)
 - **Signal Handler**: Integrated shutdown image sending directly in C
 - **Makefile**: Extended service and process detection with `killall`
 - **Daemon Output**: Complete translation of German output to English
@@ -286,7 +296,7 @@ and this project follows a custom versioning scheme: **1.year.month.day.hourminu
 ## [0.0.1] - 2025-07-04
 
 ### Added
-- **First Working Version**: Monolithic C program `aiolcdcam.c`
+- **First Working Version**: Monolithic C program `coolerdash.c`
 - **NZXT Kraken LCD Support**: Display of CPU/GPU temperatures
 - **CoolerControl Integration**: REST API communication via curl
 - **Cairo-based Rendering**: PNG generation for LCD display

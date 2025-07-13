@@ -1,6 +1,6 @@
 [Unit]
-Description=LCD AIO CAM Temperature Monitor
-Documentation=man:aiolcdcam(1)
+Description=CoolerDash Temperature Monitor
+Documentation=man:coolerdash(1)
 After=network.target coolercontrold.service
 Wants=coolercontrold.service
 Requires=coolercontrold.service
@@ -8,7 +8,7 @@ Requires=coolercontrold.service
 [Service]
 Type=simple
 ExecStartPre=/bin/sleep 10
-ExecStart=/opt/aiolcdcam/bin/aiolcdcam --mode def
+ExecStart=/opt/coolerdash/bin/coolerdash --mode def
 ExecReload=/bin/kill -HUP $MAINPID
 Restart=always
 RestartSec=5
@@ -17,9 +17,9 @@ Group=root
 
 # Sicherheitseinstellungen
 NoNewPrivileges=true
-ProtectSystem=strict
+ProtectSystem=full
 ProtectHome=true
-ReadWritePaths=/opt/aiolcdcam/images /tmp /var/cache/aiolcdcam
+ReadWritePaths=/opt/coolerdash/images /tmp /var/cache/coolerdash
 PrivateTmp=true
 ProtectKernelTunables=true
 ProtectKernelModules=true
@@ -28,7 +28,7 @@ ProtectControlGroups=true
 # Logging
 StandardOutput=journal
 StandardError=journal
-SyslogIdentifier=aiolcdcam
+SyslogIdentifier=coolerdash
 
 [Install]
 WantedBy=multi-user.target

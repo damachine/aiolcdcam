@@ -34,8 +34,8 @@ static int session_initialized = 0;
 static char cached_aio_uuid[128] = {0};  // Cache for detected AIO UUID
 
 // UUID cache file path
-#define UUID_CACHE_DIR "/var/cache/aiolcdcam"
-#define UUID_CACHE_FILE "/var/cache/aiolcdcam/device.uuid"
+#define UUID_CACHE_DIR "/var/cache/coolerdash"
+#define UUID_CACHE_FILE "/var/cache/coolerdash/device.uuid"
 
 /**
  * Initializes cURL and authenticates with the CoolerControl daemon

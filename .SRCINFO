@@ -1,9 +1,9 @@
-pkgbase = aiolcdcam
-	pkgdesc = LCD AIO CAM - Modular C daemon for NZXT Kraken LCD temperature monitoring via CoolerControl (BETA)
-	pkgver = 1.25.07.08.2234
+pkgbase = coolerdash
+	pkgdesc = CoolerDash - Modular C daemon for AIO LCD temperature monitoring via CoolerControl (BETA)
+	pkgver = 1.25.07.13.1200
 	pkgrel = 1
-	url = https://github.com/damachine/aiolcdcam
-	install = aiolcdcam.install
+	url = https://github.com/damachine/coolerdash
+	install = coolerdash.install
 	arch = x86_64
 	license = MIT
 	makedepends = gcc
@@ -14,8 +14,8 @@ pkgbase = aiolcdcam
 	depends = coolercontrol
 	optdepends = nvidia-utils: for GPU temperature monitoring
 	optdepends = lm_sensors: for additional hardware monitoring
-	backup = opt/aiolcdcam/README.md
-	source = aiolcdcam-1.25.07.08.2234.tar.gz::https://github.com/damachine/aiolcdcam/releases/download/v1.25.07.08.2234/aiolcdcam-1.25.07.08.2234.tar.gz
+	backup = opt/coolerdash/README.md
+	source = coolerdash-1.25.07.13.1200.tar.gz::https://github.com/damachine/coolerdash/releases/download/v1.25.07.13.1200/coolerdash-1.25.07.13.1200.tar.gz
 	sha256sums = 0019dfc4b32d63c1392aa264aed2253c1e0c2fb09216f8e2cc269bbfb8bb49b5
 
-pkgname = aiolcdcam
+pkgname = coolerdash

@@ -41,9 +41,9 @@
 
 // Paths and Files
 #define HWMON_PATH "/sys/class/hwmon" // path to hardware monitors
-#define IMAGE_DIR "/opt/aiolcdcam/images" // directory for images
-#define IMAGE_PATH "/opt/aiolcdcam/images/aiolcdcam.png" // path to CPU/GPU temperature display image
-#define PID_FILE "/var/run/aiolcdcam.pid" // PID file for daemon
+#define IMAGE_DIR "/opt/coolerdash/images" // directory for images
+#define IMAGE_PATH "/opt/coolerdash/images/coolerdash.png" // path to CPU/GPU temperature display image
+#define PID_FILE "/var/run/coolerdash.pid" // PID file for daemon
 
 // CoolerControl Settings
 // Make sure CoolerControl is running: sudo systemctl start coolercontrold

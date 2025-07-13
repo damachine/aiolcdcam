@@ -2,8 +2,8 @@
 # create-release.sh - Creates a release tarball for GitHub
 # This script is for the maintainer only, not for end users
 
-VERSION="1.25.07.08.2234"
-PKGNAME="aiolcdcam"
+VERSION="1.25.07.13.1200"
+PKGNAME="coolerdash"
 TARBALL="${PKGNAME}-${VERSION}.tar.gz"
 
 echo "🚀 Creating release tarball for maintainer: $TARBALL"

@@ -1,6 +1,6 @@
 post_install() {
     echo "========================================================================"
-    echo "LCD AIO CAM has been installed successfully!"
+    echo "CoolerDash has been installed successfully!"
     echo "========================================================================"
     echo ""
     echo "✅ NEW: Device UUID is automatically detected - no manual configuration required!"
@@ -14,55 +14,55 @@ post_install() {
     echo "   - Set LCD display to 'Image' mode"
     echo ""
     echo "3. Start the service (automatic device detection):"
-    echo "   sudo systemctl enable aiolcdcam.service"
-    echo "   sudo systemctl start aiolcdcam.service"
+    echo "   sudo systemctl enable coolerdash.service"
+    echo "   sudo systemctl start coolerdash.service"
     echo ""
     echo "4. Check if your device was detected:"
-    echo "   sudo systemctl status aiolcdcam.service"
+    echo "   sudo systemctl status coolerdash.service"
     echo "   # Look for: 'CoolerControl: Detected AIO device UUID: ...'"
     echo ""
     echo "💡 Troubleshooting (if device not detected):"
     echo "   curl http://localhost:11987/devices | jq  # Check available devices"
     echo "   # Make sure your AIO device uses Liquidctl driver"
     echo ""
-    echo "📍 Binary: /opt/aiolcdcam/bin/aiolcdcam (also available as 'aiolcdcam')"
-    echo "📖 Manual: man aiolcdcam"
+    echo "📍 Binary: /opt/coolerdash/bin/coolerdash (also available as 'coolerdash')"
+    echo "📖 Manual: man coolerdash"
     echo "📧 Support: christkue79@gmail.com"
     echo "========================================================================"
 }
 
 post_upgrade() {
     echo ""
-    echo "LCD AIO CAM has been upgraded to version $1"
+    echo "CoolerDash has been upgraded to version $1"
     echo ""
     echo "✅ Device UUID is automatically detected - no configuration required!"
     echo "    The upgrade will automatically use your detected AIO device."
     echo ""
-    echo "📍 Binary: /opt/aiolcdcam/bin/aiolcdcam (also available as 'aiolcdcam')"
+    echo "📍 Binary: /opt/coolerdash/bin/coolerdash (also available as 'coolerdash')"
     echo ""
     echo "Restart the service to apply changes:"
-    echo "   sudo systemctl restart aiolcdcam.service"
+    echo "   sudo systemctl restart coolerdash.service"
 }
 
 pre_remove() {
     # Stop service before removal
-    if systemctl is-active --quiet aiolcdcam.service; then
-        echo "Stopping aiolcdcam service..."
-        systemctl stop aiolcdcam.service
+    if systemctl is-active --quiet coolerdash.service; then
+        echo "Stopping coolerdash service..."
+        systemctl stop coolerdash.service
     fi
     
-    if systemctl is-enabled --quiet aiolcdcam.service; then
-        echo "Disabling aiolcdcam service..."
-        systemctl disable aiolcdcam.service
+    if systemctl is-enabled --quiet coolerdash.service; then
+        echo "Disabling coolerdash service..."
+        systemctl disable coolerdash.service
     fi
 }
 
 post_remove() {
     echo ""
-    echo "LCD AIO CAM has been removed."
+    echo "CoolerDash has been removed."
     echo ""
-    echo "Note: Configuration files in /opt/aiolcdcam/ may have been preserved."
-    echo "      Remove manually if no longer needed: sudo rm -rf /opt/aiolcdcam"
+    echo "Note: Configuration files in /opt/coolerdash/ may have been preserved."
+    echo "      Remove manually if no longer needed: sudo rm -rf /opt/coolerdash"
     echo ""
     echo "systemd service files have been removed."
     echo "Run 'sudo systemctl daemon-reload' to refresh systemd."

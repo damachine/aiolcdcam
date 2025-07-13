@@ -1,4 +1,4 @@
-# LCD AIO CAM - For CoolerControl
+# CoolerDash - For CoolerControl
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![C99](https://img.shields.io/badge/C-99-blue.svg)](https://en.wikipedia.org/wiki/C99)
@@ -31,13 +31,13 @@ Transform your cooling system into an intelligent monitoring hub that keeps you 
 
 ### 🔮 **Planned User Experience Improvements:**
 - **🎛️ Configuration GUI**: Graphical interface for advanced settings configuration
-- **📄 User-friendly .conf file**: Replace config.h editing with `/etc/aiolcdcam/aiolcdcam.conf` file
+- **📄 User-friendly .conf file**: Replace config.h editing with `/etc/coolerdash/coolerdash.conf` file
 - **📱 System tray integration**: Easy mode switching and status monitoring
 - **🎨 Theme system**: Visual customization of LCD displays
 - **📊 Advanced monitoring**: Additional sensor data and customizable layouts
 
 ### 📸 **Screenshot - Current LCD Output:**
-![CPU/GPU Temperature Display](images/aiolcdcam.png)
+![CPU/GPU Temperature Display](images/coolerdash.png)
 *Live temperature monitoring on NZXT AIO LCD display*
 
 ---
@@ -51,7 +51,7 @@ Transform your cooling system into an intelligent monitoring hub that keeps you 
 - **🏗️ Modular Architecture**: Professional separation of CPU, GPU, coolant, and display logic into separate modules
 - **⚡ Performance-Optimized**: Caching, change detection, minimal I/O operations, mode-dependent resource usage
 - **🔧 Automatic Device Detection**: Runtime UUID detection with persistent caching - no manual configuration required
-- **💾 Smart UUID Caching**: First-run detection saves to `/var/cache/aiolcdcam/device.uuid` for instant subsequent startups
+- **💾 Smart UUID Caching**: First-run detection saves to `/var/cache/coolerdash/device.uuid` for instant subsequent startups
 - **🎨 4 Display Modes**: From simple temperatures (def) to complex load diagrams (1-3)
 - **🌐 Native CoolerControl Integration**: REST API communication without Python dependencies
 - **📊 Efficient Sensor Polling**: Only necessary sensor data is queried depending on mode
@@ -67,14 +67,14 @@ Transform your cooling system into an intelligent monitoring hub that keeps you 
 3. **Configure your LCD AIO** in CoolerControl GUI
 4. **Set LCD to Image mode**: In CoolerControl GUI, set your AIO LCD display to "Image" mode
 
-### Install LCD AIO CAM
+### Install CoolerDash
 
 #### Arch Linux (Recommended)
 
 ```bash
 # STEP 1: Clone and configure UUID FIRST
-git clone https://github.com/damachine/aiolcdcam.git
-cd aiolcdcam
+git clone https://github.com/damachine/coolerdash.git
+cd coolerdash
 
 # STEP 2: Start CoolerControl daemon
 # The AIO device UUID is now automatically detected at runtime and cached!
@@ -84,17 +84,17 @@ sudo systemctl start coolercontrold
 makepkg -si
 
 # Option 2: Install from AUR (when published)
-# yay -S aiolcdcam
+# yay -S coolerdash
 # or
-# paru -S aiolcdcam
+# paru -S coolerdash
 ```
 
 #### Manual Installation (All Distributions)
 
 ```bash
 # STEP 1: Clone repository
-git clone https://github.com/damachine/aiolcdcam.git
-cd aiolcdcam
+git clone https://github.com/damachine/coolerdash.git
+cd coolerdash
 
 # STEP 2: Start CoolerControl daemon
 # The AIO device UUID is now automatically detected at runtime and cached!
@@ -104,10 +104,10 @@ sudo systemctl start coolercontrold
 sudo make install
 
 # STEP 4: Enable autostart
-sudo systemctl enable aiolcdcam.service
+sudo systemctl enable coolerdash.service
 
 # STEP 5: Start AIOLCDCAM
-sudo systemctl start aiolcdcam.service
+sudo systemctl start coolerdash.service
 ```
 
 > **ℹ️ NEW**: Device UUID is now automatically detected at runtime and cached for instant subsequent startups! No manual configuration required.
@@ -116,7 +116,7 @@ sudo systemctl start aiolcdcam.service
 
 For optimal performance, the detected UUID is cached:
 - **First run**: UUID detected via CoolerControl API
-- **Cache saved**: UUID stored in `/var/cache/aiolcdcam/device.uuid`
+- **Cache saved**: UUID stored in `/var/cache/coolerdash/device.uuid`
 - **Subsequent runs**: UUID loaded from cache for instant startup
 - **Validation**: Cached UUID verified against current device list on each startup
 
@@ -135,7 +135,7 @@ For optimal performance, the detected UUID is cached:
 
 The daemon will:
 1. **Connect to CoolerControl** daemon at startup
-2. **Load cached UUID** from `/var/cache/aiolcdcam/device.uuid` (if available)
+2. **Load cached UUID** from `/var/cache/coolerdash/device.uuid` (if available)
 3. **Validate cached UUID** against current device list
 4. **Auto-detect new UUID** if cache is invalid or missing
 5. **Save detected UUID** to cache for future startups
@@ -182,31 +182,31 @@ curl http://localhost:11987/devices | jq
 **Via systemd service (recommended):**
 ```bash
 # Edit systemd service file
-sudo systemctl edit aiolcdcam.service
+sudo systemctl edit coolerdash.service
 
 # Add this content (example for mode 2):
 [Service]
 ExecStart=
-ExecStart=/opt/aiolcdcam/bin/aiolcdcam 2
+ExecStart=/opt/coolerdash/bin/coolerdash 2
 
 # Apply changes
 sudo systemctl daemon-reload
-sudo systemctl restart aiolcdcam.service
+sudo systemctl restart coolerdash.service
 ```
 
 **Manual execution:**
 ```bash
 # Stop service first
-sudo systemctl stop aiolcdcam.service
+sudo systemctl stop coolerdash.service
 
 # Run manually with desired mode
-./aiolcdcam def      # Temperatures only
-./aiolcdcam 1        # Vertical bars
-./aiolcdcam 2        # Circular diagrams
-./aiolcdcam 3        # Horizontal bars
+./coolerdash def      # Temperatures only
+./coolerdash 1        # Vertical bars
+./coolerdash 2        # Circular diagrams
+./coolerdash 3        # Horizontal bars
 
 # Or with --mode syntax
-./aiolcdcam --mode 2
+./coolerdash --mode 2
 ```
 
 ### Advanced Configuration
@@ -235,39 +235,39 @@ Edit `include/config.h` for customization:
 
 ```bash
 # Service control
-sudo systemctl start aiolcdcam.service     # Start
-sudo systemctl stop aiolcdcam.service      # Stop (displays face.png automatically)
-sudo systemctl restart aiolcdcam.service   # Restart
-sudo systemctl status aiolcdcam.service    # Status + recent logs
+sudo systemctl start coolerdash.service     # Start
+sudo systemctl stop coolerdash.service      # Stop (displays face.png automatically)
+sudo systemctl restart coolerdash.service   # Restart
+sudo systemctl status coolerdash.service    # Status + recent logs
 
 # Live logs
-sudo journalctl -u aiolcdcam.service -f
+sudo journalctl -u coolerdash.service -f
 
 # Makefile shortcuts
-make start      # systemctl start aiolcdcam
-make stop       # systemctl stop aiolcdcam
-make status     # systemctl status aiolcdcam
-make logs       # journalctl -u aiolcdcam -f
+make start      # systemctl start coolerdash
+make stop       # systemctl stop coolerdash
+make status     # systemctl status coolerdash
+make logs       # journalctl -u coolerdash -f
 ```
 
 ### Manual Usage
 
 ```bash
 # Run manually (different modes) - both work after installation
-aiolcdcam def      # System-wide command (via symlink)
-aiolcdcam 1        # Vertical bars
-aiolcdcam 2        # Circular diagrams  
-aiolcdcam 3        # Horizontal bars
+coolerdash def      # System-wide command (via symlink)
+coolerdash 1        # Vertical bars
+coolerdash 2        # Circular diagrams  
+coolerdash 3        # Horizontal bars
 
 # Or use full path
-/opt/aiolcdcam/bin/aiolcdcam def
+/opt/coolerdash/bin/coolerdash def
 
 # Alternative syntax
-aiolcdcam --mode def
-aiolcdcam --mode 2
+coolerdash --mode def
+coolerdash --mode 2
 
 # From project directory (before installation)
-./aiolcdcam def
+./coolerdash def
 ```
 
 ### Build Commands
@@ -309,7 +309,7 @@ make help       # Show all options
 
 - **"Connection refused"**: CoolerControl daemon not running → `sudo systemctl start coolercontrold`
 - **"Device not found"**: LCD AIO not configured in CoolerControl → Use CoolerControl GUI  
-- **"Permission denied"**: Run with appropriate permissions → `sudo aiolcdcam def`
+- **"Permission denied"**: Run with appropriate permissions → `sudo coolerdash def`
 - **"Empty JSON response"**: No devices found → Check CoolerControl configuration and LCD AIO connection
 - **"UUID not working"**: Wrong device UUID → Verify with `curl http://localhost:11987/devices | jq` and copy exact UUID
 
@@ -320,14 +320,14 @@ make help       # Show all options
 sudo systemctl status coolercontrold
 curl http://localhost:11987/devices
 
-# 2. Test LCD AIO CAM manually
-aiolcdcam def
+# 2. Test CoolerDash manually
+coolerdash def
 
 # 3. Debug build for detailed information
-make debug && aiolcdcam def
+make debug && coolerdash def
 
 # 4. Check service logs
-sudo journalctl -u aiolcdcam.service -f
+sudo journalctl -u coolerdash.service -f
 ```
 
 ### Finding Device UUID
@@ -361,7 +361,7 @@ MIT License - See LICENSE file for details.
 
 ## 💝 Support the Project
 
-If you find LCD AIO CAM useful and want to support its development:
+If you find CoolerDash useful and want to support its development:
 
 ### 🪙 Cryptocurrency Donations:
 - **Bitcoin (BTC)**: `13WjpWQMGG5sg3vTJJnCX3cXzwf2vZddKo`
@@ -379,6 +379,6 @@ If you find LCD AIO CAM useful and want to support its development:
 
 **👨‍💻 Developed by DAMACHINE for maximum efficiency, stability and professional code structure.**  
 **📧 Contact:** [christkue79@gmail.com](mailto:christkue79@gmail.com)  
-**📖 Manual:** `man aiolcdcam`  
-**📍 Binary:** `/opt/aiolcdcam/bin/aiolcdcam` (also available as `aiolcdcam`)  
+**📖 Manual:** `man coolerdash`  
+**📍 Binary:** `/opt/coolerdash/bin/coolerdash` (also available as `coolerdash`)  
 **💝 Donate:** BTC: `13WjpWQMGG5sg3vTJJnCX3cXzwf2vZddKo` | DOGE: `DRSY4cA8eCALn819MjWLbwaePFNti9oS3y`
