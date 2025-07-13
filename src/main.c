@@ -58,14 +58,14 @@ static void cleanup_and_exit(int sig) {
         const char* shutdown_image = "/opt/coolerdash/images/face.png";
         const char* device_uuid = get_cached_aio_uuid();
         
-        printf("LCD AIO CAM: Sending shutdown image to AIO LCD...\n");
+        printf("CoolerDash: Sending shutdown image to AIO LCD...\n");
         fflush(stdout);
         
         if (device_uuid && send_image_to_lcd(shutdown_image, device_uuid)) {
-            printf("LCD AIO CAM: Shutdown image sent successfully\n");
+            printf("CoolerDash: Shutdown image sent successfully\n");
             shutdown_sent = 1; // set flag so it's only sent once
         } else {
-            printf("LCD AIO CAM: Warning - Could not send shutdown image%s\n", 
+            printf("CoolerDash: Warning - Could not send shutdown image%s\n", 
                    device_uuid ? "" : " (device UUID not detected)");
         }
         fflush(stdout);
@@ -121,7 +121,7 @@ static int check_existing_instance_and_handle(const char *pid_file, int is_servi
     
     if (is_service_start) {
         // systemd service starting: Always terminate previous instance
-        printf("LCD AIO CAM: Service starting, terminating existing instance (PID %d)...\n", old_pid);
+        printf("CoolerDash: Service starting, terminating existing instance (PID %d)...\n", old_pid);
         kill(old_pid, SIGTERM);
         
         // Wait for clean termination
@@ -132,24 +132,24 @@ static int check_existing_instance_and_handle(const char *pid_file, int is_servi
         
         // If still active, force termination
         if (kill(old_pid, 0) == 0) {
-            printf("LCD AIO CAM: Force-killing stubborn instance...\n");
+            printf("CoolerDash: Force-killing stubborn instance...\n");
             kill(old_pid, SIGKILL);
             sleep(1);
         }
         
-        printf("LCD AIO CAM: Previous instance terminated successfully\n");
+        printf("CoolerDash: Previous instance terminated successfully\n");
         unlink(pid_file);
         return 0;
     } else {
         // Manual start: Check if service is running
         if (is_existing_service) {
-            printf("LCD AIO CAM: Error - systemd service is already running (PID %d)\n", old_pid);
+            printf("CoolerDash: Error - systemd service is already running (PID %d)\n", old_pid);
             printf("Stop the service first: sudo systemctl stop coolerdash.service\n");
             printf("Or check status: sudo systemctl status coolerdash.service\n");
             return -1; // Error: Service already running
         } else {
             // Other manual instance running: Terminate it
-            printf("LCD AIO CAM: Terminating existing manual instance (PID %d)...\n", old_pid);
+            printf("CoolerDash: Terminating existing manual instance (PID %d)...\n", old_pid);
             kill(old_pid, SIGTERM);
             
             // Wait for clean termination
@@ -160,12 +160,12 @@ static int check_existing_instance_and_handle(const char *pid_file, int is_servi
             
             // If still active, force termination
             if (kill(old_pid, 0) == 0) {
-                printf("LCD AIO CAM: Force-killing stubborn manual instance...\n");
+                printf("CoolerDash: Force-killing stubborn manual instance...\n");
                 kill(old_pid, SIGKILL);
                 sleep(1);
             }
             
-            printf("LCD AIO CAM: Previous manual instance terminated successfully\n");
+            printf("CoolerDash: Previous manual instance terminated successfully\n");
             unlink(pid_file);
             return 0;
         }
@@ -390,13 +390,13 @@ int main(int argc, char *argv[]) {
         const char* shutdown_image = "/opt/coolerdash/images/face.png";
         const char* device_uuid = get_cached_aio_uuid();
         
-        printf("LCD AIO CAM: Sending final shutdown image...\n");
+        printf("CoolerDash: Sending final shutdown image...\n");
         fflush(stdout);
         
         if (device_uuid && send_image_to_lcd(shutdown_image, device_uuid)) {
-            printf("LCD AIO CAM: Final shutdown image sent successfully\n");
+            printf("CoolerDash: Final shutdown image sent successfully\n");
         } else {
-            printf("LCD AIO CAM: Warning - Could not send final shutdown image%s\n",
+            printf("CoolerDash: Warning - Could not send final shutdown image%s\n",
                    device_uuid ? "" : " (device UUID not detected)");
         }
         fflush(stdout);
