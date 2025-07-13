@@ -25,18 +25,16 @@ Transform your cooling system into an intelligent monitoring hub that keeps you 
 > - Features may change or break without notice
 > - Bugs and issues are expected
 > - **Currently tested only on developer's system with NZXT Kraken 2023**
-> - **Technical knowledge needed** - simplified installation process coming
 > - **Command-line focused** - GUI configuration interface planned
-> - **Technical knowledge needed** - simplified installation process coming
 > - Use at your own risk and please report any issues
 > - Contributions and feedback are highly appreciated!
 
 ### 🔮 **Planned User Experience Improvements:**
-- **🎛️ Configuration GUI**: Graphical interface for UUID and settings configuration
-- **🚀 One-click installer**: Automated setup without manual config editing
+- **🎛️ Configuration GUI**: Graphical interface for advanced settings configuration
+- **📄 User-friendly .conf file**: Replace config.h editing with `/etc/aiolcdcam/aiolcdcam.conf` file
 - **📱 System tray integration**: Easy mode switching and status monitoring
 - **🎨 Theme system**: Visual customization of LCD displays
-- **📊 Configuration wizard**: Step-by-step guided setup process
+- **📊 Advanced monitoring**: Additional sensor data and customizable layouts
 
 ### 📸 **Screenshot - Current LCD Output:**
 ![CPU/GPU Temperature Display](images/aiolcdcam.png)
@@ -263,11 +261,12 @@ aiolcdcam --mode 2
 ### Build Commands
 
 ```bash
-make          # Standard C99 build
-make clean    # Clean up
-make install  # System installation with dependency auto-detection
-make debug    # Debug build with AddressSanitizer
-make help     # Show all options
+make            # Standard C99 build
+make clean      # Clean up
+make install    # System installation with dependency auto-detection
+make uninstall  # Remove installation (service, binary, files)
+make debug      # Debug build with AddressSanitizer
+make help       # Show all options
 ```
 
 **C99 Compliance:**
