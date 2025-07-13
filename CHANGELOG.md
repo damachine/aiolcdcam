@@ -32,6 +32,8 @@ and this project follows a custom versioning scheme: **1.year.month.day.hourminu
 - **Display rendering logic**: Adjusted spacing for temperature bars and labels to enhance readability
 
 ### Fixed
+- **Installation script error**: Fixed typo "ech" should be "echo" in aiolcdcam.install causing PKGBUILD installation failure
+- **Unicode characters in install messages**: Repaired broken Unicode symbols in post-installation output
 - **GPU cache interval bug**: Now truly supports 2.5 seconds with millisecond precision (was rounding to 2 seconds)
 - **Function declaration order** in gpu_monitor.c for successful compilation
 - **Automatic device detection**: Robust UUID detection using `"type": "Liquidctl"` as reliable indicator
