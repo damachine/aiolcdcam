@@ -224,7 +224,7 @@ install: check-deps-for-install $(TARGET)
 	@printf "$(ICON_INFO) $(CYAN)Copying files...$(RESET)\n"
 	sudo cp $(BINDIR)/$(TARGET) /opt/coolerdash/bin/
 	sudo chmod +x /opt/coolerdash/bin/$(TARGET)
-	sudo cp images/face.png /opt/coolerdash/images/ 2>/dev/null || true
+	sudo cp images/face.png /opt/coolerdash/images/
 	sudo cp $(README) /opt/coolerdash/
 	@printf "  $(GREEN)→$(RESET) Program: /opt/coolerdash/bin/$(TARGET)\n"
 	@printf "  $(GREEN)→$(RESET) Shutdown image: /opt/coolerdash/images/face.png\n"
@@ -271,30 +271,38 @@ uninstall:
 	@printf "$(ICON_UNINSTALL) $(WHITE)═══ COOLERDASH UNINSTALLATION ═══$(RESET)\n"
 	@printf "\n"
 	@printf "$(ICON_WARNING) $(YELLOW)Stopping and disabling service...$(RESET)\n"
-	sudo systemctl stop coolerdash.service || true
-	sudo systemctl disable coolerdash.service || true
+	sudo systemctl stop coolerdash.service 2>/dev/null || true
+	sudo systemctl disable coolerdash.service 2>/dev/null || true
 	@printf "$(ICON_SUCCESS) $(GREEN)Service stopped$(RESET)\n"
 	@printf "\n"
-	@printf "$(ICON_INFO) $(CYAN)Removing files...$(RESET)\n"
+	@printf "$(ICON_INFO) $(CYAN)Removing all files...$(RESET)\n"
 	sudo rm -f /etc/systemd/system/coolerdash.service
 	sudo rm -f /usr/share/man/man1/coolerdash.1
 	sudo rm -f /opt/coolerdash/README.md
+	sudo rm -f /opt/coolerdash/LICENSE
+	sudo rm -f /opt/coolerdash/CHANGELOG.md
 	sudo rm -f /opt/coolerdash/bin/$(TARGET)
 	sudo rm -rf /opt/coolerdash/bin/
+	sudo rm -rf /opt/coolerdash/images/
+	sudo rm -rf /opt/coolerdash/
 	sudo rm -rf /var/cache/coolerdash/
+	sudo rm -f /usr/bin/coolerdash 2>/dev/null || true
 	@printf "  $(RED)✗$(RESET) Service: /etc/systemd/system/coolerdash.service\n"
 	@printf "  $(RED)✗$(RESET) Manual: /usr/share/man/man1/coolerdash.1\n"
 	@printf "  $(RED)✗$(RESET) Program: /opt/coolerdash/bin/$(TARGET)\n"
-	@printf "  $(RED)✗$(RESET) README: /opt/coolerdash/README.md\n"
+	@printf "  $(RED)✗$(RESET) Documentation: /opt/coolerdash/README.md, LICENSE, CHANGELOG.md\n"
+	@printf "  $(RED)✗$(RESET) Images: /opt/coolerdash/images/\n"
+	@printf "  $(RED)✗$(RESET) Installation: /opt/coolerdash/\n"
 	@printf "  $(RED)✗$(RESET) Cache: /var/cache/coolerdash/\n"
+	@printf "  $(RED)✗$(RESET) Symlink: /usr/bin/coolerdash\n"
 	@printf "\n"
 	@printf "$(ICON_INFO) $(CYAN)Updating system...$(RESET)\n"
 	sudo mandb -q
 	sudo systemctl daemon-reload
 	@printf "\n"
-	@printf "$(ICON_SUCCESS) $(WHITE)═══ UNINSTALLATION COMPLETE ═══$(RESET)\n"
+	@printf "$(ICON_SUCCESS) $(WHITE)═══ COMPLETE REMOVAL SUCCESSFUL ═══$(RESET)\n"
 	@printf "\n"
-	@printf "$(ICON_INFO) $(BLUE)Note:$(RESET) /opt/coolerdash/images/ remains (may contain images)\n"
+	@printf "$(ICON_SUCCESS) $(GREEN)All coolerdash files have been completely removed$(RESET)\n"
 	@printf "\n"
 
 # Debug Build

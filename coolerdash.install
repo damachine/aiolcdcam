@@ -59,11 +59,42 @@ pre_remove() {
 
 post_remove() {
     echo ""
-    echo "CoolerDash has been removed."
+    echo "========================================="
+    echo "CoolerDash complete removal in progress..."
+    echo "========================================="
     echo ""
-    echo "Note: Configuration files in /opt/coolerdash/ may have been preserved."
-    echo "      Remove manually if no longer needed: sudo rm -rf /opt/coolerdash"
+    
+    # Remove all remaining files and directories
+    echo "Removing all coolerdash files..."
+    
+    # Remove cache directory
+    if [ -d "/var/cache/coolerdash" ]; then
+        rm -rf /var/cache/coolerdash
+        echo "✗ Removed: /var/cache/coolerdash/"
+    fi
+    
+    # Remove any remaining files in /opt/coolerdash
+    if [ -d "/opt/coolerdash" ]; then
+        rm -rf /opt/coolerdash
+        echo "✗ Removed: /opt/coolerdash/"
+    fi
+    
+    # Remove symlink if it exists
+    if [ -L "/usr/bin/coolerdash" ]; then
+        rm -f /usr/bin/coolerdash
+        echo "✗ Removed: /usr/bin/coolerdash"
+    fi
+    
+    # Reload systemd
+    systemctl daemon-reload
+    echo "✗ Reloaded systemd configuration"
+    
     echo ""
-    echo "systemd service files have been removed."
-    echo "Run 'sudo systemctl daemon-reload' to refresh systemd."
+    echo "========================================="
+    echo "✅ CoolerDash completely removed!"
+    echo "========================================="
+    echo ""
+    echo "All files, directories, and configurations have been"
+    echo "permanently removed from your system."
+    echo ""
 }

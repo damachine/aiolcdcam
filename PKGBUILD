@@ -75,32 +75,42 @@ prepare() {
             else
                 echo "⚠️  Make uninstall failed, attempting manual cleanup..."
                 
-                # Manual cleanup if make uninstall fails
+                # Complete manual cleanup if make uninstall fails
                 sudo systemctl stop coolerdash.service 2>/dev/null || true
                 sudo systemctl disable coolerdash.service 2>/dev/null || true
                 sudo rm -f /etc/systemd/system/coolerdash.service
                 sudo rm -f /usr/share/man/man1/coolerdash.1
                 sudo rm -f /opt/coolerdash/bin/coolerdash
                 sudo rm -f /opt/coolerdash/README.md
+                sudo rm -f /opt/coolerdash/LICENSE
+                sudo rm -f /opt/coolerdash/CHANGELOG.md
                 sudo rm -rf /opt/coolerdash/images/
+                sudo rm -rf /opt/coolerdash/
+                sudo rm -rf /var/cache/coolerdash/
+                sudo rm -f /usr/bin/coolerdash 2>/dev/null || true
                 sudo systemctl daemon-reload
                 
-                echo "✅ Manual cleanup completed"
+                echo "✅ Complete manual cleanup completed"
             fi
         else
             echo "⚠️  No Makefile found, performing manual cleanup..."
             
-            # Manual cleanup
+            # Complete manual cleanup
             sudo systemctl stop coolerdash.service 2>/dev/null || true
             sudo systemctl disable coolerdash.service 2>/dev/null || true
             sudo rm -f /etc/systemd/system/coolerdash.service
             sudo rm -f /usr/share/man/man1/coolerdash.1
             sudo rm -f /opt/coolerdash/bin/coolerdash
             sudo rm -f /opt/coolerdash/README.md
+            sudo rm -f /opt/coolerdash/LICENSE
+            sudo rm -f /opt/coolerdash/CHANGELOG.md
             sudo rm -rf /opt/coolerdash/images/
+            sudo rm -rf /opt/coolerdash/
+            sudo rm -rf /var/cache/coolerdash/
+            sudo rm -f /usr/bin/coolerdash 2>/dev/null || true
             sudo systemctl daemon-reload
             
-            echo "✅ Manual cleanup completed"
+            echo "✅ Complete manual cleanup completed"
         fi
         
         echo ""
