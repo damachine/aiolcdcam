@@ -20,6 +20,7 @@ and this project follows a custom versioning scheme: **1.year.month.day.hourminu
 - **4-stage temperature color gradient documentation**: Clear thresholds (≤55°C Green, ≤65°C Orange, ≤75°C Hot Orange, >75°C Red)
 
 ### Changed
+- **PKGBUILD package cleanup**: Removed development files (include/, src/, Makefile) from installation to reduce package size
 - **Removed manual UUID configuration**: Device UUID is now automatically detected at runtime using CoolerControl API
 - **All GPU monitoring functions** (read_gpu_temp, get_gpu_usage_data, get_gpu_data_full) now use millisecond-based caching
 - **Display layout improvements**: Font sizes increased and horizontal bars made smaller for better readability
