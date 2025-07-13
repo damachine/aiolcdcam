@@ -161,8 +161,6 @@ package() {
     # Create directory structure
     install -dm755 "$pkgdir/opt/aiolcdcam/bin"
     install -dm755 "$pkgdir/opt/aiolcdcam/images"
-    install -dm755 "$pkgdir/opt/aiolcdcam/include"
-    install -dm755 "$pkgdir/opt/aiolcdcam/src"
     install -dm755 "$pkgdir/usr/lib/systemd/system"
     install -dm755 "$pkgdir/usr/share/man/man1"
     install -dm755 "$pkgdir/usr/bin"
@@ -170,11 +168,6 @@ package() {
     
     # Install binary
     install -Dm755 "bin/aiolcdcam" "$pkgdir/opt/aiolcdcam/bin/aiolcdcam"
-    
-    # Install source code for reference and potential customization
-    install -Dm644 include/*.h "$pkgdir/opt/aiolcdcam/include/"
-    install -Dm644 src/*.c "$pkgdir/opt/aiolcdcam/src/"
-    install -Dm644 Makefile "$pkgdir/opt/aiolcdcam/"
     
     # Install default image
     if [[ -f "images/face.png" ]]; then
