@@ -48,14 +48,14 @@ Transform your cooling system into an intelligent monitoring hub that keeps you 
 
 ## ✨ Features
 
-- **🏗️ Modular Architecture**: Professional separation of CPU, GPU, coolant, and display logic into separate modules
+- **🏗️ Modular Architecture**: Separation of CPU, GPU, coolant, and display logic into separate modules
 - **⚡ Performance-Optimized**: Caching, change detection, minimal I/O operations, mode-dependent resource usage
 - **🔧 Automatic Device Detection**: Runtime UUID detection with persistent caching - no manual configuration required
 - **💾 Smart UUID Caching**: First-run detection saves to `/var/cache/coolerdash/device.uuid` for instant subsequent startups
-- **🎨 4 Display Modes**: From simple temperatures (def) to complex load diagrams (1-3)
+- **🎨 4 Display Modes**: Stable mode "def" (temperatures only) + 3 beta modes (1-3) with load diagrams
 - **🌐 Native CoolerControl Integration**: REST API communication without Python dependencies
 - **📊 Efficient Sensor Polling**: Only necessary sensor data is queried depending on mode
-- **🔄 Systemd Integration**: Professional service management with detailed logs
+- **🔄 Systemd Integration**: Service management with detailed logs
 - **🚀 Intelligent Installation**: Automatic dependency detection and installation for all major Linux distributions
 
 ## 📦 Installation
@@ -164,12 +164,15 @@ curl http://localhost:11987/devices | jq
 
 ### Display Modes
 
-| Mode | Description | Sensor Data |
-|------|-------------|-------------|
-| `def` | Temperatures only (CPU, GPU, coolant) | Minimal I/O - temperatures only |
-| `1`   | Temperatures + vertical load bars | All sensors + CPU/RAM/GPU load |
-| `2`   | Temperatures + circular diagrams | All sensors + CPU/RAM/GPU load |
-| `3`   | Temperatures + horizontal load bars | All sensors + CPU/RAM/GPU load |
+| Mode | Status | Description | Sensor Data |
+|------|--------|-------------|-------------|
+| `def` | ✅ **Stable** | Temperatures only (CPU, GPU, coolant) | Minimal I/O - temperatures only |
+| `1`   | 🧪 **Beta** | Temperatures + vertical load bars | All sensors + CPU/RAM/GPU load |
+| `2`   | 🧪 **Beta** | Temperatures + circular diagrams | All sensors + CPU/RAM/GPU load |
+| `3`   | 🧪 **Beta** | Temperatures + horizontal load bars | All sensors + CPU/RAM/GPU load |
+
+> **✅ Recommended**: Use mode `def` for production environments (most stable)  
+> **🧪 Beta modes**: Modes 1-3 are functional but may have occasional issues
 
 > **🎨 Temperature Colors**: 4-stage gradient based on temperature:
 > - **≤55°C**: 🟢 Green (cool)
@@ -288,8 +291,8 @@ make help       # Show all options
 
 ### Performance Notes
 
-- **Mode "def"**: Only temperature sensors, minimal I/O (~3.4MB RAM, <1% CPU)
-- **Modes 1-3**: Additional load data with intelligent caching (~3.5MB RAM, <2% CPU)
+- **Mode "def"**: ✅ **Production ready** - Only temperature sensors, minimal I/O (~3.4MB RAM, <1% CPU)
+- **Modes 1-3**: 🧪 **Beta status** - Additional load data with intelligent caching (~3.5MB RAM, <2% CPU)
 - **Sensor caching**: hwmon paths cached at startup, GPU data cached for 2 seconds
 - **Change detection**: PNG only updated when significant changes occur
 
@@ -377,7 +380,7 @@ If you find CoolerDash useful and want to support its development:
 
 ---
 
-**👨‍💻 Developed by DAMACHINE for maximum efficiency, stability and professional code structure.**  
+**👨‍💻 Developed by DAMACHINE for maximum efficiency and stability.**  
 **📧 Contact:** [christkue79@gmail.com](mailto:christkue79@gmail.com)  
 **📖 Manual:** `man coolerdash`  
 **📍 Binary:** `/opt/coolerdash/bin/coolerdash` (also available as `coolerdash`)  
