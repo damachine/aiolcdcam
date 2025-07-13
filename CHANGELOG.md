@@ -28,6 +28,8 @@ and this project follows a custom versioning scheme: **1.year.month.day.hourminu
 - **Installation process simplified**: No more manual config.h editing required before installation
 - **Terminology consistency**: All "Kraken" references replaced with neutral "AIO" or "AIO LCD" terminology
 - **Image filename standardized**: All references now use `aiolcdcam.png` consistently
+- **BOX_GAP constant updated**: Refined spacing between layout boxes for improved visual alignment
+- **Display rendering logic**: Adjusted spacing for temperature bars and labels to enhance readability
 
 ### Fixed
 - **GPU cache interval bug**: Now truly supports 2.5 seconds with millisecond precision (was rounding to 2 seconds)
