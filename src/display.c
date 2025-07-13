@@ -198,21 +198,21 @@ static void draw_labels(cairo_t *cr, display_mode_t mode) {
     const int cpu_bar_y = (DISPLAY_HEIGHT - (2 * BAR_HEIGHT + BAR_GAP)) / 2;
     const int gpu_bar_y = cpu_bar_y + BAR_HEIGHT + BAR_GAP;
     
-    cairo_select_font_face(cr, "DejaVuSans-Bold", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+    cairo_select_font_face(cr, "DejaVu Sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
     
     if (mode == DISPLAY_MODE_DEF) {
         // Special labels for def mode (white, larger, side-aligned)
-        cairo_set_font_size(cr, 26);
+        cairo_set_font_size(cr, 24);
         cairo_set_source_rgb(cr, 1, 1, 1);
         
         cairo_text_extents_t text_ext;
         
         cairo_text_extents(cr, "CPU", &text_ext);
-        cairo_move_to(cr, 1 + (50 - text_ext.width) / 2, 70);
+        cairo_move_to(cr, 2 + (50 - text_ext.width) / 2, 70);
         cairo_show_text(cr, "CPU");
         
         cairo_text_extents(cr, "GPU", &text_ext);
-        cairo_move_to(cr, 1 + (50 - text_ext.width) / 2, DISPLAY_HEIGHT - 50);
+        cairo_move_to(cr, 2 + (50 - text_ext.width) / 2, DISPLAY_HEIGHT - 50);
         cairo_show_text(cr, "GPU");
     } else {
         // Labels for modes 1, 2, 3 (black, aligned with bars)
@@ -244,7 +244,7 @@ static void draw_temperature_displays(cairo_t *cr, const sensor_data_t *data, di
     const int gpu_box_x = 2 + BOX_WIDTH + BOX_GAP;
     const int gpu_box_y = DISPLAY_HEIGHT - BOX_HEIGHT - 2;
     
-    cairo_select_font_face(cr, "DejaVuSans-Bold", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+    cairo_select_font_face(cr, "DejaVu Sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
     cairo_set_source_rgb(cr, 1, 1, 1);
     
     char temp_str[8];
@@ -263,7 +263,7 @@ static void draw_temperature_displays(cairo_t *cr, const sensor_data_t *data, di
     // Degree symbol for CPU
     cairo_set_font_size(cr, FONT_SIZE_DEGREE);
     cairo_text_extents(cr, "°", &deg_ext);
-    cairo_move_to(cr, cpu_temp_x + ext.width + 12, cpu_temp_y - deg_ext.height - 2);
+    cairo_move_to(cr, cpu_temp_x + ext.width + 8, cpu_temp_y - deg_ext.height + 12);
     cairo_show_text(cr, "°");
 
     // Coolant temperature display (only if CPU <= 99°C)
@@ -271,15 +271,15 @@ static void draw_temperature_displays(cairo_t *cr, const sensor_data_t *data, di
         snprintf(cool_str, sizeof(cool_str), "%.1f", data->coolant_temp);
         cairo_set_font_size(cr, FONT_SIZE_COOLANT);
         cairo_text_extents(cr, cool_str, &cool_ext);
-        const double cool_x = coolant_box_x + (BOX_WIDTH - cool_ext.width) / 2;
-        const double cool_y = coolant_box_y + BOX_HEIGHT + 8;
+        const double cool_x = coolant_box_x + (BOX_WIDTH - cool_ext.width) / 2 + 4; // Shift right by x pixels
+        const double cool_y = coolant_box_y + BOX_HEIGHT + 24;
         cairo_move_to(cr, cool_x + 4, cool_y);
         cairo_show_text(cr, cool_str);
         
         // Degree symbol for coolant
-        cairo_set_font_size(cr, FONT_SIZE_DEGREE * 0.30);
+        cairo_set_font_size(cr, FONT_SIZE_DEGREE * 0.25);
         cairo_text_extents(cr, "°", &deg_ext_cool);
-        cairo_move_to(cr, cool_x + cool_ext.width + 8, cool_y - deg_ext_cool.height + 2);
+        cairo_move_to(cr, cool_x + cool_ext.width + 4, cool_y - deg_ext_cool.height + 4);
         cairo_show_text(cr, "°");
     }
 
@@ -295,7 +295,7 @@ static void draw_temperature_displays(cairo_t *cr, const sensor_data_t *data, di
     // Degree symbol for GPU
     cairo_set_font_size(cr, FONT_SIZE_DEGREE);
     cairo_text_extents(cr, "°", &deg_ext_gpu);
-    cairo_move_to(cr, gpu_temp_x + ext.width + 12, gpu_temp_y - deg_ext_gpu.height - 2);
+    cairo_move_to(cr, gpu_temp_x + ext.width + 8, gpu_temp_y - deg_ext_gpu.height + 12);
     cairo_show_text(cr, "°");
 }
 

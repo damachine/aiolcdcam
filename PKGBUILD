@@ -7,7 +7,7 @@ arch=('x86_64')
 url="https://github.com/damachine/coolerdash"
 license=('MIT')
 depends=('cairo' 'libcurl-gnutls' 'coolercontrol')
-makedepends=('gcc' 'make' 'pkg-config')
+makedepends=('gcc' 'make' 'pkg-config' 'ttf-dejavu')
 optdepends=('nvidia-utils: for GPU temperature monitoring'
             'lm_sensors: for additional hardware monitoring')
 backup=('opt/coolerdash/README.md')

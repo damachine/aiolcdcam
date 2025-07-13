@@ -8,17 +8,7 @@ and this project follows a custom versioning scheme: **1.year.month.day.hourminu
 
 ---
 
-## [1.25.07.13.1200] - 2025-07-13
-
-### Changed
-- **Complete Project Rename**: Project renamed from "aiolcdcam" to "coolerdash" everywhere
-  - Binary renamed: `/opt/coolerdash/bin/coolerdash`
-  - Service renamed: `coolerdash.service`
-  - Manpage renamed: `man coolerdash`
-  - Cache directory: `/var/cache/coolerdash/`
-  - Image files: `coolerdash.png`
-  - All documentation and installation scripts updated
-  - GitHub repository: https://github.com/damachine/coolerdash
+## [1.25.07.13.1300] - 2025-07-13
 
 ### Added
 - **Persistent UUID Caching System**: After first-run automatic detection, UUID is cached to `/var/cache/coolerdash/device.uuid` for fast startup
@@ -28,6 +18,10 @@ and this project follows a custom versioning scheme: **1.year.month.day.hourminu
 - **Millisecond-precision GPU cache interval**: GPU_CACHE_INTERVAL now supports float values (e.g. 2.5f) for accurate caching
 - **Helper function get_current_time_ms()** for precise time measurement
 - **4-stage temperature color gradient documentation**: Clear thresholds (≤55°C Green, ≤65°C Orange, ≤75°C Hot Orange, >75°C Red)
+- **DejaVu Sans as dependency**: The font is now included as a package dependency for all Linux distributions
+  - Arch: `ttf-dejavu` in makedepends and install-deps
+  - Debian/Ubuntu: `fonts-dejavu` in install-deps
+  - Fedora/RHEL/openSUSE: `dejavu-sans-fonts` in install-deps
 
 ### Changed
 - **PKGBUILD package cleanup**: Removed development files (include/, src/, Makefile) from installation to reduce package size
@@ -41,6 +35,8 @@ and this project follows a custom versioning scheme: **1.year.month.day.hourminu
 - **Image filename standardized**: All references now use `coolerdash.png` consistently
 - **BOX_GAP constant updated**: Refined spacing between layout boxes for improved visual alignment
 - **Display rendering logic**: Adjusted spacing for temperature bars and labels to enhance readability
+- **PKGBUILD and Makefile updated**: Added dependencies for DejaVu Sans
+- **Installation hints removed**: Install script now only shows a short success message
 
 ### Fixed
 - **Installation script error**: Fixed typo "ech" should be "echo" in coolerdash.install causing PKGBUILD installation failure
@@ -62,7 +58,8 @@ and this project follows a custom versioning scheme: **1.year.month.day.hourminu
 - **Automatic compatibility**: Works with all CoolerControl-compatible AIO devices with LCD displays
 - **Cache directory management**: Makefile and PKGBUILD handle `/var/cache/coolerdash/` creation and cleanup
 - **systemd service permissions**: ReadWritePaths configured for cache directory access
-- **All changes committed and tested**: Ready for production use
+- **Compatibility**: The font is available system-wide after installation and is used automatically
+- **All changes committed and tested**
 
 ---
 
@@ -170,7 +167,7 @@ and this project follows a custom versioning scheme: **1.year.month.day.hourminu
 - **Source Code**: Complete translation of all German comments to English in all source files
   - config.h: All configuration comments and setup instructions
   - main.c: All function comments and documentation
-  - display.c: All rendering and display logic comments  
+  - display.c: All rendering and display logic comments
   - cpu_monitor.c: All sensor monitoring comments
   - gpu_monitor.c: All GPU monitoring and caching comments
   - coolant_monitor.c: All coolant temperature monitoring comments
