@@ -11,7 +11,10 @@ and this project follows a custom versioning scheme: **1.year.month.day.hourminu
 ## [1.25.07.13.XXXX] - 2025-07-13
 
 ### Added
+- **Persistent UUID Caching System**: After first-run automatic detection, UUID is cached to `/var/cache/aiolcdcam/device.uuid` for fast startup
 - **Automatic AIO Device Detection**: Runtime UUID detection via CoolerControl API - no manual configuration required
+- **UUID Cache Validation**: On startup, cached UUID is validated against current device list to ensure compatibility
+- **Memory UUID Cache**: Detected UUID is cached in memory to minimize CoolerControl API calls during runtime
 - **Millisecond-precision GPU cache interval**: GPU_CACHE_INTERVAL now supports float values (e.g. 2.5f) for accurate caching
 - **Helper function get_current_time_ms()** for precise time measurement
 - **4-stage temperature color gradient documentation**: Clear thresholds (≤55°C Green, ≤65°C Orange, ≤75°C Hot Orange, >75°C Red)
@@ -37,9 +40,13 @@ and this project follows a custom versioning scheme: **1.year.month.day.hourminu
 - **Hardware-specific output**: Generic "AIO LCD" terminology instead of device-specific references
 
 ### Technical
+- **Persistent UUID Caching**: First-run detection saves UUID to `/var/cache/aiolcdcam/device.uuid` for instant subsequent startups
 - **Dynamic UUID detection system**: Queries CoolerControl API and caches detected UUID
-- **get_cached_aio_uuid() function**: Provides runtime-detected UUID throughout application
+- **Cache validation on startup**: Ensures cached UUID still exists in current device list before use
+- **get_cached_aio_uuid() function**: Provides runtime-detected UUID throughout application with memory caching
 - **Automatic compatibility**: Works with all CoolerControl-compatible AIO devices with LCD displays
+- **Cache directory management**: Makefile and PKGBUILD handle `/var/cache/aiolcdcam/` creation and cleanup
+- **systemd service permissions**: ReadWritePaths configured for cache directory access
 - **All changes committed and tested**: Ready for production use
 
 ---

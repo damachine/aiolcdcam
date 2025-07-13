@@ -166,6 +166,7 @@ package() {
     install -dm755 "$pkgdir/usr/lib/systemd/system"
     install -dm755 "$pkgdir/usr/share/man/man1"
     install -dm755 "$pkgdir/usr/bin"
+    install -dm755 "$pkgdir/var/cache/aiolcdcam"
     
     # Install binary
     install -Dm755 "bin/aiolcdcam" "$pkgdir/opt/aiolcdcam/bin/aiolcdcam"

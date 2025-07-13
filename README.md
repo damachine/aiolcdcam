@@ -50,8 +50,9 @@ Transform your cooling system into an intelligent monitoring hub that keeps you 
 
 - **🏗️ Modular Architecture**: Professional separation of CPU, GPU, coolant, and display logic into separate modules
 - **⚡ Performance-Optimized**: Caching, change detection, minimal I/O operations, mode-dependent resource usage
+- **🔧 Automatic Device Detection**: Runtime UUID detection with persistent caching - no manual configuration required
+- **💾 Smart UUID Caching**: First-run detection saves to `/var/cache/aiolcdcam/device.uuid` for instant subsequent startups
 - **🎨 4 Display Modes**: From simple temperatures (def) to complex load diagrams (1-3)
-- **🔧 Central Configuration**: All settings (UUID, paths, colors, layout) in `include/config.h`
 - **🌐 Native CoolerControl Integration**: REST API communication without Python dependencies
 - **📊 Efficient Sensor Polling**: Only necessary sensor data is queried depending on mode
 - **🔄 Systemd Integration**: Professional service management with detailed logs
@@ -76,7 +77,7 @@ git clone https://github.com/damachine/aiolcdcam.git
 cd aiolcdcam
 
 # STEP 2: Start CoolerControl daemon
-# The AIO device UUID is now automatically detected at runtime!
+# The AIO device UUID is now automatically detected at runtime and cached!
 sudo systemctl start coolercontrold
 
 # STEP 3: Build and install (includes automatic dependency management)
@@ -96,7 +97,7 @@ git clone https://github.com/damachine/aiolcdcam.git
 cd aiolcdcam
 
 # STEP 2: Start CoolerControl daemon
-# The AIO device UUID is now automatically detected at runtime!
+# The AIO device UUID is now automatically detected at runtime and cached!
 sudo systemctl start coolercontrold
 
 # STEP 3: Build and install (auto-detects Linux distribution and installs dependencies)
@@ -109,7 +110,15 @@ sudo systemctl enable aiolcdcam.service
 sudo systemctl start aiolcdcam.service
 ```
 
-> **ℹ️ NEW**: Device UUID is now automatically detected at runtime! No manual configuration required.
+> **ℹ️ NEW**: Device UUID is now automatically detected at runtime and cached for instant subsequent startups! No manual configuration required.
+
+### 💾 **UUID Caching System**
+
+For optimal performance, the detected UUID is cached:
+- **First run**: UUID detected via CoolerControl API
+- **Cache saved**: UUID stored in `/var/cache/aiolcdcam/device.uuid`
+- **Subsequent runs**: UUID loaded from cache for instant startup
+- **Validation**: Cached UUID verified against current device list on each startup
 
 **Supported Distributions (Auto-Detected):**
 - **Arch Linux / Manjaro**: `pacman -S cairo libcurl-gnutls coolercontrol gcc make pkg-config`
@@ -126,8 +135,11 @@ sudo systemctl start aiolcdcam.service
 
 The daemon will:
 1. **Connect to CoolerControl** daemon at startup
-2. **Automatically detect** your AIO LCD device UUID
-3. **Display the detected device** in the startup logs
+2. **Load cached UUID** from `/var/cache/aiolcdcam/device.uuid` (if available)
+3. **Validate cached UUID** against current device list
+4. **Auto-detect new UUID** if cache is invalid or missing
+5. **Save detected UUID** to cache for future startups
+6. **Display the active device** in the startup logs
 
 **For troubleshooting**, you can manually check devices:
 ```bash

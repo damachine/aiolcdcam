@@ -5,6 +5,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <sys/stat.h>
 
 // Response buffer structure for HTTP responses
 struct http_response {
@@ -31,6 +32,10 @@ static CURL *curl_handle = NULL;
 static char cookie_jar[256] = {0};
 static int session_initialized = 0;
 static char cached_aio_uuid[128] = {0};  // Cache for detected AIO UUID
+
+// UUID cache file path
+#define UUID_CACHE_DIR "/var/cache/aiolcdcam"
+#define UUID_CACHE_FILE "/var/cache/aiolcdcam/device.uuid"
 
 /**
  * Initializes cURL and authenticates with the CoolerControl daemon
@@ -324,6 +329,8 @@ int get_aio_device_uuid(char* uuid_buffer, size_t buffer_size) {
                         // Cache the UUID for future use
                         if (uuid_length < sizeof(cached_aio_uuid)) {
                             strcpy(cached_aio_uuid, uuid_buffer);
+                            // Save to persistent cache
+                            save_cached_uuid(uuid_buffer);
                         }
                         
                         success = 1;
@@ -349,15 +356,158 @@ int get_aio_device_uuid(char* uuid_buffer, size_t buffer_size) {
  * @return Pointer to cached UUID string, or NULL on error
  */
 const char* get_cached_aio_uuid(void) {
-    // If already cached, return it
+    // If already cached in memory, validate it first
     if (cached_aio_uuid[0] != '\0') {
-        return cached_aio_uuid;
+        if (validate_cached_uuid(cached_aio_uuid)) {
+            return cached_aio_uuid;
+        } else {
+            // Invalid, clear it
+            cached_aio_uuid[0] = '\0';
+        }
     }
     
-    // Try to detect the UUID
+    // Try to load from persistent cache
+    if (load_cached_uuid()) {
+        // Validate the loaded UUID
+        if (validate_cached_uuid(cached_aio_uuid)) {
+            return cached_aio_uuid;
+        } else {
+            // Invalid cached UUID, clear it
+            clear_uuid_cache();
+        }
+    }
+    
+    // No valid cache found, detect UUID from API
+    printf("No valid UUID cache found, detecting device...\n");
     if (get_aio_device_uuid(cached_aio_uuid, sizeof(cached_aio_uuid))) {
+        // Save the newly detected UUID to cache
+        save_cached_uuid(cached_aio_uuid);
         return cached_aio_uuid;
     }
     
     return NULL;  // Detection failed
+}
+
+/**
+ * Loads cached UUID from persistent storage
+ *
+ * @return 1 on success, 0 if no valid cache found
+ */
+int load_cached_uuid(void) {
+    FILE *cache_file = fopen(UUID_CACHE_FILE, "r");
+    if (!cache_file) {
+        return 0;  // No cache file found
+    }
+    
+    char uuid_from_file[128] = {0};
+    if (fgets(uuid_from_file, sizeof(uuid_from_file), cache_file)) {
+        // Remove newline if present
+        size_t len = strlen(uuid_from_file);
+        if (len > 0 && uuid_from_file[len-1] == '\n') {
+            uuid_from_file[len-1] = '\0';
+        }
+        
+        // Validate UUID format (basic check)
+        if (len > 10 && len < 120) {  // Reasonable UUID length
+            strcpy(cached_aio_uuid, uuid_from_file);
+            fclose(cache_file);
+            printf("UUID loaded from cache: %s\n", cached_aio_uuid);
+            return 1;
+        }
+    }
+    
+    fclose(cache_file);
+    return 0;
+}
+
+/**
+ * Saves UUID to persistent cache file
+ *
+ * @param uuid The UUID to cache
+ * @return 1 on success, 0 on error
+ */
+int save_cached_uuid(const char* uuid) {
+    if (!uuid || strlen(uuid) == 0) {
+        return 0;
+    }
+    
+    // Create cache directory if it doesn't exist
+    struct stat st = {0};
+    if (stat(UUID_CACHE_DIR, &st) == -1) {
+        if (mkdir(UUID_CACHE_DIR, 0755) != 0) {
+            return 0;  // Cannot create directory
+        }
+    }
+    
+    FILE *cache_file = fopen(UUID_CACHE_FILE, "w");
+    if (!cache_file) {
+        return 0;  // Cannot create cache file
+    }
+    
+    if (fprintf(cache_file, "%s\n", uuid) > 0) {
+        fclose(cache_file);
+        printf("UUID saved to cache: %s\n", uuid);
+        return 1;
+    }
+    
+    fclose(cache_file);
+    return 0;
+}
+
+/**
+ * Validates if a cached UUID is still valid by testing it with CoolerControl
+ *
+ * @param uuid The UUID to validate
+ * @return 1 if valid, 0 if invalid
+ */
+int validate_cached_uuid(const char* uuid) {
+    if (!uuid || !curl_handle || !session_initialized) {
+        return 0;
+    }
+    
+    // Test UUID by checking if it exists in the devices list
+    struct http_response response = {0};
+    response.data = malloc(1);
+    response.size = 0;
+    if (!response.data) return 0;
+    
+    curl_easy_setopt(curl_handle, CURLOPT_URL, DAEMON_ADDRESS "/devices");
+    curl_easy_setopt(curl_handle, CURLOPT_HTTPGET, 1L);
+    curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, write_callback);
+    curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, &response);
+    
+    CURLcode res = curl_easy_perform(curl_handle);
+    long response_code = 0;
+    curl_easy_getinfo(curl_handle, CURLINFO_RESPONSE_CODE, &response_code);
+    
+    // Reset cURL options
+    curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, NULL);
+    curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, NULL);
+    
+    int is_valid = 0;
+    if (res == CURLE_OK && response_code == 200 && response.data) {
+        // Check if UUID exists in the response
+        if (strstr(response.data, uuid) != NULL) {
+            is_valid = 1;
+        }
+    }
+    
+    if (response.data) free(response.data);
+    
+    if (is_valid) {
+        printf("Cached UUID validated successfully: %s\n", uuid);
+    } else {
+        printf("Cached UUID is invalid, will re-detect: %s\n", uuid);
+    }
+    
+    return is_valid;
+}
+
+/**
+ * Clears the UUID cache (both memory and file)
+ */
+void clear_uuid_cache(void) {
+    cached_aio_uuid[0] = '\0';
+    unlink(UUID_CACHE_FILE);
+    printf("UUID cache cleared\n");
 }

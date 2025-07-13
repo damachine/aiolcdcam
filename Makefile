@@ -281,10 +281,12 @@ uninstall:
 	sudo rm -f /opt/aiolcdcam/README.md
 	sudo rm -f /opt/aiolcdcam/bin/$(TARGET)
 	sudo rm -rf /opt/aiolcdcam/bin/
+	sudo rm -rf /var/cache/aiolcdcam/
 	@printf "  $(RED)✗$(RESET) Service: /etc/systemd/system/aiolcdcam.service\n"
 	@printf "  $(RED)✗$(RESET) Manual: /usr/share/man/man1/aiolcdcam.1\n"
 	@printf "  $(RED)✗$(RESET) Program: /opt/aiolcdcam/bin/$(TARGET)\n"
 	@printf "  $(RED)✗$(RESET) README: /opt/aiolcdcam/README.md\n"
+	@printf "  $(RED)✗$(RESET) Cache: /var/cache/aiolcdcam/\n"
 	@printf "\n"
 	@printf "$(ICON_INFO) $(CYAN)Updating system...$(RESET)\n"
 	sudo mandb -q
