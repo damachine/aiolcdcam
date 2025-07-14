@@ -358,6 +358,20 @@ curl http://localhost:11987/devices | jq
 # }
 ```
 
+## Troubleshooting: Manual Installation Conflicts
+If you see errors like "conflicting files" or "manual installation detected" during `makepkg -si`, this means CoolerDash was previously installed manually (via `make install`).
+
+**Solution:**
+- The PKGBUILD will attempt to clean up automatically.
+- If problems persist, run:
+  ```
+  sudo make uninstall
+  ```
+- Remove any leftover files in `/opt/coolerdash/`, `/usr/bin/coolerdash`, and `/etc/systemd/system/coolerdash.service`.
+- Then retry the installation.
+
+If you need help, open an issue at https://github.com/damachine/coolerdash/issues
+
 ## 📄 License
 
 MIT License - See LICENSE file for details.

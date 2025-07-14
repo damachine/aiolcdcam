@@ -8,6 +8,32 @@ and this project follows a custom versioning scheme: **1.year.month.day.hourminu
 
 ---
 
+## [1.25.07.14.0000] - 2025-07-14
+
+### Changed
+- Project name and description updated everywhere: now "CoolerDash - Modular C daemon for Liquid Cooler LCD Dashboard via CoolerControl (BETA)"
+- PKGBUILD and Makefile: Font dependency switched from DejaVu to Roboto (ttf-roboto, fonts-roboto, google-roboto-fonts)
+- All DejaVu font references removed from build scripts and documentation
+- Makefile: Added prominent beta warning and manual installation conflict check as printf output during build
+- PKGBUILD: Removed outdated device detection and prerequisites info block for clarity
+- README: Added troubleshooting section for manual installation conflicts and cleanup instructions
+- Makefile: Description line updated for clarity and technical accuracy
+- Changelog: All changes and refactorings documented in English
+
+### Added
+- Troubleshooting instructions for manual installation conflicts in README and Makefile
+- Beta warning and project status info as printf output in Makefile
+
+### Fixed
+- Consistent naming and description across all files (Makefile, PKGBUILD, README, Changelog)
+- Font dependency now matches display code and recommended fonts
+
+### Removed
+- All references to DejaVu Sans font in PKGBUILD, Makefile, and documentation
+- Outdated device detection info block from PKGBUILD
+
+---
+
 ## [1.25.07.13.1300] - 2025-07-13
 
 ### Added

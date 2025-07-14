@@ -22,17 +22,17 @@
 
 // Layout Constants
 #define BOX_WIDTH 70 // 240 / 3.42857142857
-#define BOX_HEIGHT 60 // 240 / 4
-#define BOX_GAP 10 // spacing between boxes
+#define BOX_HEIGHT ((DISPLAY_HEIGHT - 4 * BOX_GAP) / 3) // 3 boxes, 2 gaps
+#define BOX_GAP 8 // spacing between boxes
 #define BAR_WIDTH 220 // 240 - (BOX_WIDTH * 3) - (BOX_GAP * 2) - 10 (for border)
-#define BAR_HEIGHT 24 // height of bars
-#define BAR_GAP 2 // spacing between bars
+#define BAR_HEIGHT 22 // height of bars
+#define BAR_GAP 4 // spacing between bars
 
 // Font Sizes
-#define FONT_SIZE_LARGE 90.0  // BOX_HEIGHT * 1.50
-#define FONT_SIZE_DEGREE 80.0 // FONT_SIZE_LARGE * 0.75
-#define FONT_SIZE_COOLANT 20.0 // FONT_SIZE_LARGE * 0.30
-#define FONT_SIZE_LABELS 20.0 // FONT_SIZE_LARGE * 0.25
+#define FONT_SIZE_LARGE 96.0  // BOX_HEIGHT * 1.50
+#define FONT_SIZE_DEGREE 86.0 // FONT_SIZE_LARGE * 0.75
+#define FONT_SIZE_COOLANT 26.0 // FONT_SIZE_LARGE * 0.30
+#define FONT_SIZE_LABELS 26.0 // FONT_SIZE_LARGE * 0.25
 
 // Cache Settings
 #define GPU_CACHE_INTERVAL 2.5f // seconds (supports decimal values with millisecond precision)
@@ -49,21 +49,7 @@
 // Make sure CoolerControl is running: sudo systemctl start coolercontrold
 // Test the API: curl http://localhost:11987/devices
 #define DAEMON_ADDRESS "http://localhost:11987" // CoolerControl daemon address
-#define DAEMON_PASSWORD "coolAdmin" // CoolerControl daemon password
-
-// AIO LCD Device UID - AUTOMATICALLY DETECTED AT RUNTIME
-// 
-// ✅ The device UUID is now automatically detected by querying the CoolerControl API
-// ✅ No manual configuration required! The daemon finds your AIO LCD device automatically.
-// ✅ Works with all CoolerControl-compatible AIO devices with LCD displays.
-//
-// 🔍 For troubleshooting, you can manually check devices with:
-//    curl http://localhost:11987/devices | jq
-//
-// 📝 Technical: The daemon searches for devices with "type": "Liquidctl" in the API response
-//    and automatically selects the first compatible AIO device found.
-//
-// 🧪 Tested with: NZXT AIO Kraken 2023 (Z-Series) and compatible devices
+#define DAEMON_PASSWORD "coolAdmin" // CoolerControl daemon passwor
 
 // Colors (RGB 0-255)
 #define COLOR_GREEN_R 0

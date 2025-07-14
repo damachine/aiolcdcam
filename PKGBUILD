@@ -1,13 +1,13 @@
 # Maintainer: DAMACHINE <christkue79@gmail.com>
 pkgname=coolerdash
-pkgver=1.25.07.13.1200
+pkgver=1.25.07.14.0000
 pkgrel=1
-pkgdesc="CoolerDash - Modular C daemon for AIO LCD temperature monitoring via CoolerControl (BETA)"
+pkgdesc="CoolerDash - Modular C daemon for Liquid Cooler LCD Dashboard via CoolerControl (BETA)"
 arch=('x86_64')
 url="https://github.com/damachine/coolerdash"
 license=('MIT')
 depends=('cairo' 'libcurl-gnutls' 'coolercontrol')
-makedepends=('gcc' 'make' 'pkg-config' 'ttf-dejavu')
+makedepends=('gcc' 'make' 'pkg-config' 'ttf-roboto')
 optdepends=('nvidia-utils: for GPU temperature monitoring'
             'lm_sensors: for additional hardware monitoring')
 backup=('opt/coolerdash/README.md')
@@ -118,20 +118,6 @@ prepare() {
     else
         echo "✅ No conflicting manual installation found"
     fi
-    
-    echo "================================================================"
-    echo "✅ NEW: AUTOMATIC DEVICE DETECTION - NO CONFIGURATION REQUIRED!"
-    echo "================================================================"
-    echo "This version automatically detects your AIO device UUID at runtime."
-    echo "No manual UUID configuration is needed anymore!"
-    echo ""
-    echo "Prerequisites:"
-    echo "1. Start CoolerControl: sudo systemctl start coolercontrold"
-    echo "2. Ensure your AIO device is connected and detected by CoolerControl"
-    echo "3. Run: makepkg -si"
-    echo ""
-    echo "The daemon will automatically find and use your AIO LCD device!"
-    echo "================================================================"
     
     # Additional cleanup for any remaining conflicting files
     echo "Performing final cleanup of any conflicting files..."

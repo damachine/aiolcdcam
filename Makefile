@@ -1,8 +1,28 @@
 # Makefile for CoolerDash (Standard C Project Structure)
-# CoolerDash - AIO LCD Temperature Monitor
+# CoolerDash - Modular C daemon for Liquid Cooler LCD Dashboard via CoolerControl (BETA)
+
+# ================================
+# ⚠️  BETA SOFTWARE - EARLY DEVELOPMENT STAGE
+# ================================
+# This software is in very early development and has been tested
+# only on the developer's system with NZXT AIO Kraken 2023.
+#
+# - Features may change or break without notice
+# - Bugs and issues are expected
+# - Use at your own risk
+# - Please report issues to: https://github.com/damachine/coolerdash/issues
+# ================================
+
+# ================================
+# Manual Installation Check
+# ================================
+# If you see errors about "conflicting files" or manual installation,
+# run 'sudo make uninstall' and remove leftover files in /opt/coolerdash,
+# /usr/bin/coolerdash, /etc/systemd/system/coolerdash.service.
+# ================================
 
 # Version (Format: 1.year.month.day.hourminute)
-VERSION = 1.25.07.13.1200
+VERSION = 1.25.07.14.0000
 
 CC = gcc
 CFLAGS = -Wall -Wextra -O2 -std=c99 -march=x86-64-v3 -Iinclude $(shell pkg-config --cflags cairo)
@@ -48,6 +68,17 @@ ICON_UNINSTALL = 🗑️
 
 # Standard Build Target - Standard C project structure
 $(TARGET): $(OBJDIR) $(BINDIR) $(OBJECTS) $(MAIN_SOURCE)
+	@printf "\n$(YELLOW)═══════════════════════════════════════════════════════$(RESET)\n"
+	@printf "$(RED)⚠️  BETA SOFTWARE - EARLY DEVELOPMENT STAGE$(RESET)\n"
+	@printf "$(YELLOW)═══════════════════════════════════════════════════════$(RESET)\n"
+	@printf "This software is in very early development and has been tested only on the developer's system with NZXT AIO Kraken 2023.\n"
+	@printf "- Features may change or break without notice\n"
+	@printf "- Bugs and issues are expected\n"
+	@printf "- Use at your own risk\n"
+	@printf "- Please report issues to: https://github.com/damachine/coolerdash/issues\n"
+	@printf "$(YELLOW)═══════════════════════════════════════════════════════$(RESET)\n\n"
+	@printf "$(ICON_WARNING) $(PURPLE)Manual Installation Check:$(RESET)\n"
+	@printf "If you see errors about 'conflicting files' or manual installation, run 'sudo make uninstall' and remove leftover files in /opt/coolerdash, /usr/bin/coolerdash, /etc/systemd/system/coolerdash.service.\n\n"
 	@printf "$(ICON_BUILD) $(CYAN)Compiling $(TARGET) (Standard C structure)...$(RESET)\n"
 	@printf "$(BLUE)Structure:$(RESET) src/ include/ build/ bin/\n"
 	@printf "$(BLUE)CFLAGS:$(RESET) $(CFLAGS)\n"
@@ -100,41 +131,41 @@ install-deps:
 	case $$DISTRO in \
 		arch) \
 			printf "$(ICON_INSTALL) $(GREEN)Installing dependencies for Arch Linux/Manjaro...$(RESET)\n"; \
-			sudo pacman -S --needed cairo libcurl-gnutls gcc make pkg-config ttf-dejavu || { \
+			sudo pacman -S --needed cairo libcurl-gnutls gcc make pkg-config ttf-roboto || { \
 				printf "$(ICON_WARNING) $(RED)Error installing dependencies!$(RESET)\n"; \
-				printf "$(YELLOW)Please run manually:$(RESET) sudo pacman -S cairo libcurl-gnutls gcc make pkg-config ttf-dejavu\n"; \
+				printf "$(YELLOW)Please run manually:$(RESET) sudo pacman -S cairo libcurl-gnutls gcc make pkg-config ttf-roboto\n"; \
 				exit 1; \
 			}; \
 			;; \
 		debian) \
 			printf "$(ICON_INSTALL) $(GREEN)Installing dependencies for Ubuntu/Debian...$(RESET)\n"; \
-			sudo apt update && sudo apt install -y libcairo2-dev libcurl4-openssl-dev gcc make pkg-config fonts-dejavu || { \
+			sudo apt update && sudo apt install -y libcairo2-dev libcurl4-openssl-dev gcc make pkg-config fonts-roboto || { \
 				printf "$(ICON_WARNING) $(RED)Error installing dependencies!$(RESET)\n"; \
-				printf "$(YELLOW)Please run manually:$(RESET) sudo apt install libcairo2-dev libcurl4-openssl-dev gcc make pkg-config fonts-dejavu\n"; \
+				printf "$(YELLOW)Please run manually:$(RESET) sudo apt install libcairo2-dev libcurl4-openssl-dev gcc make pkg-config fonts-roboto\n"; \
 				exit 1; \
 			}; \
 			;; \
 		fedora) \
 			printf "$(ICON_INSTALL) $(GREEN)Installing dependencies for Fedora...$(RESET)\n"; \
-			sudo dnf install -y cairo-devel libcurl-devel gcc make pkg-config dejavu-sans-fonts || { \
+			sudo dnf install -y cairo-devel libcurl-devel gcc make pkg-config google-roboto-fonts || { \
 				printf "$(ICON_WARNING) $(RED)Error installing dependencies!$(RESET)\n"; \
-				printf "$(YELLOW)Please run manually:$(RESET) sudo dnf install cairo-devel libcurl-devel gcc make pkg-config dejavu-sans-fonts\n"; \
+				printf "$(YELLOW)Please run manually:$(RESET) sudo dnf install cairo-devel libcurl-devel gcc make pkg-config google-roboto-fonts\n"; \
 				exit 1; \
 			}; \
 			;; \
 		rhel) \
 			printf "$(ICON_INSTALL) $(GREEN)Installing dependencies for RHEL/CentOS...$(RESET)\n"; \
-			sudo yum install -y cairo-devel libcurl-devel gcc make pkg-config dejavu-sans-fonts || { \
+			sudo yum install -y cairo-devel libcurl-devel gcc make pkg-config google-roboto-fonts || { \
 				printf "$(ICON_WARNING) $(RED)Error installing dependencies!$(RESET)\n"; \
-				printf "$(YELLOW)Please run manually:$(RESET) sudo yum install cairo-devel libcurl-devel gcc make pkg-config dejavu-sans-fonts\n"; \
+				printf "$(YELLOW)Please run manually:$(RESET) sudo yum install cairo-devel libcurl-devel gcc make pkg-config google-roboto-fonts\n"; \
 				exit 1; \
 			}; \
 			;; \
 		opensuse) \
 			printf "$(ICON_INSTALL) $(GREEN)Installing dependencies for openSUSE...$(RESET)\n"; \
-			sudo zypper install -y cairo-devel libcurl-devel gcc make pkg-config dejavu-sans-fonts || { \
+			sudo zypper install -y cairo-devel libcurl-devel gcc make pkg-config google-roboto-fonts || { \
 				printf "$(ICON_WARNING) $(RED)Error installing dependencies!$(RESET)\n"; \
-				printf "$(YELLOW)Please run manually:$(RESET) sudo zypper install cairo-devel libcurl-devel gcc make pkg-config dejavu-sans-fonts\n"; \
+				printf "$(YELLOW)Please run manually:$(RESET) sudo zypper install cairo-devel libcurl-devel gcc make pkg-config google-roboto-fonts\n"; \
 				exit 1; \
 			}; \
 			;; \
@@ -144,19 +175,19 @@ install-deps:
 			printf "$(YELLOW)Please install the following dependencies manually:$(RESET)\n"; \
 			printf "\n"; \
 			printf "$(WHITE)Arch Linux / Manjaro:$(RESET)\n"; \
-			printf "  sudo pacman -S cairo libcurl-gnutls gcc make pkg-config ttf-dejavu\n"; \
+			printf "  sudo pacman -S cairo libcurl-gnutls gcc make pkg-config ttf-roboto\n"; \
 			printf "\n"; \
 			printf "$(WHITE)Ubuntu / Debian:$(RESET)\n"; \
-			printf "  sudo apt install libcairo2-dev libcurl4-openssl-dev gcc make pkg-config fonts-dejavu\n"; \
+			printf "  sudo apt install libcairo2-dev libcurl4-openssl-dev gcc make pkg-config fonts-roboto\n"; \
 			printf "\n"; \
 			printf "$(WHITE)Fedora:$(RESET)\n"; \
-			printf "  sudo dnf install cairo-devel libcurl-devel gcc make pkg-config dejavu-sans-fonts\n"; \
+			printf "  sudo dnf install cairo-devel libcurl-devel gcc make pkg-config google-roboto-fonts\n"; \
 			printf "\n"; \
 			printf "$(WHITE)RHEL / CentOS:$(RESET)\n"; \
-			printf "  sudo yum install cairo-devel libcurl-devel gcc make pkg-config dejavu-sans-fonts\n"; \
+			printf "  sudo yum install cairo-devel libcurl-devel gcc make pkg-config google-roboto-fonts\n"; \
 			printf "\n"; \
 			printf "$(WHITE)openSUSE:$(RESET)\n"; \
-			printf "  sudo zypper install cairo-devel libcurl-devel gcc make pkg-config dejavu-sans-fonts\n"; \
+			printf "  sudo zypper install cairo-devel libcurl-devel gcc make pkg-config google-roboto-fonts\n"; \
 			printf "\n"; \
 			exit 1; \
 			;; \
@@ -382,8 +413,3 @@ help:
 	@printf "$(YELLOW)🔄 Version Usage:$(RESET)\n"
 	@printf "  $(GREEN)Program:$(RESET) /opt/coolerdash/bin/coolerdash [mode]\n"
 	@printf "\n"
-	@printf "$(BLUE)Compiler Flags:$(RESET) $(CFLAGS)\n"
-	@printf "$(BLUE)Libraries:$(RESET) $(LIBS)\n"
-	@printf "\n"
-
-.PHONY: clean install uninstall debug start stop restart status enable disable logs help detect-distro install-deps check-deps-for-install
