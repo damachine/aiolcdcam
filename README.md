@@ -28,6 +28,8 @@ Transform your cooling system into an intelligent monitoring hub that keeps you 
 > - **Command-line focused** - GUI configuration interface planned
 > - Use at your own risk and please report any issues
 > - Contributions and feedback are highly appreciated!
+>
+> **ℹ️ Note:** LCD display brightness is now set to 80% by default for improved comfort and reduced glare. You can change this in the source code if needed.
 
 ### 🔮 **Planned User Experience Improvements:**
 - **🎛️ Configuration GUI**: Graphical interface for advanced settings configuration

@@ -34,6 +34,9 @@
 #define FONT_SIZE_COOLANT 26.0 // FONT_SIZE_LARGE * 0.30
 #define FONT_SIZE_LABELS 26.0 // FONT_SIZE_LARGE * 0.25
 
+// LCD Display Settings
+#define LCD_BRIGHTNESS 80 // Default LCD brightness (0-100)
+
 // Cache Settings
 #define GPU_CACHE_INTERVAL 2.5f // seconds (supports decimal values with millisecond precision)
 #define CHANGE_TOLERANCE_TEMP 0.1f // temperature change tolerance in degrees Celsius
