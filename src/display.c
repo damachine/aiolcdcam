@@ -213,9 +213,7 @@ static void draw_labels(cairo_t *cr, display_mode_t mode) {
         // Special labels for def mode (white, larger, side-aligned)
         cairo_set_font_size(cr, 26);
         cairo_set_source_rgb(cr, 1, 1, 1);
-        
-        cairo_text_extents_t text_ext;
-        
+        // Keine text_extents nötig, da Position fix ist
         cairo_move_to(cr, 0, 88); // ganz links oben
         cairo_show_text(cr, "CPU");
 
@@ -225,14 +223,11 @@ static void draw_labels(cairo_t *cr, display_mode_t mode) {
         // Labels for modes 1, 2, 3 (black, aligned with bars)
         cairo_set_font_size(cr, FONT_SIZE_LABELS);
         cairo_set_source_rgb(cr, 0, 0, 0);
-        
         cairo_text_extents_t text_ext;
-        
         cairo_text_extents(cr, "CPU", &text_ext);
         cairo_move_to(cr, 15 + (40 - text_ext.width) / 2, 
                       cpu_bar_y + (BAR_HEIGHT + text_ext.height) / 2);
         cairo_show_text(cr, "CPU");
-        
         cairo_text_extents(cr, "GPU", &text_ext);
         cairo_move_to(cr, 15 + (40 - text_ext.width) / 2, 
                       gpu_bar_y + (BAR_HEIGHT + text_ext.height) / 2);
