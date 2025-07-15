@@ -8,6 +8,21 @@ and this project follows a custom versioning scheme: **1.year.month.day.hourminu
 
 ---
 
+## [1.25.07.15.1200] - 2025-07-15
+
+### Changed
+- Device name detection via "NZXT Kraken" string is now obsolete; replaced by robust UUID-based detection and caching system.
+- get_aio_device_name() function updated: legacy Kraken name search commented out, now relies on UUID cache and Liquidctl type detection.
+- Code comments clarified regarding obsolete device name search and new UUID logic.
+- Manual edits in coolercontrol.c for improved maintainability and clarity.
+
+### Technical
+- All device detection now uses runtime UUID detection and persistent caching.
+- Codebase cleaned up: legacy string search logic marked as deprecated.
+- Documentation and comments updated to reflect new detection method.
+
+---
+
 ## [1.25.07.15.0000] - 2025-07-15
 
 ### Changed

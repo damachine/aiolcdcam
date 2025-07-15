@@ -48,7 +48,7 @@ int init_coolercontrol_session(void) {
     if (!curl_handle) return 0;
     
     // Cookie jar for session management
-    snprintf(cookie_jar, sizeof(cookie_jar), "/tmp/nzxt_cookies_%d.txt", getpid());
+    snprintf(cookie_jar, sizeof(cookie_jar), "/tmp/aio_cookie_%d.txt", getpid());
     curl_easy_setopt(curl_handle, CURLOPT_COOKIEJAR, cookie_jar);
     curl_easy_setopt(curl_handle, CURLOPT_COOKIEFILE, cookie_jar);
     
@@ -116,9 +116,11 @@ int send_image_to_lcd(const char* image_path, const char* device_uid) {
     curl_mime_data(field, "image", CURL_ZERO_TERMINATED);
     
     // brightness field
+    char brightness_str[8];
+    snprintf(brightness_str, sizeof(brightness_str), "%d", LCD_BRIGHTNESS); // Use LCD_BRIGHTNESS from config.h
     field = curl_mime_addpart(form);
     curl_mime_name(field, "brightness");
-    curl_mime_data(field, "80", CURL_ZERO_TERMINATED); // Lowered brightness to 80%
+    curl_mime_data(field, brightness_str, CURL_ZERO_TERMINATED);
     
     // orientation field
     field = curl_mime_addpart(form);
@@ -219,23 +221,6 @@ int get_aio_device_name(char* name_buffer, size_t buffer_size) {
     curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, NULL);
     
     int success = 0;
-    if (res == CURLE_OK && response_code == 200 && response.data) {
-        // Search for AIO device
-        char *aio_pos = strstr(response.data, "\"NZXT Kraken");
-        if (aio_pos) {
-            // Extract name - search for end of name
-            char *name_start = aio_pos + 1;  // Skip opening quote
-            char *name_end = strchr(name_start, '"');
-            if (name_end) {
-                size_t name_length = name_end - name_start;
-                if (name_length < buffer_size) {
-                    strncpy(name_buffer, name_start, name_length);
-                    name_buffer[name_length] = '\0';
-                    success = 1;
-                }
-            }
-        }
-    }
     
     // Cleanup
     if (response.data) free(response.data);
