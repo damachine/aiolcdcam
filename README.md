@@ -24,7 +24,7 @@ Transform your cooling system into an intelligent monitoring hub that keeps you 
 > **🚧 This software is in very early development stage!**  
 > - Features may change or break without notice
 > - Bugs and issues are expected
-> - **Currently tested only on developer's system with NZXT Kraken 2023**
+> - **Currently tested only on developer's system with NZXT Kraken 2023 in daily use**
 > - **Command-line focused** - GUI configuration interface planned
 > - Use at your own risk and please report any issues
 > - Contributions and feedback are highly appreciated!

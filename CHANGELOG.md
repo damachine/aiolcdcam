@@ -8,6 +8,25 @@ and this project follows a custom versioning scheme: **1.year.month.day.hourminu
 
 ---
 
+## [1.25.07.15.1400] - 2025-07-15
+
+### Added
+- AUR-README updated: All repository links, image references, and filenames now point to the correct coolerdash project and structure.
+- Installation and workflow instructions in AUR-README clarified and modernized for current repository.
+- Beta status and hardware test coverage in documentation improved.
+- README and AUR-README now explicitly mention 24h productive operation on developer's Arch Linux system with NZXT Kraken 2023.
+
+### Changed
+- All documentation and user instructions now consistently reference coolerdash (not aiolcdcam).
+- Image references in documentation updated to coolerdash.png for consistency.
+- Future AUR workflow and checklist updated for new project name and structure.
+
+### Technical
+- Documentation and changelog now fully synchronized with latest code and repository changes.
+- All changes committed and pushed for release.
+
+---
+
 ## [1.25.07.15.1200] - 2025-07-15
 
 ### Changed
