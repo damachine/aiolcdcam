@@ -118,7 +118,7 @@ int send_image_to_lcd(const char* image_path, const char* device_uid) {
     // brightness field
     field = curl_mime_addpart(form);
     curl_mime_name(field, "brightness");
-    curl_mime_data(field, "100", CURL_ZERO_TERMINATED);
+    curl_mime_data(field, "50", CURL_ZERO_TERMINATED);
     
     // orientation field
     field = curl_mime_addpart(form);
