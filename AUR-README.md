@@ -7,7 +7,7 @@
 - Features may change or break without notice
 - Use at your own risk and report issues
 
-![LCD Display Output](images/aiolcdcam.png)
+![LCD Display Output](images/coolerdash.png)
 *Current LCD output on NZXT Kraken 2023*
 
 ## Files for AUR Publication
@@ -16,7 +16,7 @@ This directory contains the necessary files for **future** publishing to the Arc
 
 ### Core Files:
 - `PKGBUILD` - Main package build script for AUR
-- `aiolcdcam.install` - Post-installation scripts and user instructions
+- `coolerdash.install` - Post-installation scripts and user instructions
 - `.SRCINFO` - Generated metadata file for AUR (auto-generated from PKGBUILD)
 
 ## 🚧 **Development & Testing Phase**
@@ -31,24 +31,22 @@ This package is currently in development and testing phase. Before AUR publicati
 
 ```bash
 # Test the PKGBUILD locally
-git clone https://github.com/damachine/aiolcdcam.git
-cd aiolcdcam
+git clone https://github.com/damachine/coolerdash.git
+cd coolerdash
 
-# STEP 1: Configure device UUID (REQUIRED)
+# STEP 1: Start CoolerControl daemon (UUID auto-detected)
 sudo systemctl start coolercontrold
-curl http://localhost:11987/devices | jq
-nano include/config.h  # Optional: customize settings (UUID auto-detected)
 
 # STEP 2: Test build process
 makepkg -s
 
 # STEP 3: Test installation (local only)
-sudo pacman -U aiolcdcam-1.25.07.08.2234-1-x86_64.pkg.tar.zst
+sudo pacman -U coolerdash-1.25.07.15.1300-1-x86_64.pkg.tar.zst
 
 # STEP 4: Test functionality
-aiolcdcam --help
-sudo systemctl start aiolcdcam.service
-sudo systemctl status aiolcdcam.service
+coolerdash --help
+sudo systemctl start coolerdash.service
+sudo systemctl status coolerdash.service
 ```
 
 ## 📋 **Future AUR Publication Checklist**
@@ -69,12 +67,12 @@ Before publishing to AUR, the following requirements must be met:
 
 ```bash
 # Clone AUR repository (future)
-git clone ssh://aur@aur.archlinux.org/aiolcdcam.git aur-aiolcdcam
-cd aur-aiolcdcam
+git clone ssh://aur@aur.archlinux.org/coolerdash.git aur-coolerdash
+cd aur-coolerdash
 
 # Copy files from main project
-cp ../aiolcdcam/PKGBUILD .
-cp ../aiolcdcam/aiolcdcam.install .
+cp ../coolerdash/PKGBUILD .
+cp ../coolerdash/coolerdash.install .
 
 # Generate .SRCINFO
 makepkg --printsrcinfo > .SRCINFO
@@ -83,12 +81,10 @@ makepkg --printsrcinfo > .SRCINFO
 makepkg -g
 
 # Publish to AUR
-git add PKGBUILD aiolcdcam.install .SRCINFO
-git commit -m "Initial release - LCD AIO CAM daemon for NZXT Kraken"
+git add PKGBUILD coolerdash.install .SRCINFO
+git commit -m "Initial release - CoolerDash LCD AIO daemon for NZXT Kraken"
 git push origin master
 ```
-
-## 🧪 **Current Testing Phase**
 
 ## 🧪 **Current Testing Phase**
 
@@ -111,8 +107,8 @@ git push origin master
 - **Optional**: nvidia-utils (GPU monitoring), lm_sensors (additional sensors)
 
 ### Installation:
-- **Binary**: `/opt/aiolcdcam/bin/aiolcdcam` + symlink to `/usr/bin/aiolcdcam`
-- **Source**: Complete source code in `/opt/aiolcdcam/` for UUID reconfiguration
+- **Binary**: `/opt/coolerdash/bin/coolerdash` + symlink to `/usr/bin/coolerdash`
+- **Source**: Complete source code in `/opt/coolerdash/` for UUID reconfiguration
 - **Service**: systemd service file for automatic startup
 - **Documentation**: man page, README, changelog
 
@@ -125,7 +121,7 @@ git push origin master
 
 ## Local Testing Instructions
 
-**IMPORTANT: Configure UUID BEFORE building the package!**
+**IMPORTANT: Start CoolerControl BEFORE building the package!**
 
 ```bash
 # 1. FIRST: Start CoolerControl daemon
@@ -154,7 +150,7 @@ The PKGBUILD now includes intelligent conflict detection:
 
 ## Notes
 
-- The package installs to `/opt/aiolcdcam/` following Arch Linux standards for third-party software
-- A symlink in `/usr/bin/aiolcdcam` provides system-wide access
+- The package installs to `/opt/coolerdash/` following Arch Linux standards for third-party software
+- A symlink in `/usr/bin/coolerdash` provides system-wide access
 - Source code is included for post-installation UUID configuration
 - The package properly handles systemd service management and cleanup
