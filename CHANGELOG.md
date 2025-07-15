@@ -8,6 +8,14 @@ and this project follows a custom versioning scheme: **1.year.month.day.hourminu
 
 ---
 
+## [1.25.07.15.0000] - 2025-07-15
+
+### Changed
+- LCD brightness for image upload lowered to 80% for user comfort and reduced glare.
+- All Makefile build output color codes refactored for clarity and portability (no raw escape codes).
+- All printf output in Makefile now uses variables, no cryptic placeholders.
+---
+
 ## [1.25.07.14.0000] - 2025-07-14
 
 ### Changed
