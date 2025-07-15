@@ -10,6 +10,7 @@ coolerdash-*.tar.gz
 *.pkg.tar.zst
 *.pkg.tar.xz
 pkg/
+create-release.sh
 
 # Editor files
 *.swp
