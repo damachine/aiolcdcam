@@ -68,24 +68,24 @@ static int should_update_display(const sensor_data_t *data);
  */
 int render_display(const sensor_data_t *data, display_mode_t mode) {
     if (!data) return 0;
-    
+
+    cairo_surface_t *surface = NULL;
+    cairo_t *cr = NULL;
+    int success = 0;
+
     // Check if update is needed
     if (!should_update_display(data)) {
         return 1; // No update needed, but no error
     }
-    
-    // Create Cairo surface
-    cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_RGB24, DISPLAY_WIDTH, DISPLAY_HEIGHT);
+
+    surface = cairo_image_surface_create(CAIRO_FORMAT_RGB24, DISPLAY_WIDTH, DISPLAY_HEIGHT);
     if (!surface || cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS) {
-        if (surface) cairo_surface_destroy(surface);
-        return 0;
+        goto cleanup;
     }
-    
-    cairo_t *cr = cairo_create(surface);
+
+    cr = cairo_create(surface);
     if (!cr || cairo_status(cr) != CAIRO_STATUS_SUCCESS) {
-        if (cr) cairo_destroy(cr);
-        cairo_surface_destroy(surface);
-        return 0;
+        goto cleanup;
     }
 
     // Black background
@@ -94,10 +94,10 @@ int render_display(const sensor_data_t *data, display_mode_t mode) {
 
     // Draw temperature bars
     draw_temperature_bars(cr, data);
-    
+
     // Draw labels
     draw_labels(cr, mode);
-    
+
     // Draw mode-specific elements
     switch (mode) {
         case DISPLAY_MODE_1:
@@ -114,7 +114,7 @@ int render_display(const sensor_data_t *data, display_mode_t mode) {
             // Temperatures only, no additional elements
             break;
     }
-    
+
     // Draw temperature displays
     draw_temperature_displays(cr, data, mode);
 
@@ -123,12 +123,11 @@ int render_display(const sensor_data_t *data, display_mode_t mode) {
     if (stat(IMAGE_DIR, &st) == -1) {
         mkdir(IMAGE_DIR, 0755);
     }
-    
+
     // Save PNG
-    int success = 0;
     if (cairo_surface_write_to_png(surface, IMAGE_PATH) == CAIRO_STATUS_SUCCESS) {
         success = 1;
-        
+
         // Send image 2x to display (fixes a bug)
         if (is_session_initialized()) {
             const char* device_uuid = get_cached_aio_uuid();
@@ -139,9 +138,11 @@ int render_display(const sensor_data_t *data, display_mode_t mode) {
             }
         }
     }
-    
-    cairo_destroy(cr);
-    cairo_surface_destroy(surface);
+
+cleanup:
+    if (cr) cairo_destroy(cr);
+    if (surface) cairo_surface_destroy(surface);
+
     return success;
 }
 
