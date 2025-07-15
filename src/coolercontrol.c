@@ -212,7 +212,6 @@ int get_aio_device_name(char* name_buffer, size_t buffer_size) {
     curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, &response);
     
     // Execute request
-    CURLcode res = curl_easy_perform(curl_handle);
     long response_code = 0;
     curl_easy_getinfo(curl_handle, CURLINFO_RESPONSE_CODE, &response_code);
     
@@ -255,10 +254,10 @@ int get_aio_device_uuid(char* uuid_buffer, size_t buffer_size) {
     curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, &response);
     
     // Execute request
-    CURLcode res = curl_easy_perform(curl_handle);
+    CURLcode res;
+    res = curl_easy_perform(curl_handle);
     long response_code = 0;
     curl_easy_getinfo(curl_handle, CURLINFO_RESPONSE_CODE, &response_code);
-    
     // Reset cURL options
     curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, NULL);
     curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, NULL);
