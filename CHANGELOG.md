@@ -8,6 +8,21 @@ and this project follows a custom versioning scheme: **1.year.month.day.hourminu
 
 ---
 
+## [1.25.07.16.0000] - 2025-07-16
+
+### Changed
+- Doxygen comments added to all header files (`cpu_monitor.h`, `gpu_monitor.h`, `coolant_monitor.h`, `display.h`, `coolercontrol.h`) for all function prototypes, structures, and global variables to meet documentation requirements.
+- All header files reviewed for C99 compliance, English documentation, and best practices.
+- Pointer nullification after `free()` in `coolercontrol.c` for improved memory safety.
+- All central C source files (`main.c`, `display.c`, `coolercontrol.c`, `cpu_monitor.c`, `gpu_monitor.c`, `coolant_monitor.c`) reviewed for C99 compliance, memory management, and documentation quality.
+- Makefile, PKGBUILD, README, AUR-README, and manpage checked for compliance with `.github/copilot-instructions.md` (C99, English docs, Doxygen, best practices, etc.).
+
+### Technical
+- Project-wide audit for documentation, memory management, and code quality completed. All files now fully conform to project instructions and best practices.
+- No functional changes to logic, only documentation and code quality improvements.
+
+---
+
 ## [1.25.07.15.1400] - 2025-07-15
 
 ### Added

@@ -222,7 +222,10 @@ int get_aio_device_name(char* name_buffer, size_t buffer_size) {
     int success = 0;
     
     // Cleanup
-    if (response.data) free(response.data);
+    if (response.data) {
+        free(response.data);
+        response.data = NULL;
+    }
     
     return success;
 }
@@ -328,7 +331,10 @@ int get_aio_device_uuid(char* uuid_buffer, size_t buffer_size) {
     }
     
     // Cleanup
-    if (response.data) free(response.data);
+    if (response.data) {
+        free(response.data);
+        response.data = NULL;
+    }
     
     return success;
 }
@@ -476,7 +482,10 @@ int validate_cached_uuid(const char* uuid) {
         }
     }
     
-    if (response.data) free(response.data);
+    if (response.data) {
+        free(response.data);
+        response.data = NULL;
+    }
     
     if (is_valid) {
         printf("Cached UUID validated successfully: %s\n", uuid);

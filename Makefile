@@ -22,7 +22,7 @@
 # ================================
 
 # Version (Format: 1.year.month.day.hourminute)
-VERSION = 1.25.07.14.0000
+VERSION = 1.25.07.16.0000
 
 CC = gcc
 CFLAGS = -Wall -Wextra -O2 -std=c99 -march=x86-64-v3 -Iinclude $(shell pkg-config --cflags cairo)
@@ -413,3 +413,5 @@ help:
 	@printf "$(YELLOW)🔄 Version Usage:$(RESET)\n"
 	@printf "  $(GREEN)Program:$(RESET) /opt/coolerdash/bin/coolerdash [mode]\n"
 	@printf "\n"
+
+.PHONY: clean install uninstall debug start stop restart status enable disable logs help detect-distro install-deps check-deps-for-install
