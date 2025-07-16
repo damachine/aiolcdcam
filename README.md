@@ -85,10 +85,11 @@ sudo systemctl start coolercontrold
 # STEP 3: Build and install (includes automatic dependency management)
 makepkg -si
 
-# Option 2: Install from AUR (when published)
-# yay -S coolerdash
-# or
-# paru -S coolerdash
+# STEP 4: Enable autostart
+sudo systemctl enable coolerdash.service
+
+# STEP 5: Start CoolerDash service
+sudo systemctl start coolerdash.service
 ```
 
 #### Manual Installation (All Distributions)

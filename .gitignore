@@ -31,3 +31,6 @@ Thumbs.db
 # Local test files
 PKGBUILD-test
 test-*
+
+# Version update script
+update-version.sh

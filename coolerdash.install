@@ -49,6 +49,33 @@ post_remove() {
         echo "✗ Removed: /usr/bin/coolerdash"
     fi
     
+    # Remove PID file if it exists
+    if [ -f "/var/run/coolerdash.pid" ]; then
+        rm -f /var/run/coolerdash.pid
+        echo "✗ Removed: /var/run/coolerdash.pid"
+    fi
+    
+    # Remove generated images and docs
+    rm -f /opt/coolerdash/coolerdash.png 2>/dev/null || true
+    rm -f /opt/coolerdash/images/coolerdash.png 2>/dev/null || true
+    rm -f /opt/coolerdash/images/*.png 2>/dev/null || true
+    rm -f /opt/coolerdash/*.md 2>/dev/null || true
+    rm -f /opt/coolerdash/*.txt 2>/dev/null || true
+    rm -f /opt/coolerdash/*.log 2>/dev/null || true
+    rm -rf /opt/coolerdash/* 2>/dev/null || true
+    
+    # Remove systemd service file from /usr/lib/systemd/system if it exists
+    if [ -f "/usr/lib/systemd/system/coolerdash.service" ]; then
+        rm -f /usr/lib/systemd/system/coolerdash.service
+        echo "✗ Removed: /usr/lib/systemd/system/coolerdash.service"
+    fi
+
+    # Remove systemd service file from /etc/systemd/system if it exists
+    if [ -f "/etc/systemd/system/coolerdash.service" ]; then
+        rm -f /etc/systemd/system/coolerdash.service
+        echo "✗ Removed: /etc/systemd/system/coolerdash.service"
+    fi
+
     # Reload systemd
     systemctl daemon-reload
     echo "✗ Reloaded systemd configuration"

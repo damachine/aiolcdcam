@@ -2,7 +2,7 @@
 pkgname=coolerdash
 pkgver=0.2025.07.16.0000
 pkgrel=1
-pkgdesc="CoolerDash - Modular C daemon for Liquid Cooler LCD Dashboard via CoolerControl (BETA)"
+pkgdesc="CoolerDash - For CoolerControl a wrapper to take full control of your AIO liquid cooling system with integrated LCD display to monitor real-time sensor data in style."
 arch=('x86_64')
 url="https://github.com/damachine/coolerdash"
 license=('MIT')
