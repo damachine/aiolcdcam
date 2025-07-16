@@ -29,8 +29,8 @@
 #define BAR_GAP 4 // spacing between bars
 
 // Font Sizes
-#define FONT_SIZE_LARGE 96.0  // BOX_HEIGHT * 1.50
-#define FONT_SIZE_DEGREE 86.0 // FONT_SIZE_LARGE * 0.75
+#define FONT_SIZE_LARGE 100.0  // BOX_HEIGHT * 1.50
+#define FONT_SIZE_DEGREE 80.0 // FONT_SIZE_LARGE * 0.75
 #define FONT_SIZE_COOLANT 26.0 // FONT_SIZE_LARGE * 0.30
 #define FONT_SIZE_LABELS 26.0 // FONT_SIZE_LARGE * 0.25
 
