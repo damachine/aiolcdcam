@@ -1,3 +1,8 @@
+---
+applyTo: "**"
+---
+# Project general coding standards
+
 Answer all chat questions in german.
 Write all code comments, README, AUR-README, CHANGELOG, MAN and GitHub commit messages in english.
 This project follows a custom versioning scheme: "0.year.month.day.hourminute", (e.g., 0.2025.07.08.1759 = Year 2025, July 8th, 17:59).

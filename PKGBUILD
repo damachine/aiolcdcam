@@ -1,6 +1,6 @@
 # Maintainer: DAMACHINE <christkue79@gmail.com>
 pkgname=coolerdash
-pkgver=0.2025.07.16.0000
+pkgver=0.2025.07.16.1234
 pkgrel=1
 pkgdesc="CoolerDash - For CoolerControl a wrapper to take full control of your AIO liquid cooling system with integrated LCD display to monitor real-time sensor data in style."
 arch=('x86_64')
