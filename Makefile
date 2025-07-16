@@ -21,8 +21,8 @@
 # /usr/bin/coolerdash, /etc/systemd/system/coolerdash.service.
 # ================================
 
-# Version (Format: 1.year.month.day.hourminute)
-VERSION = 1.25.07.16.0000
+# Version (Format: 0.year.month.day.hourminute)
+VERSION = 0.2025.07.16.0000
 
 CC = gcc
 CFLAGS = -Wall -Wextra -O2 -std=c99 -march=x86-64-v3 -Iinclude $(shell pkg-config --cflags cairo)

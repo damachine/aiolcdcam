@@ -3,12 +3,12 @@
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project follows a custom versioning scheme: **1.year.month.day.hourminute**
-(e.g., 1.25.07.08.1759 = Year 2025, July 8th, 17:59)
+and this project follows a custom versioning scheme: **0.year.month.day.hourminute**
+(e.g., 0.2025.07.08.1759 = Year 2025, July 8th, 17:59)
 
 ---
 
-## [1.25.07.16.0000] - 2025-07-16
+## [0.2025.07.16.0000] - 2025-07-16
 
 ### Changed
 - Doxygen comments added to all header files (`cpu_monitor.h`, `gpu_monitor.h`, `coolant_monitor.h`, `display.h`, `coolercontrol.h`) for all function prototypes, structures, and global variables to meet documentation requirements.
@@ -23,7 +23,7 @@ and this project follows a custom versioning scheme: **1.year.month.day.hourminu
 
 ---
 
-## [1.25.07.15.1400] - 2025-07-15
+## [0.2025.07.15.1400] - 2025-07-15
 
 ### Added
 - AUR-README updated: All repository links, image references, and filenames now point to the correct coolerdash project and structure.
@@ -42,7 +42,7 @@ and this project follows a custom versioning scheme: **1.year.month.day.hourminu
 
 ---
 
-## [1.25.07.15.1200] - 2025-07-15
+## [0.2025.07.15.1200] - 2025-07-15
 
 ### Changed
 - Device name detection via "NZXT Kraken" string is now obsolete; replaced by robust UUID-based detection and caching system.
@@ -57,7 +57,7 @@ and this project follows a custom versioning scheme: **1.year.month.day.hourminu
 
 ---
 
-## [1.25.07.15.0000] - 2025-07-15
+## [0.2025.07.15.0000] - 2025-07-15
 
 ### Changed
 - LCD brightness for image upload lowered to 80% for user comfort and reduced glare.
@@ -65,7 +65,7 @@ and this project follows a custom versioning scheme: **1.year.month.day.hourminu
 - All printf output in Makefile now uses variables, no cryptic placeholders.
 ---
 
-## [1.25.07.14.0000] - 2025-07-14
+## [0.2025.07.14.0000] - 2025-07-14
 
 ### Changed
 - Project name and description updated everywhere: now "CoolerDash - Modular C daemon for Liquid Cooler LCD Dashboard via CoolerControl (BETA)"
@@ -91,7 +91,7 @@ and this project follows a custom versioning scheme: **1.year.month.day.hourminu
 
 ---
 
-## [1.25.07.13.1300] - 2025-07-13
+## [0.2025.07.13.1300] - 2025-07-13
 
 ### Added
 - **Persistent UUID Caching System**: After first-run automatic detection, UUID is cached to `/var/cache/coolerdash/device.uuid` for fast startup
@@ -146,7 +146,7 @@ and this project follows a custom versioning scheme: **1.year.month.day.hourminu
 
 ---
 
-## [1.25.07.08.2234] - 2025-07-08
+## [0.2025.07.08.2234] - 2025-07-08
 
 ### Added
 - **Beta Status Clarification**: Comprehensive beta warnings and user experience roadmap
@@ -202,7 +202,7 @@ and this project follows a custom versioning scheme: **1.year.month.day.hourminu
 
 ---
 
-## [1.25.07.08.1759] - 2025-07-08
+## [0.2025.07.08.1759] - 2025-07-08
 
 ### Changed
 - **Versioning Scheme**: Switched from semantic versioning to timestamp-based versioning
