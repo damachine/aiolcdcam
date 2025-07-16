@@ -1,5 +1,4 @@
 # Maintainer: DAMACHINE <christkue79@gmail.com>
-# Version (Format: 0.year.month.day.hourminute)
 pkgname=coolerdash
 pkgver=0.2025.07.16.0000
 pkgrel=1
