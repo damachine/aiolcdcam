@@ -1,5 +1,5 @@
 Answer all questions in german.
-Write all Code comments, README, AUR-README CHANGELOG, MAN and github commit in english.
+Write all code comments, README, AUR-README, CHANGELOG, MAN and GitHub commit messages in english.
 This project follows a custom versioning scheme: "0.year.month.day.hourminute", (e.g., 0.2025.07.08.1759 = Year 2025, July 8th, 17:59).
 This project uses C99 standard. All code should be compliant with ISO/IEC 9899:1999 (C99).
 Always check return values of malloc(), calloc(), realloc().
@@ -15,11 +15,11 @@ Use PascalCase for typedef structs: MyStruct.
 Use forward declarations when possible.
 Use descriptive names, avoid abbreviations.
 Opening braces on the same line for functions and control structures (K&R style).
-Use Doxygen-style comments for functions.
+Use Doxygen-style comments for functions. Include a brief description, parameters, return values, and examples if useful.
 Include brief description, parameters, return values, and examples.
 Document complex algorithms and data structures.
 Add comments for non-obvious code sections.
-Handle dependencies correctly.
-Update the CHANGELOG.md in less than 1000 characters
-Update the "VERSION" in Makefile and "pkgver" in PKGBUILD before commiting to GitHub.
-Always commit with message less than 100 characters GitHub.
+Handle all dependencies clearly in the build system (e.g. Makefile, PKGBUILD) and document them in README and related documentation.
+Each entry in CHANGELOG.md must be less than or equal to 1000 characters.
+Before every GitHub commit, always check and update the "VERSION" in Makefile and "pkgver" in PKGBUILD so that both match the current release.
+Always commit with an English message less than 100 characters.
