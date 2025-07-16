@@ -250,6 +250,7 @@ install: check-deps-for-install $(TARGET)
 	@printf "$(ICON_INFO) $(CYAN)Creating directories...$(RESET)\n"
 	sudo mkdir -p /opt/coolerdash/bin
 	sudo mkdir -p /opt/coolerdash/images
+	sudo mkdir -p /var/cache/coolerdash
 	@printf "$(ICON_SUCCESS) $(GREEN)Directories created$(RESET)\n"
 	@printf "\n"
 	@printf "$(ICON_INFO) $(CYAN)Copying files...$(RESET)\n"
@@ -318,6 +319,14 @@ uninstall:
 	sudo rm -rf /opt/coolerdash/
 	sudo rm -rf /var/cache/coolerdash/
 	sudo rm -f /usr/bin/coolerdash 2>/dev/null || true
+	sudo rm -f /var/run/coolerdash.pid 2>/dev/null || true
+	sudo rm -f /opt/coolerdash/coolerdash.png 2>/dev/null || true
+	sudo rm -f /opt/coolerdash/images/coolerdash.png 2>/dev/null || true
+	sudo rm -f /opt/coolerdash/images/*.png 2>/dev/null || true
+	sudo rm -f /opt/coolerdash/*.md 2>/dev/null || true
+	sudo rm -f /opt/coolerdash/*.txt 2>/dev/null || true
+	sudo rm -f /opt/coolerdash/*.log 2>/dev/null || true
+	sudo rm -rf /opt/coolerdash/* 2>/dev/null || true
 	@printf "  $(RED)✗$(RESET) Service: /etc/systemd/system/coolerdash.service\n"
 	@printf "  $(RED)✗$(RESET) Manual: /usr/share/man/man1/coolerdash.1\n"
 	@printf "  $(RED)✗$(RESET) Program: /opt/coolerdash/bin/$(TARGET)\n"

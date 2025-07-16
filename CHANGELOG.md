@@ -8,6 +8,18 @@ and this project follows a custom versioning scheme: **0.year.month.day.hourminu
 
 ---
 
+## [0.2025.07.16.2100] - 2025-07-16
+
+### Changed
+- Makefile: The install target now creates /var/cache/coolerdash (systemd compatible, namespace error fixed).
+- The uninstall target now removes all residual files (cache, PID, generated PNGs, markdown, log and text files, images, symlinks, etc.) for a truly clean uninstallation.
+
+### Technical
+- Further improved systemd and installation process to fully comply with .github/copilot-instructions.md and best practices.
+- No functional changes to the program code itself.
+
+---
+
 ## [0.2025.07.16.0000] - 2025-07-16
 
 ### Changed
