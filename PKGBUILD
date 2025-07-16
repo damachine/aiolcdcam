@@ -1,6 +1,6 @@
 # Maintainer: DAMACHINE <christkue79@gmail.com>
 pkgname=coolerdash
-pkgver=1.25.07.14.0000
+pkgver=1.25.07.16.0000
 pkgrel=1
 pkgdesc="CoolerDash - Modular C daemon for Liquid Cooler LCD Dashboard via CoolerControl (BETA)"
 arch=('x86_64')
