@@ -347,10 +347,14 @@ int main(int argc, char *argv[]) {
     if (init_coolercontrol_session()) { // Check return value
         printf("✓ CoolerControl session initialized\n");
         
-        // Get and display AIO device UUID
+        // Get and display AIO device UUID only if detected and changed
+        static char last_device_uuid[128] = {0};
         char device_uuid[128] = {0};
         if (get_aio_device_uuid(device_uuid, sizeof(device_uuid))) {
-            printf("CoolerControl: Detected AIO device UUID: %.20s...\n", device_uuid);
+            if (strcmp(last_device_uuid, device_uuid) != 0) {
+                printf("CoolerControl: Detected AIO device UUID: %.20s...\n", device_uuid);
+                strncpy(last_device_uuid, device_uuid, sizeof(last_device_uuid));
+            }
         } else {
             fprintf(stderr, "Error: Could not detect AIO device UUID\n");
             fprintf(stderr, "Please check:\n");
@@ -361,7 +365,7 @@ int main(int argc, char *argv[]) {
             return 1;
         }
         
-        // Get and display full AIO device name
+        // Get and display full AIO device name only if detected
         char device_name[128] = {0};
         if (get_aio_device_name(device_name, sizeof(device_name))) {
             printf("CoolerControl: Connected to %s\n", device_name);

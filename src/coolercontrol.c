@@ -487,8 +487,15 @@ int validate_cached_uuid(const char* uuid) {
         response.data = NULL;
     }
     
+    // Nur bei Fehler oder Änderung loggen
+    static char last_validated_uuid[128] = {0};
     if (is_valid) {
-        printf("Cached UUID validated successfully: %s\n", uuid);
+        if (strcmp(last_validated_uuid, uuid) != 0) {
+            printf("Cached UUID validated successfully: %s\n", uuid);
+            strncpy(last_validated_uuid, uuid, sizeof(last_validated_uuid) - 1);
+            last_validated_uuid[sizeof(last_validated_uuid) - 1] = '\0';
+        }
+        // Sonst keine Log-Ausgabe
     } else {
         printf("Cached UUID is invalid, will re-detect: %s\n", uuid);
     }
