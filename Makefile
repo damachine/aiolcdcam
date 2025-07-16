@@ -1,17 +1,21 @@
-# Makefile for CoolerDash (Standard C Project Structure)
-# CoolerDash - Modular C daemon for Liquid Cooler LCD Dashboard via CoolerControl (BETA)
-
-# ================================
-# ⚠️  BETA SOFTWARE - EARLY DEVELOPMENT STAGE
-# ================================
-# This software is in very early development and has been tested
-# only on the developer's system with NZXT AIO Kraken 2023.
+# Project coding standards and packaging notes (see README and AUR-README for details)
 #
-# - Features may change or break without notice
-# - Bugs and issues are expected
-# - Use at your own risk
-# - Please report issues to: https://github.com/damachine/coolerdash/issues
-# ================================
+# - All code must be C99 compliant (ISO/IEC 9899:1999)
+# - Versioning: custom scheme "0.year.month.day.hourminute" (see VERSION file)
+# - Always update both VERSION (here) and pkgver (in PKGBUILD) before every commit/release
+# - All code comments, documentation, and commit messages must be in English
+# - All user questions are answered in German (see .github/copilot-instructions.md)
+# - All dependencies must be clearly listed and documented here, in PKGBUILD, and in README
+# - Build flags must enforce C99 and recommended optimizations
+# - See README and AUR-README for further details
+#
+# Example version: 0.2025.07.16.1234 (Year 2025, July 16th, 12:34)
+#
+# Before every commit: ensure VERSION and pkgver match the current release!
+#
+
+# Makefile for CoolerDash (Standard C Project Structure)
+# CoolerDash - Modular C daemon for Liquid Cooler LCD Dashboard via CoolerControl
 
 # ================================
 # Manual Installation Check
@@ -68,16 +72,7 @@ ICON_UNINSTALL = 🗑️
 
 # Standard Build Target - Standard C project structure
 $(TARGET): $(OBJDIR) $(BINDIR) $(OBJECTS) $(MAIN_SOURCE)
-	@printf "\n$(YELLOW)═══════════════════════════════════════════════════════$(RESET)\n"
-	@printf "$(RED)⚠️  BETA SOFTWARE - EARLY DEVELOPMENT STAGE$(RESET)\n"
-	@printf "$(YELLOW)═══════════════════════════════════════════════════════$(RESET)\n"
-	@printf "This software is in very early development and has been tested only on the developer's system with NZXT AIO Kraken 2023.\n"
-	@printf " - Features may change or break without notice\n"
-	@printf " - Bugs and issues are expected\n"
-	@printf " - Use at your own risk\n"
-	@printf " - Please report issues to: https://github.com/damachine/coolerdash/issues\n"
-	@printf "$(YELLOW)═══════════════════════════════════════════════════════$(RESET)\n\n"
-	@printf "$(PURPLE)Manual Installation Check:$(RESET)\n"
+	@printf "\n$(PURPLE)Manual Installation Check:$(RESET)\n"
 	@printf "If you see errors about 'conflicting files' or manual installation, run 'sudo make uninstall' and remove leftover files in /opt/coolerdash, /usr/bin/coolerdash, /etc/systemd/system/coolerdash.service.\n\n"
 	@printf "$(ICON_BUILD) $(CYAN)Compiling $(TARGET) (Standard C structure)...$(RESET)\n"
 	@printf "$(BLUE)Structure:$(RESET) src/ include/ build/ bin/\n"
@@ -320,13 +315,8 @@ uninstall:
 	sudo rm -rf /var/cache/coolerdash/
 	sudo rm -f /usr/bin/coolerdash 2>/dev/null || true
 	sudo rm -f /var/run/coolerdash.pid 2>/dev/null || true
-	sudo rm -f /opt/coolerdash/coolerdash.png 2>/dev/null || true
-	sudo rm -f /opt/coolerdash/images/coolerdash.png 2>/dev/null || true
-	sudo rm -f /opt/coolerdash/images/*.png 2>/dev/null || true
-	sudo rm -f /opt/coolerdash/*.md 2>/dev/null || true
-	sudo rm -f /opt/coolerdash/*.txt 2>/dev/null || true
-	sudo rm -f /opt/coolerdash/*.log 2>/dev/null || true
-	sudo rm -rf /opt/coolerdash/* 2>/dev/null || true
+	# Remove any remaining files in /opt/coolerdash (catch-all, safe if dir already gone)
+	sudo rm -f /opt/coolerdash/* 2>/dev/null || true
 	@printf "  $(RED)✗$(RESET) Service: /etc/systemd/system/coolerdash.service\n"
 	@printf "  $(RED)✗$(RESET) Manual: /usr/share/man/man1/coolerdash.1\n"
 	@printf "  $(RED)✗$(RESET) Program: /opt/coolerdash/bin/$(TARGET)\n"

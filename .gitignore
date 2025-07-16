@@ -13,6 +13,7 @@ create-release.sh
 pkg/
 
 # Editor files
+*.code-workspace
 *.swp
 *.swo
 *~

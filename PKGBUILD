@@ -1,4 +1,34 @@
+# Project coding standards and packaging notes (see README for details)
+#
+# - All code must be C99 compliant (ISO/IEC 9899:1999)
+# - Versioning: custom scheme "0.year.month.day.hourminute" (see VERSION file)
+# - Always update both pkgver (here) and VERSION before every commit/release
+# - All code comments, documentation, and commit messages must be in English
+# - All user questions are answered in German (see .github/copilot-instructions.md)
+# - All dependencies must be clearly listed and documented here and in README
+# - Build flags must enforce C99 and recommended optimizations
+# - See README and AUR-README for further details
+#
+# Example version: 0.2025.07.16.1234 (Year 2025, July 16th, 12:34)
+#
 # Maintainer: DAMACHINE <christkue79@gmail.com>
+#
+# --- Dependency notes ---
+# - 'cairo', 'libcurl-gnutls', 'coolercontrol' are required for core functionality
+# - 'nvidia-utils' and 'lm_sensors' are optional for extended hardware monitoring
+# - 'ttf-roboto' is required for proper font rendering on the LCD
+# - All dependencies are documented in README and AUR-README
+# ------------------------
+
+# NOTE: Before every commit, update pkgver to match the current release version.
+# Versioning follows: 0.year.month.day.hourminute (e.g., 0.2025.07.16.1234)
+# Always ensure VERSION in Makefile matches pkgver here.
+#
+# Build flags are set for C99 compliance and x86-64-v3 optimizations.
+# All dependencies must be documented and handled in the build system.
+#
+# All comments in this file must be in English (see coding standards).
+
 pkgname=coolerdash
 pkgver=0.2025.07.16.1234
 pkgrel=1
@@ -89,7 +119,7 @@ prepare() {
                 sudo rm -rf /var/cache/coolerdash/
                 sudo rm -f /usr/bin/coolerdash 2>/dev/null || true
                 sudo systemctl daemon-reload
-                
+                # All files and images are removed above; no need for extra image cleanup
                 echo "✅ Complete manual cleanup completed"
             fi
         else
@@ -120,20 +150,21 @@ prepare() {
     fi
     
     # Additional cleanup for any remaining conflicting files
-    echo "Performing final cleanup of any conflicting files..."
-    sudo rm -f /opt/coolerdash/images/coolerdash.png 2>/dev/null || true
-    sudo rm -f /opt/coolerdash/images/face.png 2>/dev/null || true
+    # All files and images are already removed above; no further cleanup needed
     echo "✅ Final cleanup completed"
 }
 
 build() {
     # For local build: use current directory directly
     cd "$startdir"
-    
+
+    # Remove all previous tarball builds
+    rm -f *.pkg.tar.*
+
     # Clean any previous builds
     make clean || true
-    
-    # Build with Arch Linux specific optimizations
+
+    # Build with Arch Linux specific optimizations and C99 compliance
     make CC=gcc CFLAGS="-Wall -Wextra -O2 -std=c99 -march=x86-64-v3 -Iinclude $(pkg-config --cflags cairo)" \
          LIBS="$(pkg-config --libs cairo) -lcurl -lm"
 }

@@ -1,3 +1,12 @@
+# CoolerDash systemd service unit
+#
+# Purpose: Runs the CoolerDash daemon for LCD temperature monitoring and control.
+# Starts after network and coolercontrold.service are available.
+# Security: Uses systemd hardening (NoNewPrivileges, ProtectSystem, etc.) and restricts write access.
+# Logging: All output is sent to the systemd journal.
+#
+# For details, see README and man:coolerdash(1)
+
 [Unit]
 Description=CoolerDash Temperature Monitor
 Documentation=man:coolerdash(1)
