@@ -311,7 +311,7 @@ static void draw_labels(cairo_t *cr, display_mode_t mode) {
         cairo_move_to(cr, 0, 94); // top left
         cairo_show_text(cr, "CPU");
 
-        cairo_move_to(cr, 0, 166); // bottom left
+        cairo_move_to(cr, 0, 165); // bottom left
         cairo_show_text(cr, "GPU");
     } else {
         // Labels for modes 1, 2, 3 (black, aligned with bars)
