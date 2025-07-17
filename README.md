@@ -64,13 +64,6 @@ Transform your cooling system into an intelligent monitoring hub that keeps you 
 
 **For older CPUs**: Use `CFLAGS=-march=x86-64 make` for compatibility
 
-### Performance Notes
-
-- **Mode "def"**: ✅ **Production ready** - Only temperature sensors, minimal I/O (~3.4MB RAM, <1% CPU)
-- **Modes 1-3**: 🧪 **Beta status** - Additional load data with intelligent caching (~3.5MB RAM, <2% CPU)
-- **Sensor caching**: hwmon paths cached at startup, GPU data cached for 2 seconds
-- **Change detection**: PNG only updated when significant changes occur
-
 ### Install CoolerDash
 
 #### Arch Linux (Recommended)
@@ -117,6 +110,8 @@ sudo systemctl start coolerdash.service
 
 ## ⚙️ Configuration
 There is no configuration needed.
+CoolerDash is pre config with default mode.
+CoolerDash is pre-configured to use the default mode.
 
 The daemon will:
 1. **Connect to CoolerControl** daemon at startup
@@ -149,6 +144,13 @@ curl http://localhost:11987/devices | jq
       }
 ```
 > **💡 Note**: The daemon automatically finds and uses AIO devices with LCD capability.
+
+### Performance Notes
+
+- **Mode "def"**: ✅ **Production ready** - Only temperature sensors, minimal I/O (~3.4MB RAM, <1% CPU)
+- **Modes 1-3**: 🧪 **Beta status** - Additional load data with intelligent caching (~3.5MB RAM, <2% CPU)
+- **Sensor caching**: hwmon paths cached at startup, GPU data cached for 2 seconds
+- **Change detection**: PNG only updated when significant changes occur
 
 ## 🔍 Troubleshooting
 
