@@ -179,7 +179,7 @@ If you need help, open an issue at https://github.com/damachine/coolerdash/issue
 
 | Mode | Status | Description | Sensor Data |
 |------|--------|-------------|-------------|
-| `def` | ✅ **Stable** <img src="images/coolerdash.png" width="120" height="120"/> | Temperatures only (CPU, GPU, coolant) | Minimal I/O - temperatures only |
+| `def` | ✅ **Stable** <img src="images/coolerdash.png" width="80" height="80"/> | Temperatures only (CPU, GPU, coolant) | Minimal I/O - temperatures only |
 | `1`   | ⚠️ **Beta** | Temperatures + vertical load bars<br><sub>Beta: This mode may have occasional issues or incomplete features.</sub> | All sensors + CPU/RAM/GPU load |
 | `2`   | ⚠️ **Beta** | Temperatures + circular diagrams<br><sub>Beta: This mode may have occasional issues or incomplete features.</sub> | All sensors + CPU/RAM/GPU load |
 | `3`   | ⚠️ **Beta** | Temperatures + horizontal load bars<br><sub>Beta: This mode may have occasional issues or incomplete features.</sub> | All sensors + CPU/RAM/GPU load |
