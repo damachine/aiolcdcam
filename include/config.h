@@ -21,18 +21,18 @@
 #define TEMP_THRESHOLD_RED 75.0f // 75°C - Hot Orange threshold (above this = Red)
 
 // Layout Constants
-#define BOX_WIDTH 70 // 240 / 3.42857142857
-#define BOX_HEIGHT ((DISPLAY_HEIGHT - 4 * BOX_GAP) / 3) // 3 boxes, 2 gaps
-#define BOX_GAP 8 // spacing between boxes
+#define BOX_WIDTH 80 // 240 / 3
+#define BOX_HEIGHT 80 // 240 / 3
+#define BOX_GAP 0 // no gap for perfect 3x80 grid
 #define BAR_WIDTH 220 // 240 - (BOX_WIDTH * 3) - (BOX_GAP * 2) - 10 (for border)
-#define BAR_HEIGHT 22 // height of bars
-#define BAR_GAP 4 // spacing between bars
+#define BAR_HEIGHT 20 // height of bars
+#define BAR_GAP 0 // spacing between bars
 
 // Font Sizes
-#define FONT_SIZE_LARGE 100.0  // BOX_HEIGHT * 1.50
-#define FONT_SIZE_DEGREE 80.0 // FONT_SIZE_LARGE * 0.75
+#define FONT_SIZE_LARGE 102.0  // BOX_HEIGHT * 1.50
+#define FONT_SIZE_DEGREE 82.0 // FONT_SIZE_LARGE * 0.75
 #define FONT_SIZE_COOLANT 26.0 // FONT_SIZE_LARGE * 0.30
-#define FONT_SIZE_LABELS 26.0 // FONT_SIZE_LARGE * 0.25
+#define FONT_SIZE_LABELS 32.0 // FONT_SIZE_LARGE * 0.25
 
 // LCD Display Settings
 #define LCD_BRIGHTNESS 80 // Default LCD brightness (0-100)
