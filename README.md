@@ -59,8 +59,8 @@ Transform your cooling system into an intelligent monitoring hub that keeps you 
 - **OS**: Linux (hwmon support required)
 - **CoolerControl**: Version 1.0+ (REQUIRED - must be installed and running)
 - **CPU**: x86-64-v3 compatible (Intel Haswell+ 2013+ / AMD Excavator+ 2015+)
-- **LCD**: LCD AIO displays supported by CoolerControl (NZXT AIO, etc.)
-- **Resources**: < 5 MB RAM, < 1-2% CPU load
+- **LCD**: LCD AIO displays supported by CoolerControl (Asus, NZXT, etc.)
+- **Resources**: < 4 MB RAM, < 1-2% CPU load
 
 **For older CPUs**: Use `CFLAGS=-march=x86-64 make` for compatibility
 
@@ -237,15 +237,39 @@ Edit `include/config.h` for customization:
 #define DAEMON_ADDRESS "http://localhost:11987"
 
 // Display settings
-#define DISPLAY_WIDTH 240
-#define DISPLAY_HEIGHT 240
-#define DISPLAY_REFRESH_INTERVAL_SEC 2
+#define DISPLAY_WIDTH 240 // Device display resolution
+#define DISPLAY_HEIGHT 240 // Device display resolution
+#define DISPLAY_REFRESH_INTERVAL_SEC 2 // 2 seconds (optional fine-tuning)
+#define DISPLAY_REFRESH_INTERVAL_NSEC 500000000  // 0.5 seconds (optional fine-tuning)
+
+// LCD display settings
+#define LCD_BRIGHTNESS 80 // Default LCD brightness (0-100)
 
 // Temperature thresholds (4-stage color gradient)
 #define TEMP_THRESHOLD_GREEN 55.0f    // ≤55°C: Green
 #define TEMP_THRESHOLD_ORANGE 65.0f   // ≤65°C: Orange  
-#define TEMP_THRESHOLD_RED 75.0f      // ≤75°C: Hot Orange (>75°C: Red)
+#define TEMP_THRESHOLD_RED 75.0f      // ≤75°C: Hot Orange, >75°C: Red
+
+// Cache and change detection settings
+#define GPU_CACHE_INTERVAL 2.5f // seconds (interval for GPU data refresh)
+#define CHANGE_TOLERANCE_TEMP 0.1f // temperature change tolerance in degrees Celsius
+#define CHANGE_TOLERANCE_USAGE 0.5f // usage change tolerance in percent
+
+// Paths (advanced)
+#define HWMON_PATH "/sys/class/hwmon" // path to hardware monitors
+#define IMAGE_DIR "/opt/coolerdash/images" // directory for images
+#define IMAGE_PATH "/opt/coolerdash/images/coolerdash.png" // path to temperature display image
+#define PID_FILE "/var/run/coolerdash.pid" // PID file for daemon
+#define DAEMON_PASSWORD "coolAdmin" // CoolerControl daemon password (default)
 ```
+
+**Tip:**
+- `DISPLAY_REFRESH_INTERVAL_XY` allows you to fine-tune the refresh interval in nanoseconds (e.g., 0.5 seconds = 500000000).
+- `LCD_BRIGHTNESS` sets the default LCD brightness (range: 0-100).
+- `GPU_CACHE_INTERVAL` sets how often GPU data is refreshed (in seconds, supports decimals).
+- `CHANGE_TOLERANCE_TEMP` and `CHANGE_TOLERANCE_USAGE` control when a value change is considered significant (for display updates).
+- `HWMON_PATH`, `IMAGE_DIR`, `IMAGE_PATH`, and `PID_FILE` can be changed for advanced setups.
+- `DAEMON_PASSWORD` must match your CoolerControl configuration if changed from default.
 
 ## 🔧 Usage & Tips
 
@@ -257,6 +281,9 @@ sudo systemctl start coolerdash.service     # Start
 sudo systemctl stop coolerdash.service      # Stop (displays face.png automatically)
 sudo systemctl restart coolerdash.service   # Restart
 sudo systemctl status coolerdash.service    # Status + recent logs
+
+# Journal log
+journalctl -xeu coolerdash.service
 
 # Live logs
 sudo journalctl -u coolerdash.service -f
