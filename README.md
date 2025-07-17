@@ -18,13 +18,8 @@ Transform your cooling system into an intelligent monitoring hub that keeps you 
 
 ### 📸 Screenshot – Example LCD Output
 ![CPU/GPU Temperature Display](images/coolerdash.png)
-*Live temperature monitoring image on NZXT Kraken 2023 LCD display*
-
-### 📸 Animation – CoolerDash in Action
-
 ![CoolerDash LCD Animation](images/animation.gif)
-*Animated LCD output showing real-time operation*
----
+*Live temperature monitoring image on NZXT Kraken 2023 LCD display*
 
 **👨‍💻 Author:** DAMACHINE ([christkue79@gmail.com](mailto:christkue79@gmail.com))  
 **🧪 Tested with:** NZXT AIO Kraken 2023 (Z-Series) - Developer's personal system  
