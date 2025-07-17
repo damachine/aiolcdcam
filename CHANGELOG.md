@@ -8,6 +8,19 @@ and this project follows a custom versioning scheme: **0.year.month.day.hourminu
 
 ---
 
+## [0.2025.07.17.2000] - 2025-07-17
+
+### Changed
+- Display layout: All temperature boxes (CPU, GPU, coolant) now use a strict 3x80 grid (240x240px, no gap) for perfect centering and alignment.
+- CPU and GPU temperature values are now exactly centered in their boxes, coolant temperature is right-aligned and vertically centered.
+- Doxygen-style comments added for all major rendering functions in display.c (draw_temperature_displays, draw_temperature_bars, draw_labels, draw_mode_1_vertical_bars, draw_mode_2_circles, draw_mode_3_horizontal_bars, should_update_display, draw_combined_image).
+- Coding standards: All code and comments now fully comply with project conventions (C99, naming, K&R, English comments, Doxygen, build system docs, versioning, etc.).
+
+### Technical
+- No functional changes to program logic. All changes are layout, documentation, or code style improvements only.
+
+---
+
 ## [0.2025.07.17.0000] - 2025-07-17
 
 ### Changed
