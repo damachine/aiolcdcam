@@ -17,7 +17,7 @@ Transform your cooling system into an intelligent monitoring hub that keeps you 
 ---
 
 ### 📸 Screenshot – Example LCD Output
-![CPU/GPU Temperature Display](images/coolerdash.png)
+![CPU/GPU/Coolant Temperature Display](images/coolerdash.png)
 ![CoolerDash LCD Animation](images/animation.gif)
 *Live temperature monitoring image on NZXT Kraken 2023 LCD display*
 
