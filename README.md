@@ -17,7 +17,6 @@ Transform your cooling system into an intelligent monitoring hub that keeps you 
 ---
 
 ### 📸 Screenshot – Example LCD Output
-![CPU/GPU/Coolant Temperature Display](images/coolerdash.png)
 ![CoolerDash LCD Animation](images/animation.gif)
 *Live temperature monitoring image on NZXT Kraken 2023 LCD display*
 
@@ -180,7 +179,7 @@ If you need help, open an issue at https://github.com/damachine/coolerdash/issue
 
 | Mode | Status | Description | Sensor Data |
 |------|--------|-------------|-------------|
-| `def` | ✅ **Stable** | Temperatures only (CPU, GPU, coolant) | Minimal I/O - temperatures only |
+| `def` | ✅ **Stable**![CPU/GPU/Coolant Temperature Display](images/coolerdash.png) | Temperatures only (CPU, GPU, coolant) | Minimal I/O - temperatures only |
 | `1`   | ⚠️ **Beta** | Temperatures + vertical load bars<br><sub>Beta: This mode may have occasional issues or incomplete features.</sub> | All sensors + CPU/RAM/GPU load |
 | `2`   | ⚠️ **Beta** | Temperatures + circular diagrams<br><sub>Beta: This mode may have occasional issues or incomplete features.</sub> | All sensors + CPU/RAM/GPU load |
 | `3`   | ⚠️ **Beta** | Temperatures + horizontal load bars<br><sub>Beta: This mode may have occasional issues or incomplete features.</sub> | All sensors + CPU/RAM/GPU load |
