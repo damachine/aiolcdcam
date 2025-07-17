@@ -8,6 +8,20 @@ and this project follows a custom versioning scheme: **0.year.month.day.hourminu
 
 ---
 
+## [0.2025.07.17.0000] - 2025-07-17
+
+### Changed
+- README: Improved and clarified Advanced Configuration section. Added documentation for all relevant config.h options (cache intervals, tolerances, paths, password, LCD brightness, refresh interval) with explanations and examples.
+- README: Table for display modes now shows the LCD screenshot as a small 120x120px image using HTML for better layout.
+- README: Minor language and formatting corrections for consistency and clarity.
+- Build: The resulting program binary and package size are now smaller due to documentation and configuration cleanups.
+
+### Technical
+- Documentation and configuration instructions now fully synchronized with config.h and project coding standards.
+- No functional changes to the program code itself.
+
+---
+
 ## [0.2025.07.16.2100] - 2025-07-16
 
 ### Changed
@@ -230,7 +244,7 @@ and this project follows a custom versioning scheme: **0.year.month.day.hourminu
 
 ---
 
-## [0.1.3] - 2025-01-26
+## [0.1.3] - 2025-07-08
 
 ### Added
 - **Arch Linux PKGBUILD**: Complete packaging for Arch User Repository (AUR)
