@@ -2,20 +2,13 @@
 applyTo: "**"
 ---
 
-# Project language and conservations
+Use german language to answer chat questions.
+Use english language in the README.md, AUR-README.md, CHANGELOG.md and the Linux man files. 
+Use english language for code comments.
+Use Doxygen-style comments for functions. Include a brief description, parameters, return values, and examples if useful.
+Opening braces on the same line for functions and control structures (K&R style).
+Add comments for non-obvious code sections.
 
-Answer all chat questions in german.
-Write all code comments in english.
-Write all in README.md file in english. 
-Write all in AUR-README.md in english.
-Write all in CHANGELOG.md in english.
-Write all MAN file in english.
-Write all GitHub commit with messages in english.
-Each commit to Github write in english.
-
-# Coding Standards
-
-This project follows a custom versioning scheme: "0.year.month.day.hourminute", (e.g., 0.2025.07.08.1759 = Year 2025, July 8th, 17:59).
 This project uses C99 standard.
 All code should be compliant with ISO/IEC 9899:1999 (C99).
 Always check return values of malloc(), calloc(), realloc().
@@ -30,8 +23,4 @@ Use UPPER_CASE for constants and macros: MAX_SIZE, PI.
 Use PascalCase for typedef structs: MyStruct.
 Use forward declarations when possible.
 Use descriptive names, avoid abbreviations.
-Opening braces on the same line for functions and control structures (K&R style).
-Use Doxygen-style comments for functions. Include a brief description, parameters, return values, and examples if useful.
-Include brief description, parameters, return values, and examples.
 Document complex algorithms and data structures.
-Add comments for non-obvious code sections.

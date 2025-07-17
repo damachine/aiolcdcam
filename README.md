@@ -109,7 +109,6 @@ sudo systemctl start coolerdash.service
 
 ## ⚙️ Configuration
 There is no configuration needed.
-CoolerDash is pre config with default mode.
 CoolerDash is pre-configured to use the default mode.
 
 The daemon will:

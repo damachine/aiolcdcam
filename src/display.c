@@ -164,11 +164,11 @@ cleanup:
  */
 static void draw_temperature_displays(cairo_t *cr, const sensor_data_t *data, display_mode_t mode __attribute__((unused))) {
     // Box positions for 240x240 layout, no gap
-    const int cpu_box_x = BOX_WIDTH; // mittlere Box
+    const int cpu_box_x = BOX_WIDTH; // middle box
     const int cpu_box_y = 0;
-    const int coolant_box_x = 2 * BOX_WIDTH; // rechte Box
+    const int coolant_box_x = 2 * BOX_WIDTH; // right box
     const int coolant_box_y = 0;
-    const int gpu_box_x = BOX_WIDTH; // mittlere Box unten
+    const int gpu_box_x = BOX_WIDTH; // middle box bottom
     const int gpu_box_y = 2 * BOX_HEIGHT;
     
     // Set font and size DejaVu Sans, Roboto Black, Noto Sans Black, Liberation Sans
@@ -199,7 +199,7 @@ static void draw_temperature_displays(cairo_t *cr, const sensor_data_t *data, di
         snprintf(cool_str, sizeof(cool_str), "%.1f", data->coolant_temp);
         cairo_set_font_size(cr, FONT_SIZE_COOLANT);
         cairo_text_extents(cr, cool_str, &cool_ext);
-        // Position: ganz rechts in der Box
+        // Position: far right in the box
         const double cool_x = coolant_box_x + BOX_WIDTH - cool_ext.width - 8; // px padding
         const double cool_y = coolant_box_y + BOX_HEIGHT + 14; // px padding
         cairo_move_to(cr, cool_x, cool_y);
@@ -307,11 +307,11 @@ static void draw_labels(cairo_t *cr, display_mode_t mode) {
         // Special labels for def mode (white, larger, side-aligned)
         cairo_set_font_size(cr, 32);
         cairo_set_source_rgb(cr, 1, 1, 1);
-        // Keine text_extents nötig, da Position fix ist
-        cairo_move_to(cr, 0, 94); // ganz links oben
+        // No text_extents needed, as position is fixed
+        cairo_move_to(cr, 0, 94); // top left
         cairo_show_text(cr, "CPU");
 
-        cairo_move_to(cr, 0, 168); // ganz links unten
+        cairo_move_to(cr, 0, 168); // bottom left
         cairo_show_text(cr, "GPU");
     } else {
         // Labels for modes 1, 2, 3 (black, aligned with bars)
