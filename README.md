@@ -71,16 +71,6 @@ Transform your cooling system into an intelligent monitoring hub that keeps you 
 - **Sensor caching**: hwmon paths cached at startup, GPU data cached for 2 seconds
 - **Change detection**: PNG only updated when significant changes occur
 
-## 🔍 Troubleshooting
-
-### Common Issues
-
-- **"Connection refused"**: CoolerControl daemon not running → `sudo systemctl start coolercontrold`
-- **"Device not found"**: LCD AIO not configured in CoolerControl → Use CoolerControl GUI  
-- **"Permission denied"**: Run with appropriate permissions → `sudo coolerdash def`
-- **"Empty JSON response"**: No devices found → Check CoolerControl configuration and LCD AIO connection
-- **"UUID not working"**: Wrong device UUID → Verify with `curl http://localhost:11987/devices | jq` and copy exact UUID
-
 ### Install CoolerDash
 
 #### Arch Linux (Recommended)
@@ -159,6 +149,16 @@ curl http://localhost:11987/devices | jq
       }
 ```
 > **💡 Note**: The daemon automatically finds and uses AIO devices with LCD capability.
+
+## 🔍 Troubleshooting
+
+### Common Issues
+
+- **"Connection refused"**: CoolerControl daemon not running → `sudo systemctl start coolercontrold`
+- **"Device not found"**: LCD AIO not configured in CoolerControl → Use CoolerControl GUI  
+- **"Permission denied"**: Run with appropriate permissions → `sudo coolerdash def`
+- **"Empty JSON response"**: No devices found → Check CoolerControl configuration and LCD AIO connection
+- **"UUID not working"**: Wrong device UUID → Verify with `curl http://localhost:11987/devices | jq` and copy exact UUID
 
 ## Troubleshooting: Manual Installation Conflicts
 If you see errors like "conflicting files" or "manual installation detected" during `makepkg -si`, this means CoolerDash was previously installed manually (via `make install`).
