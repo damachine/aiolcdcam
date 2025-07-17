@@ -305,7 +305,7 @@ static void draw_labels(cairo_t *cr, display_mode_t mode) {
     
     if (mode == DISPLAY_MODE_DEF) {
         // Special labels for def mode (white, larger, side-aligned)
-        cairo_set_font_size(cr, 32);
+        cairo_set_font_size(cr, 26);
         cairo_set_source_rgb(cr, 1, 1, 1);
         // No text_extents needed, as position is fixed
         cairo_move_to(cr, 0, 94); // top left
