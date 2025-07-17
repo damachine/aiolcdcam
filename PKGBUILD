@@ -30,9 +30,9 @@
 # All comments in this file must be in English (see coding standards).
 
 pkgname=coolerdash
-pkgver=0.2025.07.16.1234
+pkgver=0.2025.07.17.2000
 pkgrel=1
-pkgdesc="CoolerDash - For CoolerControl a wrapper to take full control of your AIO liquid cooling system with integrated LCD display to monitor real-time sensor data in style."
+pkgdesc="CoolerDash a Wrapper for LCD Device Image Control in CoolerControl. To take full control of your AIO liquid cooling system with integrated LCD display to monitor real-time sensor data in style."
 arch=('x86_64')
 url="https://github.com/damachine/coolerdash"
 license=('MIT')
@@ -46,19 +46,6 @@ source=()
 sha256sums=()
 
 prepare() {
-    echo "================================================================"
-    echo "⚠️  BETA SOFTWARE - EARLY DEVELOPMENT STAGE"
-    echo "================================================================"
-    echo "This software is in very early development and has been tested"
-    echo "only on the developer's system with NZXT AIO Kraken 2023."
-    echo ""
-    echo "- Features may change or break without notice"
-    echo "- Bugs and issues are expected"
-    echo "- Use at your own risk"
-    echo "- Please report issues to: https://github.com/damachine/coolerdash/issues"
-    echo "================================================================"
-    echo ""
-    
     echo "================================================================"
     echo "Checking for existing manual installation..."
     echo "================================================================"

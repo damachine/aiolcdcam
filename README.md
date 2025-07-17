@@ -14,14 +14,16 @@ This high-performance, modular C-based daemon empowers you to harness the potent
 
 Transform your cooling system into an intelligent monitoring hub that keeps you informed about your system's vital signs at a glance.
 
-**🔧 Built with strict C99 compliance** for maximum portability and standards conformance.
-
 ---
 
-### 📸 **Screenshot - Current LCD Output:**
+### 📸 Screenshot – Example LCD Output
 ![CPU/GPU Temperature Display](images/coolerdash.png)
-*Live temperature monitoring on NZXT AIO LCD display*
+*Live temperature monitoring image on NZXT Kraken 2023 LCD display*
 
+### 📸 Animation – CoolerDash in Action
+
+![CoolerDash LCD Animation](images/animation.gif)
+*Animated LCD output showing real-time operation*
 ---
 
 **👨‍💻 Author:** DAMACHINE ([christkue79@gmail.com](mailto:christkue79@gmail.com))  
@@ -39,6 +41,7 @@ Transform your cooling system into an intelligent monitoring hub that keeps you 
 - **📊 Efficient Sensor Polling**: Only necessary sensor data is queried depending on mode
 - **🔄 Systemd Integration**: Service management with detailed logs
 - **🚀 Intelligent Installation**: Automatic dependency detection and installation for all major Linux distributions
+- **🔧 Built with strict C99 compliance** for maximum portability and standards conformance.
 
 **Supported Distributions (Auto-Detected):**
 - **Arch Linux / Manjaro**: `pacman -S cairo libcurl-gnutls coolercontrol gcc make pkg-config`

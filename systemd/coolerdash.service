@@ -8,7 +8,7 @@
 # For details, see README and man:coolerdash(1)
 
 [Unit]
-Description=CoolerDash Temperature Monitor
+Description=CoolerDash daemon
 Documentation=man:coolerdash(1)
 After=network.target coolercontrold.service
 Wants=coolercontrold.service

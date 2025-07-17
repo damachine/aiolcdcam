@@ -26,7 +26,7 @@
 # ================================
 
 # Version (Format: 0.year.month.day.hourminute)
-VERSION = 0.2025.07.16.1234
+VERSION = 0.2025.07.17.2000
 
 CC = gcc
 CFLAGS = -Wall -Wextra -O2 -std=c99 -march=x86-64-v3 -Iinclude $(shell pkg-config --cflags cairo)

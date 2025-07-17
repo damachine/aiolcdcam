@@ -3,11 +3,11 @@ build/
 bin/
 *.o
 
-# Release tarballs (created by create-release.sh)
+# Release tarballs (created by release.sh)
+release.sh
 coolerdash-*.tar.gz
 
 # Arch package files (created by makepkg)
-create-release.sh
 *.pkg.tar.zst
 *.pkg.tar.xz
 pkg/
@@ -32,6 +32,3 @@ Thumbs.db
 # Local test files
 PKGBUILD-test
 test-*
-
-# Version update script
-update-version.sh
