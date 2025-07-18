@@ -7,36 +7,31 @@
 #include <cairo/cairo.h>
 #include <sys/stat.h>
 #include <math.h>
-#include <string.h>
 #include <stdio.h>
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
+#ifndef M_PI_2
+#define M_PI_2 1.57079632679489661923
+#endif
 
 /**
- * Convert mode string to display mode enum
+ * @brief Calculate color gradient for temperature bars (green → orange → red).
  *
- * @param mode_str Mode string ("def", "1", "2", "3")
- * @return Display mode enum
- */
-display_mode_t parse_display_mode(const char *mode_str) {
-    if (!mode_str) return DISPLAY_MODE_DEF;
-    
-    if (strcmp(mode_str, "1") == 0) return DISPLAY_MODE_1;
-    if (strcmp(mode_str, "2") == 0) return DISPLAY_MODE_2;
-    if (strcmp(mode_str, "3") == 0) return DISPLAY_MODE_3;
-    
-    return DISPLAY_MODE_DEF;  // Default
-}
-
-/**
- * Calculate color gradient for temperature bars (green → orange → red)
+ * Determines the RGB color for a given temperature value according to the defined thresholds.
  *
  * @param val Temperature value
  * @param[out] r Red component (0-255)
  * @param[out] g Green component (0-255)
  * @param[out] b Blue component (0-255)
+ * @return void
+ *
+ * Example:
+ * @code
+ * int r, g, b;
+ * lerp_temp_color(65.0f, &r, &g, &b);
+ * @endcode
  */
 void lerp_temp_color(float val, int* r, int* g, int* b) {
     if (val <= TEMP_THRESHOLD_GREEN) { 
@@ -52,21 +47,24 @@ void lerp_temp_color(float val, int* r, int* g, int* b) {
 
 // Forward declarations for internal functions
 static void draw_temperature_bars(cairo_t *cr, const sensor_data_t *data);
-static void draw_temperature_displays(cairo_t *cr, const sensor_data_t *data, display_mode_t mode);
-static void draw_mode_1_vertical_bars(cairo_t *cr, const sensor_data_t *data);
-static void draw_mode_2_circles(cairo_t *cr, const sensor_data_t *data);
-static void draw_mode_3_horizontal_bars(cairo_t *cr, const sensor_data_t *data);
-static void draw_labels(cairo_t *cr, display_mode_t mode);
+static void draw_temperature_displays(cairo_t *cr, const sensor_data_t *data);
+static void draw_labels(cairo_t *cr);
 static int should_update_display(const sensor_data_t *data);
 
 /**
- * Render display based on sensor data and mode
+ * @brief Render display based on sensor data (only default mode).
+ *
+ * Renders the LCD display image using the provided sensor data. Handles drawing, saving, and uploading the image.
  *
  * @param data Pointer to sensor data
- * @param mode Display mode
  * @return 1 on success, 0 on error
+ *
+ * Example:
+ * @code
+ * int result = render_display(&sensor_data);
+ * @endcode
  */
-int render_display(const sensor_data_t *data, display_mode_t mode) {
+int render_display(const sensor_data_t *data) {
     if (!data) return 0;
 
     cairo_surface_t *surface = NULL;
@@ -92,31 +90,14 @@ int render_display(const sensor_data_t *data, display_mode_t mode) {
     cairo_set_source_rgb(cr, 0, 0, 0);
     cairo_paint(cr);
 
-    // Draw temperature bars
-    draw_temperature_bars(cr, data);
-
     // Draw labels
-    draw_labels(cr, mode);
-
-    // Draw mode-specific elements
-    switch (mode) {
-        case DISPLAY_MODE_1:
-            draw_mode_1_vertical_bars(cr, data);
-            break;
-        case DISPLAY_MODE_2:
-            draw_mode_2_circles(cr, data);
-            break;
-        case DISPLAY_MODE_3:
-            draw_mode_3_horizontal_bars(cr, data);
-            break;
-        case DISPLAY_MODE_DEF:
-        default:
-            // Temperatures only, no additional elements
-            break;
-    }
+    draw_labels(cr);
 
     // Draw temperature displays
-    draw_temperature_displays(cr, data, mode);
+    draw_temperature_displays(cr, data);
+
+    // Draw temperature bars
+    draw_temperature_bars(cr, data);
 
     // Create image directory if needed
     struct stat st = {0};
@@ -126,15 +107,16 @@ int render_display(const sensor_data_t *data, display_mode_t mode) {
 
     // Save PNG
     if (cairo_surface_write_to_png(surface, IMAGE_PATH) == CAIRO_STATUS_SUCCESS) {
+        // Ensure PNG is fully written to disk before sending to LCD
+        fflush(NULL);
         success = 1;
 
-        // Send image 2x to display (fixes a bug)
         if (is_session_initialized()) {
             const char* device_uuid = get_cached_aio_uuid();
             if (device_uuid) {
-                for (int i = 0; i < 2; ++i) {
-                    send_image_to_lcd(IMAGE_PATH, device_uuid);
-                }
+                // Workaround: send image twice to avoid LCD artifacts
+                send_image_to_lcd(IMAGE_PATH, device_uuid);
+                send_image_to_lcd(IMAGE_PATH, device_uuid);
             }
         }
     }
@@ -147,101 +129,73 @@ cleanup:
 }
 
 /**
- * Draw temperature displays (large numbers for CPU, GPU, coolant)
+ * @brief Draw temperature displays (large numbers for CPU, GPU).
  *
- * Draws the temperature values for CPU, GPU, and coolant in their respective boxes
- * according to the 240x240px layout. CPU and GPU temperatures are centered in their boxes,
- * coolant temperature is right-aligned and vertically centered.
+ * Draws the temperature values for CPU and GPU in their respective boxes according to the 240x240px layout. CPU and GPU temperatures are centered in their boxes.
  *
  * @param cr Cairo drawing context
  * @param data Pointer to sensor data (temperatures)
- * @param mode Display mode (unused)
+ * @return void
  *
  * Example:
  * @code
- * draw_temperature_displays(cr, &sensor_data, DISPLAY_MODE_DEF);
+ * draw_temperature_displays(cr, &sensor_data);
  * @endcode
  */
-static void draw_temperature_displays(cairo_t *cr, const sensor_data_t *data, display_mode_t mode __attribute__((unused))) {
-    // Box positions for 240x240 layout, no gap
-    const int cpu_box_x = BOX_WIDTH; // middle box
-    const int cpu_box_y = 0;
-    const int coolant_box_x = 2 * BOX_WIDTH; // right box
-    const int coolant_box_y = 0;
-    const int gpu_box_x = BOX_WIDTH; // middle box bottom
-    const int gpu_box_y = 2 * BOX_HEIGHT;
+static void draw_temperature_displays(cairo_t *cr, const sensor_data_t *data) {
+    // Box positions for 240x240 layout, two boxes (top/bottom)
+    const int cpu_box_x = 0; // top box, full width
+    const int cpu_box_y = 0 ;
+    const int gpu_box_x = 0; // bottom box, full width
+    const int gpu_box_y = BOX_HEIGHT;
     
-    // Set font and size DejaVu Sans, Roboto Black, Noto Sans Black, Liberation Sans
-    cairo_select_font_face(cr, "Roboto Black", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-    cairo_set_source_rgb(cr, 1, 1, 1);
+    // Set font and size
+    cairo_select_font_face(cr, FONT_FACE, CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+    cairo_set_source_rgb(cr, COLOR_TEMP_R, COLOR_TEMP_G, COLOR_TEMP_B);
     
     char temp_str[8];
-    char cool_str[16];
-    cairo_text_extents_t ext, deg_ext, cool_ext, deg_ext_cool, deg_ext_gpu;
+    cairo_text_extents_t ext;
 
-    // CPU temperature display
-    snprintf(temp_str, sizeof(temp_str), "%d", (int)data->cpu_temp);
+    // CPU temperature display (number + degree symbol in one string)
+    snprintf(temp_str, sizeof(temp_str), "%d\xC2\xB0", (int)data->cpu_temp);
     cairo_set_font_size(cr, FONT_SIZE_LARGE);
     cairo_text_extents(cr, temp_str, &ext);
-    const double cpu_temp_x = cpu_box_x + (BOX_WIDTH - ext.width) / 2;
-    const double cpu_temp_y = cpu_box_y + ext.height + 2;
+    // Centered in top box (no bearing correction)
+    const double cpu_temp_x = cpu_box_x + (BOX_WIDTH - ext.width) / 2 + 22;
+    const double cpu_temp_y = cpu_box_y + (BOX_HEIGHT + ext.height) / 2 - 22;
     cairo_move_to(cr, cpu_temp_x, cpu_temp_y);
     cairo_show_text(cr, temp_str);
-    
-    // Degree symbol for CPU
-    cairo_set_font_size(cr, FONT_SIZE_DEGREE);
-    cairo_text_extents(cr, "\xC2\xB0", &deg_ext); // UTF-8 degree symbol
-    cairo_move_to(cr, cpu_temp_x + ext.width + 6, cpu_temp_y - deg_ext.height + 6);
-    cairo_show_text(cr, "\xC2\xB0"); // UTF-8 degree symbol
 
-    // Coolant temperature display (only if CPU <= 99°C)
-    if (data->cpu_temp <= 99.0f && data->coolant_temp > 0.0f) {
-        snprintf(cool_str, sizeof(cool_str), "%.1f", data->coolant_temp);
-        cairo_set_font_size(cr, FONT_SIZE_COOLANT);
-        cairo_text_extents(cr, cool_str, &cool_ext);
-        // Position: far right in the box
-        const double cool_x = coolant_box_x + BOX_WIDTH - cool_ext.width - 8; // px padding
-        const double cool_y = coolant_box_y + BOX_HEIGHT + 14; // px padding
-        cairo_move_to(cr, cool_x, cool_y);
-        cairo_show_text(cr, cool_str);
-
-        // Degree symbol for coolant
-        cairo_set_font_size(cr, FONT_SIZE_DEGREE * 0.25);
-        cairo_text_extents(cr, "\xC2\xB0", &deg_ext_cool); // UTF-8 degree symbol
-        cairo_move_to(cr, cool_x + cool_ext.width, cool_y - deg_ext_cool.height);
-        cairo_show_text(cr, "\xC2\xB0"); // UTF-8 degree symbol
-    }
-
-    // GPU temperature display
-    snprintf(temp_str, sizeof(temp_str), "%d", (int)data->gpu_temp);
+    // GPU temperature display (number + degree symbol in one string)
+    snprintf(temp_str, sizeof(temp_str), "%d\xC2\xB0", (int)data->gpu_temp);
     cairo_set_font_size(cr, FONT_SIZE_LARGE);
     cairo_text_extents(cr, temp_str, &ext);
-    const double gpu_temp_x = gpu_box_x + (BOX_WIDTH - ext.width) / 2;
-    const double gpu_temp_y = gpu_box_y + BOX_HEIGHT - 2;
+    // Centered in bottom box (no bearing correction)
+    const double gpu_temp_x = gpu_box_x + (BOX_WIDTH - ext.width) / 2 + 22;
+    const double gpu_temp_y = gpu_box_y + (BOX_HEIGHT + ext.height) / 2 + 22;
     cairo_move_to(cr, gpu_temp_x, gpu_temp_y);
     cairo_show_text(cr, temp_str);
-    
-    // Degree symbol for GPU
-    cairo_set_font_size(cr, FONT_SIZE_DEGREE);
-    cairo_text_extents(cr, "\xC2\xB0", &deg_ext_gpu); // UTF-8 degree symbol
-    cairo_move_to(cr, gpu_temp_x + ext.width + 6, gpu_temp_y - deg_ext_gpu.height + 6);
-    cairo_show_text(cr, "\xC2\xB0"); // UTF-8 degree symbol
 }
 
 /**
- * Draw temperature bars (CPU and GPU)
+ * @brief Draw temperature bars (CPU and GPU).
  *
- * Draws horizontal bars representing CPU and GPU temperatures, with color gradient
- * according to temperature value.
+ * Draws horizontal bars representing CPU and GPU temperatures, with color gradient according to temperature value.
  *
  * @param cr Cairo drawing context
  * @param data Pointer to sensor data (temperatures)
+ * @return void
+ *
+ * Example:
+ * @code
+ * draw_temperature_bars(cr, &sensor_data);
+ * @endcode
  */
 static void draw_temperature_bars(cairo_t *cr, const sensor_data_t *data) {
     // Calculate horizontal position (centered)
     const int bar_x = (DISPLAY_WIDTH - BAR_WIDTH) / 2;
     // Calculate vertical positions for CPU and GPU bars
-    const int cpu_bar_y = (DISPLAY_HEIGHT - (2 * BAR_HEIGHT + BAR_GAP)) / 2;
+    const int cpu_bar_y = (DISPLAY_HEIGHT - (2 * BAR_HEIGHT + BAR_GAP)) / 2 + 1;
     const int gpu_bar_y = cpu_bar_y + BAR_HEIGHT + BAR_GAP;
     
     // --- CPU bar ---
@@ -252,18 +206,40 @@ static void draw_temperature_bars(cairo_t *cr, const sensor_data_t *data) {
     const int safe_cpu_val_w = (cpu_val_w < 0) ? 0 : 
         (cpu_val_w > BAR_WIDTH) ? BAR_WIDTH : cpu_val_w; // Clamp to valid range
     
-    // Draw CPU bar background
+    // Draw CPU bar background (rounded corners)
+    double radius = 8.0; // Corner radius in px
     cairo_set_source_rgb(cr, COLOR_BG_R, COLOR_BG_G, COLOR_BG_B);
-    cairo_rectangle(cr, bar_x, cpu_bar_y, BAR_WIDTH, BAR_HEIGHT);
+    cairo_new_sub_path(cr);
+    cairo_arc(cr, bar_x + BAR_WIDTH - radius, cpu_bar_y + radius, radius, -M_PI_2, 0);
+    cairo_arc(cr, bar_x + BAR_WIDTH - radius, cpu_bar_y + BAR_HEIGHT - radius, radius, 0, M_PI_2);
+    cairo_arc(cr, bar_x + radius, cpu_bar_y + BAR_HEIGHT - radius, radius, M_PI_2, M_PI);
+    cairo_arc(cr, bar_x + radius, cpu_bar_y + radius, radius, M_PI, 1.5 * M_PI);
+    cairo_close_path(cr);
     cairo_fill(cr);
-    // Draw CPU bar fill (temperature color)
+    // Draw CPU bar fill (temperature color, rounded)
     cairo_set_source_rgb(cr, r/255.0, g/255.0, b/255.0);
-    cairo_rectangle(cr, bar_x, cpu_bar_y, safe_cpu_val_w, BAR_HEIGHT);
+    double fill_width = safe_cpu_val_w;
+    cairo_new_sub_path(cr);
+    if (fill_width > 2 * radius) {
+        cairo_arc(cr, bar_x + fill_width - radius, cpu_bar_y + radius, radius, -M_PI_2, 0);
+        cairo_arc(cr, bar_x + fill_width - radius, cpu_bar_y + BAR_HEIGHT - radius, radius, 0, M_PI_2);
+        cairo_arc(cr, bar_x + radius, cpu_bar_y + BAR_HEIGHT - radius, radius, M_PI_2, M_PI);
+        cairo_arc(cr, bar_x + radius, cpu_bar_y + radius, radius, M_PI, 1.5 * M_PI);
+    } else {
+        // If fill is too small, draw as rectangle
+        cairo_rectangle(cr, bar_x, cpu_bar_y, fill_width, BAR_HEIGHT);
+    }
+    cairo_close_path(cr);
     cairo_fill(cr);
-    // Draw CPU bar border
-    cairo_set_line_width(cr, 1.0);
+    // Draw CPU bar border (rounded)
+    cairo_set_line_width(cr, BORDER_LINE_WIDTH);
     cairo_set_source_rgb(cr, COLOR_BORDER_R, COLOR_BORDER_G, COLOR_BORDER_B);
-    cairo_rectangle(cr, bar_x, cpu_bar_y, BAR_WIDTH, BAR_HEIGHT);
+    cairo_new_sub_path(cr);
+    cairo_arc(cr, bar_x + BAR_WIDTH - radius, cpu_bar_y + radius, radius, -M_PI_2, 0);
+    cairo_arc(cr, bar_x + BAR_WIDTH - radius, cpu_bar_y + BAR_HEIGHT - radius, radius, 0, M_PI_2);
+    cairo_arc(cr, bar_x + radius, cpu_bar_y + BAR_HEIGHT - radius, radius, M_PI_2, M_PI);
+    cairo_arc(cr, bar_x + radius, cpu_bar_y + radius, radius, M_PI, 1.5 * M_PI);
+    cairo_close_path(cr);
     cairo_stroke(cr);
 
     // --- GPU bar ---
@@ -272,206 +248,84 @@ static void draw_temperature_bars(cairo_t *cr, const sensor_data_t *data) {
         (int)((data->gpu_temp / 100.0f) * BAR_WIDTH) : 0; // Calculate filled width
     const int safe_gpu_val_w = (gpu_val_w < 0) ? 0 : 
         (gpu_val_w > BAR_WIDTH) ? BAR_WIDTH : gpu_val_w; // Clamp to valid range
-    
-    // Draw GPU bar background
+    // Draw GPU bar background (rounded corners)
     cairo_set_source_rgb(cr, COLOR_BG_R, COLOR_BG_G, COLOR_BG_B);
-    cairo_rectangle(cr, bar_x, gpu_bar_y, BAR_WIDTH, BAR_HEIGHT);
+    cairo_new_sub_path(cr);
+    cairo_arc(cr, bar_x + BAR_WIDTH - radius, gpu_bar_y + radius, radius, -M_PI_2, 0);
+    cairo_arc(cr, bar_x + BAR_WIDTH - radius, gpu_bar_y + BAR_HEIGHT - radius, radius, 0, M_PI_2);
+    cairo_arc(cr, bar_x + radius, gpu_bar_y + BAR_HEIGHT - radius, radius, M_PI_2, M_PI);
+    cairo_arc(cr, bar_x + radius, gpu_bar_y + radius, radius, M_PI, 1.5 * M_PI);
+    cairo_close_path(cr);
     cairo_fill(cr);
-    // Draw GPU bar fill (temperature color)
+    // Draw GPU bar fill (temperature color, rounded)
     cairo_set_source_rgb(cr, r/255.0, g/255.0, b/255.0);
-    cairo_rectangle(cr, bar_x, gpu_bar_y, safe_gpu_val_w, BAR_HEIGHT);
-    cairo_fill(cr);
-    // Draw GPU bar border
-    cairo_set_line_width(cr, 1.0);
-    cairo_set_source_rgb(cr, COLOR_BORDER_R, COLOR_BORDER_G, COLOR_BORDER_B);
-    cairo_rectangle(cr, bar_x, gpu_bar_y, BAR_WIDTH, BAR_HEIGHT);
-    cairo_stroke(cr);
-}
-
-/**
- * Draw CPU/GPU labels depending on mode
- *
- * Draws text labels for CPU and GPU, with different style depending on display mode.
- *
- * @param cr Cairo drawing context
- * @param mode Display mode
- */
-static void draw_labels(cairo_t *cr, display_mode_t mode) {
-    const int cpu_bar_y = (DISPLAY_HEIGHT - (2 * BAR_HEIGHT + BAR_GAP)) / 2;
-    const int gpu_bar_y = cpu_bar_y + BAR_HEIGHT + BAR_GAP;
-    
-    // Set font and size DejaVu Sans, Roboto Black, Noto Sans Black, Liberation Sans
-    cairo_select_font_face(cr, "Roboto Black", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-    
-    if (mode == DISPLAY_MODE_DEF) {
-        // Special labels for def mode (white, larger, side-aligned)
-        cairo_set_font_size(cr, 26);
-        cairo_set_source_rgb(cr, 1, 1, 1);
-        // No text_extents needed, as position is fixed
-        cairo_move_to(cr, 0, 94); // top left
-        cairo_show_text(cr, "CPU");
-
-        cairo_move_to(cr, 0, 165); // bottom left
-        cairo_show_text(cr, "GPU");
+    fill_width = safe_gpu_val_w;
+    cairo_new_sub_path(cr);
+    if (fill_width > 2 * radius) {
+        cairo_arc(cr, bar_x + fill_width - radius, gpu_bar_y + radius, radius, -M_PI_2, 0);
+        cairo_arc(cr, bar_x + fill_width - radius, gpu_bar_y + BAR_HEIGHT - radius, radius, 0, M_PI_2);
+        cairo_arc(cr, bar_x + radius, gpu_bar_y + BAR_HEIGHT - radius, radius, M_PI_2, M_PI);
+        cairo_arc(cr, bar_x + radius, gpu_bar_y + radius, radius, M_PI, 1.5 * M_PI);
     } else {
-        // Labels for modes 1, 2, 3 (black, aligned with bars)
-        cairo_set_font_size(cr, FONT_SIZE_LABELS);
-        cairo_set_source_rgb(cr, 0, 0, 0);
-        cairo_text_extents_t text_ext;
-        cairo_text_extents(cr, "CPU", &text_ext);
-        cairo_move_to(cr, 15 + (40 - text_ext.width) / 2, 
-                      cpu_bar_y + (BAR_HEIGHT + text_ext.height) / 2);
-        cairo_show_text(cr, "CPU");
-        cairo_text_extents(cr, "GPU", &text_ext);
-        cairo_move_to(cr, 15 + (40 - text_ext.width) / 2, 
-                      gpu_bar_y + (BAR_HEIGHT + text_ext.height) / 2);
-        cairo_show_text(cr, "GPU");
+        cairo_rectangle(cr, bar_x, gpu_bar_y, fill_width, BAR_HEIGHT);
     }
+    cairo_close_path(cr);
+    cairo_fill(cr);
+    // Draw GPU bar border (rounded)
+    cairo_set_line_width(cr, BORDER_LINE_WIDTH);
+    cairo_set_source_rgb(cr, COLOR_BORDER_R, COLOR_BORDER_G, COLOR_BORDER_B);
+    cairo_new_sub_path(cr);
+    cairo_arc(cr, bar_x + BAR_WIDTH - radius, gpu_bar_y + radius, radius, -M_PI_2, 0);
+    cairo_arc(cr, bar_x + BAR_WIDTH - radius, gpu_bar_y + BAR_HEIGHT - radius, radius, 0, M_PI_2);
+    cairo_arc(cr, bar_x + radius, gpu_bar_y + BAR_HEIGHT - radius, radius, M_PI_2, M_PI);
+    cairo_arc(cr, bar_x + radius, gpu_bar_y + radius, radius, M_PI, 1.5 * M_PI);
+    cairo_close_path(cr);
+    cairo_stroke(cr);
 }
 
 /**
- * Draw vertical bars for mode 1 (CPU, RAM, GPU, GPU RAM usage)
+ * @brief Draw CPU/GPU labels (default mode only).
  *
- * Draws four vertical bars representing CPU usage, RAM usage, GPU usage, and GPU RAM usage.
+ * Draws text labels for CPU and GPU in the default style.
  *
  * @param cr Cairo drawing context
- * @param data Pointer to sensor data (usage values)
+ * @return void
+ *
+ * Example:
+ * @code
+ * draw_labels(cr);
+ * @endcode
  */
-static void draw_mode_1_vertical_bars(cairo_t *cr, const sensor_data_t *data) {
-    // CPU usage bar (blue)
-    const int cpu_fill = (int)(VERTICAL_BAR_HEIGHT * data->cpu_usage / 100.0f);
-    cairo_set_source_rgb(cr, COLOR_CPU_USAGE_R, COLOR_CPU_USAGE_G, COLOR_CPU_USAGE_B);
-    cairo_rectangle(cr, VERTICAL_BAR_BASE_X, VERTICAL_BAR_BASE_Y + VERTICAL_BAR_HEIGHT - cpu_fill, 
-                   VERTICAL_BAR_WIDTH, cpu_fill);
-    cairo_fill(cr);
-    
-    // RAM usage bar (purple)
-    const int ram_fill = (int)(VERTICAL_BAR_HEIGHT * data->ram_usage / 100.0f);
-    cairo_set_source_rgb(cr, COLOR_RAM_USAGE_R, COLOR_RAM_USAGE_G, COLOR_RAM_USAGE_B);
-    cairo_rectangle(cr, VERTICAL_BAR_BASE_X + VERTICAL_BAR_WIDTH + VERTICAL_BAR_SPACING, 
-                   VERTICAL_BAR_BASE_Y + VERTICAL_BAR_HEIGHT - ram_fill, VERTICAL_BAR_WIDTH, ram_fill);
-    cairo_fill(cr);
-
-    // GPU usage bar (green)
-    const int gpu_y_base = DISPLAY_HEIGHT - VERTICAL_BAR_HEIGHT - 10;
-    const int gpu_fill = (int)(VERTICAL_BAR_HEIGHT * data->gpu_usage / 100.0f);
-    cairo_set_source_rgb(cr, COLOR_GPU_USAGE_R, COLOR_GPU_USAGE_G, COLOR_GPU_USAGE_B);
-    cairo_rectangle(cr, VERTICAL_BAR_BASE_X, gpu_y_base + VERTICAL_BAR_HEIGHT - gpu_fill, 
-                   VERTICAL_BAR_WIDTH, gpu_fill);
-    cairo_fill(cr);
-    
-    // GPU RAM usage bar (purple)
-    const int gpu_ram_fill = (int)(VERTICAL_BAR_HEIGHT * data->gpu_ram_usage / 100.0f);
-    cairo_set_source_rgb(cr, COLOR_GPU_RAM_USAGE_R, COLOR_GPU_RAM_USAGE_G, COLOR_GPU_RAM_USAGE_B);
-    cairo_rectangle(cr, VERTICAL_BAR_BASE_X + VERTICAL_BAR_WIDTH + VERTICAL_BAR_SPACING, 
-                   gpu_y_base + VERTICAL_BAR_HEIGHT - gpu_ram_fill, VERTICAL_BAR_WIDTH, gpu_ram_fill);
-    cairo_fill(cr);
+static void draw_labels(cairo_t *cr) {
+    // Set font and size
+    cairo_select_font_face(cr, FONT_FACE, CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+    cairo_set_font_size(cr, FONT_SIZE_LABELS);
+    cairo_set_source_rgb(cr, COLOR_LABEL_R, COLOR_LABEL_G, COLOR_LABEL_B);
+    // CPU label: left in top box
+    cairo_move_to(cr, + 0, BOX_HEIGHT / 2 + FONT_SIZE_LABELS / 2 - 12);
+    cairo_show_text(cr, "CPU");
+    // GPU label: left in bottom box
+    cairo_move_to(cr, + 0 ,BOX_HEIGHT + BOX_HEIGHT / 2 + FONT_SIZE_LABELS / 2 +2);
+    cairo_show_text(cr, "GPU");
 }
 
 /**
- * Draw circular diagrams for mode 2 (CPU/RAM and GPU/GPU RAM usage)
- *
- * Draws two sets of concentric circles representing CPU/RAM and GPU/GPU RAM usage.
- *
- * @param cr Cairo drawing context
- * @param data Pointer to sensor data (usage values)
- */
-static void draw_mode_2_circles(cairo_t *cr, const sensor_data_t *data) {
-    const double cy_bot = DISPLAY_HEIGHT - CIRCLE_CENTER_Y_TOP;
-    
-    // Top: CPU usage (blue) and RAM usage (purple)
-    // Background circles (gray)
-    cairo_set_line_width(cr, CIRCLE_THICKNESS);
-    cairo_set_source_rgb(cr, 0.2, 0.2, 0.2);
-    cairo_arc(cr, CIRCLE_CENTER_X, CIRCLE_CENTER_Y_TOP, CIRCLE_RADIUS, 0, 2 * M_PI);
-    cairo_stroke(cr);
-    cairo_arc(cr, CIRCLE_CENTER_X, CIRCLE_CENTER_Y_TOP, CIRCLE_INNER_RADIUS, 0, 2 * M_PI);
-    cairo_stroke(cr);
-    
-    // CPU usage (outer ring, blue)
-    const double cpu_angle = 2 * M_PI * data->cpu_usage / 100.0;
-    cairo_set_source_rgb(cr, COLOR_CPU_USAGE_R, COLOR_CPU_USAGE_G, COLOR_CPU_USAGE_B);
-    cairo_arc(cr, CIRCLE_CENTER_X, CIRCLE_CENTER_Y_TOP, CIRCLE_RADIUS, -M_PI/2, -M_PI/2 + cpu_angle);
-    cairo_stroke(cr);
-    
-    // RAM usage (inner ring, purple)
-    const double ram_angle = 2 * M_PI * data->ram_usage / 100.0;
-    cairo_set_source_rgb(cr, COLOR_RAM_USAGE_R, COLOR_RAM_USAGE_G, COLOR_RAM_USAGE_B);
-    cairo_arc(cr, CIRCLE_CENTER_X, CIRCLE_CENTER_Y_TOP, CIRCLE_INNER_RADIUS, -M_PI/2, -M_PI/2 + ram_angle);
-    cairo_stroke(cr);
-
-    // Bottom: GPU usage (green) and GPU RAM usage (purple)
-    // Background circles (gray)
-    cairo_set_source_rgb(cr, 0.2, 0.2, 0.2);
-    cairo_arc(cr, CIRCLE_CENTER_X, cy_bot, CIRCLE_RADIUS, 0, 2 * M_PI);
-    cairo_stroke(cr);
-    cairo_arc(cr, CIRCLE_CENTER_X, cy_bot, CIRCLE_INNER_RADIUS, 0, 2 * M_PI);
-    cairo_stroke(cr);
-    
-    // GPU usage (outer ring, green)
-    const double gpu_angle = 2 * M_PI * data->gpu_usage / 100.0;
-    cairo_set_source_rgb(cr, COLOR_GPU_USAGE_R, COLOR_GPU_USAGE_G, COLOR_GPU_USAGE_B);
-    cairo_arc(cr, CIRCLE_CENTER_X, cy_bot, CIRCLE_RADIUS, -M_PI/2, -M_PI/2 + gpu_angle);
-    cairo_stroke(cr);
-    
-    // GPU RAM usage (inner ring, purple)
-    const double gpu_ram_angle = 2 * M_PI * data->gpu_ram_usage / 100.0;
-    cairo_set_source_rgb(cr, COLOR_GPU_RAM_USAGE_R, COLOR_GPU_RAM_USAGE_G, COLOR_GPU_RAM_USAGE_B);
-    cairo_arc(cr, CIRCLE_CENTER_X, cy_bot, CIRCLE_INNER_RADIUS, -M_PI/2, -M_PI/2 + gpu_ram_angle);
-    cairo_stroke(cr);
-}
-
-/**
- * Draw horizontal bars for mode 3 (CPU, RAM, GPU, GPU RAM usage)
- *
- * Draws four horizontal bars representing CPU usage, RAM usage, GPU usage, and GPU RAM usage.
- *
- * @param cr Cairo drawing context
- * @param data Pointer to sensor data (usage values)
- */
-static void draw_mode_3_horizontal_bars(cairo_t *cr, const sensor_data_t *data) {
-    const int bar_x = (DISPLAY_WIDTH - BAR_WIDTH) / 2;
-    const int cpu_bar_y = (DISPLAY_HEIGHT - (2 * BAR_HEIGHT + BAR_GAP)) / 2;
-    const int gpu_bar_y = cpu_bar_y + BAR_HEIGHT + BAR_GAP;
-    const int offset_x = bar_x + 1;
-    const int max_bar_width = BAR_WIDTH - 2;
-    
-    // CPU usage (blue)
-    const int cpu_usage_width = (int)(max_bar_width * data->cpu_usage / 100.0f);
-    cairo_set_source_rgb(cr, COLOR_CPU_USAGE_R, COLOR_CPU_USAGE_G, COLOR_CPU_USAGE_B);
-    cairo_rectangle(cr, offset_x, cpu_bar_y + 1, cpu_usage_width, SMALL_BAR_HEIGHT);
-    cairo_fill(cr);
-    
-    // RAM usage (purple)
-    const int ram_usage_width = (int)(max_bar_width * data->ram_usage / 100.0f);
-    cairo_set_source_rgb(cr, COLOR_RAM_USAGE_R, COLOR_RAM_USAGE_G, COLOR_RAM_USAGE_B);
-    cairo_rectangle(cr, offset_x, cpu_bar_y + 1 + SMALL_BAR_SPACING, ram_usage_width, SMALL_BAR_HEIGHT);
-    cairo_fill(cr);
-    
-    // GPU usage (yellow)
-    const int gpu_usage_width = (int)(max_bar_width * data->gpu_usage / 100.0f);
-    cairo_set_source_rgb(cr, COLOR_GPU_USAGE_YELLOW_R, COLOR_GPU_USAGE_YELLOW_G, COLOR_GPU_USAGE_YELLOW_B);
-    cairo_rectangle(cr, offset_x, gpu_bar_y + 1, gpu_usage_width, SMALL_BAR_HEIGHT);
-    cairo_fill(cr);
-    
-    // GPU RAM usage (purple)
-    const int gpu_ram_usage_width = (int)(max_bar_width * data->gpu_ram_usage / 100.0f);
-    cairo_set_source_rgb(cr, COLOR_GPU_RAM_USAGE_R, COLOR_GPU_RAM_USAGE_G, COLOR_GPU_RAM_USAGE_B);
-    cairo_rectangle(cr, offset_x, gpu_bar_y + 1 + SMALL_BAR_SPACING, gpu_ram_usage_width, SMALL_BAR_HEIGHT);
-    cairo_fill(cr);
-}
-
-/**
- * Check if display update is needed (change detection)
+ * @brief Check if display update is needed (change detection).
  *
  * Compares current sensor data with last drawn values and determines if a redraw is necessary.
  *
  * @param data Pointer to current sensor data
  * @return 1 if update is needed, 0 otherwise
+ *
+ * Example:
+ * @code
+ * if (should_update_display(&sensor_data)) {
+ *     // redraw
+ * }
+ * @endcode
  */
 static int should_update_display(const sensor_data_t *data) {
-    static sensor_data_t last_data = {.cpu_temp = -1.0f, .gpu_temp = -1.0f, .coolant_temp = -1.0f, 
-                                      .cpu_usage = -1.0f, .ram_usage = -1.0f, .gpu_usage = -1.0f, .gpu_ram_usage = -1.0f};
+    static sensor_data_t last_data = {.cpu_temp = 1.0f, .gpu_temp = 1.0f};
     static int first_run = 1;
     
     if (first_run) {
@@ -479,87 +333,36 @@ static int should_update_display(const sensor_data_t *data) {
         last_data = *data;
         return 1;
     }
-    
-    // Check for significant changes
+    // Check for significant changes (only CPU/GPU temperatures)
     if (fabsf(data->cpu_temp - last_data.cpu_temp) > CHANGE_TOLERANCE_TEMP ||
-        fabsf(data->gpu_temp - last_data.gpu_temp) > CHANGE_TOLERANCE_TEMP ||
-        fabsf(data->coolant_temp - last_data.coolant_temp) > CHANGE_TOLERANCE_TEMP ||
-        fabsf(data->cpu_usage - last_data.cpu_usage) > CHANGE_TOLERANCE_USAGE ||
-        fabsf(data->gpu_usage - last_data.gpu_usage) > CHANGE_TOLERANCE_USAGE ||
-        fabsf(data->ram_usage - last_data.ram_usage) > CHANGE_TOLERANCE_USAGE ||
-        fabsf(data->gpu_ram_usage - last_data.gpu_ram_usage) > CHANGE_TOLERANCE_USAGE) {
-        
+        fabsf(data->gpu_temp - last_data.gpu_temp) > CHANGE_TOLERANCE_TEMP) {
         last_data = *data;
         return 1;
     }
-    
     return 0;
 }
 
 /**
- * Simplified all-in-one function - collects sensor data and renders display
+ * @brief Collects sensor data and renders display (default mode only).
  *
- * Reads all relevant sensor data (temperatures, usage) and renders the display image
- * for the given mode. Also uploads the image to the device if available.
+ * Reads all relevant sensor data (temperatures) and renders the display image. Also uploads the image to the device if available.
  *
- * @param mode Display mode
+ * @return void
  *
  * Example:
  * @code
- * draw_combined_image(DISPLAY_MODE_1);
+ * draw_combined_image();
  * @endcode
  */
-void draw_combined_image(display_mode_t mode) {
+void draw_combined_image(void) {
     sensor_data_t sensor_data = {0};
-    
-    // Temperatures (in all modes)
+    // Temperatures
     sensor_data.cpu_temp = read_cpu_temp();
     sensor_data.gpu_temp = read_gpu_temp();
-    sensor_data.coolant_temp = read_coolant_temp();
-    
-    // Usage data only in modes 1, 2, 3 (not in "def")
-    if (mode != DISPLAY_MODE_DEF) {
-        // CPU usage
-        static cpu_stat_t last_cpu_stat = {0, 0};
-        cpu_stat_t curr_cpu_stat;
-        
-        if (get_cpu_stat(&curr_cpu_stat)) {
-            sensor_data.cpu_usage = calculate_cpu_usage(&last_cpu_stat, &curr_cpu_stat);
-            last_cpu_stat = curr_cpu_stat;
-        } else {
-            sensor_data.cpu_usage = 0.0f;
-        }
-        
-        // RAM usage
-        sensor_data.ram_usage = get_ram_usage();
-        
-        // GPU usage
-        float gpu_usage, gpu_mem_usage;
-        if (get_gpu_usage_data(&gpu_usage, &gpu_mem_usage)) {
-            sensor_data.gpu_usage = gpu_usage;
-            sensor_data.gpu_ram_usage = gpu_mem_usage;
-        } else {
-            sensor_data.gpu_usage = 0.0f;
-            sensor_data.gpu_ram_usage = 0.0f;
-        }
-    } else {
-        // In "def" mode no usage data
-        sensor_data.cpu_usage = 0.0f;
-        sensor_data.ram_usage = 0.0f;
-        sensor_data.gpu_usage = 0.0f;
-        sensor_data.gpu_ram_usage = 0.0f;
-    }
-    
     // Render display
-    int render_result = render_display(&sensor_data, mode);
+    int render_result = render_display(&sensor_data);
     if (render_result == 0) {
         // Silent continuation on render errors
         return;
-    }
-    
-    // Send image to AIO LCD (silent, without error messages)
-    const char* device_uuid = get_cached_aio_uuid();
-    if (device_uuid) {
-        upload_image_to_device(IMAGE_PATH, device_uuid);
     }
 }

@@ -13,32 +13,37 @@
 /**
  * CoolerDash - Main Program
  * =========================
- * 
- * Professional, modular C daemon for AIO LCD Temperature Monitor.
- * Displays CPU/GPU temperatures and optional load data on LCD display.
- * 
- * Compile with: make
- * Or manually: gcc -Wall -Wextra -O2 -std=c99 main.c cpu_monitor.c gpu_monitor.c 
- *               coolant_monitor.c display.c coolercontrol.c -o coolerdash -lcairo -lcurl -lm
- * 
- * Modes:
- *   def - Temperatures only (CPU, GPU, Coolant)
- *   1   - Temperatures + vertical load bars 
- *   2   - Temperatures + circular diagrams for load
- *   3   - Temperatures + horizontal load bars
  *
- * Single-Instance Enforcement:
- *   - Only one coolerdash instance can run simultaneously
- *   - Manual start: Error if systemd service is running
+ * Professional, modular C daemon for AIO LCD Temperature Monitor.
+ * Displays CPU and GPU temperatures on an AIO LCD display (two-box layout).
+ *
+ * Compile with: make
+ * Or manually: gcc -Wall -Wextra -O2 -std=c99 main.c cpu_monitor.c gpu_monitor.c \
+ *               display.c coolercontrol.c -o coolerdash -lcairo -lcurl -lm
+ *
+ * Features:
+ *   - Displays CPU and GPU temperatures (no coolant, no load bars)
+ *   - Resource-efficient, optimized for continuous background operation
+ *   - Two-box layout: CPU (top), GPU (bottom)
+ *   - Configurable colors and update interval (see config.h)
+ *   - Single-Instance Enforcement: Only one coolerdash instance can run simultaneously
  *   - systemd start: Terminates previous manual instances
+ *   - Manual start: Error if systemd service is running
  *   - PID file coordinates instance management
+ *
+ * Future:
+ *   - Support for multiple display modes and GUI planned
+ *
+ * Usage:
+ *   - Start via systemd service (recommended)
+ *   - Manual start possible, but not parallel zum Service
+ *   - See README.md for configuration and details
  */
 
 // Include modules
 #include "../include/config.h"
 #include "../include/cpu_monitor.h"
 #include "../include/gpu_monitor.h"
-#include "../include/coolant_monitor.h"
 #include "../include/display.h"
 #include "../include/coolercontrol.h"
 
@@ -48,7 +53,17 @@ static volatile sig_atomic_t shutdown_sent = 0; // flag whether shutdown image w
 static const char *pid_file = PID_FILE; // PID file for daemon
 
 /**
- * Signal handler for clean daemon termination with shutdown image
+ * @brief Signal handler for clean daemon termination with shutdown image.
+ *
+ * Sends a shutdown image to the AIO LCD (if not already sent), removes the PID file, and sets the running flag to 0 for clean termination.
+ *
+ * @param sig Signal number (unused)
+ * @return void
+ *
+ * Example:
+ * @code
+ * signal(SIGTERM, cleanup_and_exit);
+ * @endcode
  */
 static void cleanup_and_exit(int sig) {
     (void)sig; // parameter is not used
@@ -76,9 +91,20 @@ static void cleanup_and_exit(int sig) {
 }
 
 /**
- * Check for existing instance and handle based on start type
- * - systemd service: Always terminates previous instance
- * - Manual start: Prevents start if service is running, terminates other manual instances
+ * @brief Check for existing instance and handle based on start type.
+ *
+ * Checks for an existing running instance using the PID file. If started by systemd, always terminates the previous instance. If started manually, prevents start if a service is running, otherwise terminates other manual instances.
+ *
+ * @param pid_file Path to the PID file
+ * @param is_service_start 1 if started by systemd, 0 if manual
+ * @return 0 if no error, -1 if service already running (manual start)
+ *
+ * Example:
+ * @code
+ * if (check_existing_instance_and_handle(pid_file, is_service_start) < 0) {
+ *     // Error: Service already running
+ * }
+ * @endcode
  */
 static int check_existing_instance_and_handle(const char *pid_file, int is_service_start) {
     FILE *f = fopen(pid_file, "r");
@@ -173,7 +199,17 @@ static int check_existing_instance_and_handle(const char *pid_file, int is_servi
 }
 
 /**
- * Write current PID to PID file
+ * @brief Write current PID to PID file.
+ *
+ * Writes the current process ID to the specified PID file for single-instance enforcement.
+ *
+ * @param pid_file Path to the PID file
+ * @return void
+ *
+ * Example:
+ * @code
+ * write_pid_file("/var/run/coolerdash.pid");
+ * @endcode
  */
 static void write_pid_file(const char *pid_file) {
     FILE *f = fopen(pid_file, "w");
@@ -184,17 +220,26 @@ static void write_pid_file(const char *pid_file) {
 }
 
 /**
- * Main daemon loop
+ * @brief Main daemon loop.
+ *
+ * Runs the main loop of the daemon, periodically updating the display with sensor data until termination is requested.
+ *
+ * @return 0 on normal termination
+ *
+ * Example:
+ * @code
+ * int result = run_daemon();
+ * @endcode
  */
-static int run_daemon(display_mode_t mode) {
-    printf("CoolerDash daemon started (Mode: %d)\n", mode); // Show mode
+static int run_daemon(void) {
+    printf("CoolerDash daemon started (Temperatures only, resource-efficient)\n");
     printf("Sensor data updated every %d.%d seconds\n", 
            DISPLAY_REFRESH_INTERVAL_SEC, DISPLAY_REFRESH_INTERVAL_NSEC / 100000000);
     printf("Daemon now running silently in background...\n\n");
     fflush(stdout);
     
     while (running) { // Main daemon loop
-        draw_combined_image(mode); // Draw combined image based on mode
+        draw_combined_image(); // Draw combined image (default mode only)
         struct timespec ts = {DISPLAY_REFRESH_INTERVAL_SEC, DISPLAY_REFRESH_INTERVAL_NSEC}; // Wait time for update
         nanosleep(&ts, NULL); // Wait for specified time
     }
@@ -204,31 +249,38 @@ static int run_daemon(display_mode_t mode) {
 }
 
 /**
- * Show help and explain program usage
+ * @brief Show help and explain program usage.
+ *
+ * Prints usage information and help text to stdout.
+ *
+ * @param program_name Name of the executable
+ * @return void
+ *
+ * Example:
+ * @code
+ * show_help(argv[0]);
+ * @endcode
  */
 static void show_help(const char *program_name) {
     printf("CoolerDash - Complete AIO LCD Temperature Monitor\n\n");
-    printf("Usage: %s [MODE] or %s --mode [MODE]\n\n", program_name, program_name);
-    printf("Modes:\n");
-    printf("  def  - Temperatures only (default, resource-efficient)\n");
-    printf("  1    - Temperatures + vertical load bars\n");
-    printf("  2    - Temperatures + circular diagrams\n");
-    printf("  3    - Temperatures + horizontal load bars\n\n");
-    printf("Direct parameters:\n");
-    printf("  %s def      # Show temperatures only\n", program_name);
-    printf("  %s 1        # With vertical bars\n", program_name);
-    printf("  %s 2        # With circular diagrams\n", program_name);
-    printf("  %s 3        # With horizontal bars\n\n", program_name);
-    printf("--mode parameters:\n");
-    printf("  %s --mode def   # Show temperatures only\n", program_name);
-    printf("  %s --mode 1     # With vertical bars\n", program_name);
-    printf("  %s --mode 2     # With circular diagrams\n", program_name);
-    printf("  %s --mode 3     # With horizontal bars\n\n", program_name);
+    printf("Usage: %s\n\n", program_name);
+    printf("This version only supports the default mode (temperatures only, resource-efficient).\n");
     printf("The daemon runs in background and updates the LCD every %d.%d seconds.\n",
            DISPLAY_REFRESH_INTERVAL_SEC, DISPLAY_REFRESH_INTERVAL_NSEC / 100000000);
     printf("To stop: sudo systemctl stop coolerdash\n");
-}/**
- * Detect if we were started by systemd
+}
+
+/**
+ * @brief Detect if we were started by systemd.
+ *
+ * Checks if the parent process is PID 1 (systemd/init).
+ *
+ * @return 1 if started by systemd, 0 otherwise
+ *
+ * Example:
+ * @code
+ * int is_service = is_started_by_systemd();
+ * @endcode
  */
 static int is_started_by_systemd(void) {
     // Simple and reliable method: Check if our parent process is PID 1 (init/systemd)
@@ -236,7 +288,20 @@ static int is_started_by_systemd(void) {
 }
 
 /**
- * Main function
+ * @brief Main function for CoolerDash daemon.
+ *
+ * Initializes modules, enforces single-instance, manages daemon lifecycle, and handles clean shutdown.
+ *
+ * @param argc Argument count
+ * @param argv Argument vector
+ * @return 0 on success, 1 on error
+ *
+ * Example:
+ * @code
+ * int main(int argc, char *argv[]) {
+ *     return main(argc, argv);
+ * }
+ * @endcode
  */
 int main(int argc, char *argv[]) {
     // Show help
@@ -244,63 +309,6 @@ int main(int argc, char *argv[]) {
         show_help(argv[0]);
         return 0;
     }
-    
-    // Parse display mode - supports both formats:
-    // ./coolerdash def      or    ./coolerdash --mode def
-    // ./coolerdash 1        or    ./coolerdash --mode 1
-    // ./coolerdash 2        or    ./coolerdash --mode 2
-    // ./coolerdash 3        or    ./coolerdash --mode 3
-    // Default mode is "def" (temperatures only, resource-efficient)
-    const char *mode_str = "def"; // default mode
-    
-    if (argc > 1) { // Check if a parameter is provided
-        // Check if the first parameter is --mode
-        if (strcmp(argv[1], "--mode") == 0) { // --mode parameter
-            // --mode parameter format: ./coolerdash --mode def
-            // Check if a mode is specified
-            if (argc > 2) {
-                if (strcmp(argv[2], "def") == 0 || 
-                    strcmp(argv[2], "1") == 0 || 
-                    strcmp(argv[2], "2") == 0 || 
-                    strcmp(argv[2], "3") == 0) {
-                    mode_str = argv[2];
-                } else {
-                    fprintf(stderr, "Warning: Invalid mode '%s'! Fallback to 'def' mode.\n", argv[2]);
-                    fprintf(stderr, "Valid modes: 'def', '1', '2', '3'\n");
-                    fflush(stderr);
-                    mode_str = "def";  // Fallback
-                }
-            } else {
-                fprintf(stderr, "Warning: --mode requires a parameter! Fallback to 'def' mode.\n");
-                fflush(stderr);
-                mode_str = "def";  // Fallback
-            }
-        } else {
-            // Direct parameter format: ./coolerdash def
-            // Check if the parameter is valid
-            if (strcmp(argv[1], "def") == 0 || 
-                strcmp(argv[1], "1") == 0 || 
-                strcmp(argv[1], "2") == 0 || 
-                strcmp(argv[1], "3") == 0) {
-                mode_str = argv[1];
-            } else {
-                fprintf(stderr, "Warning: Invalid mode '%s'! Fallback to 'def' mode.\n", argv[1]);
-                fprintf(stderr, "Valid modes: 'def', '1', '2', '3'\n");
-                fflush(stderr);
-                mode_str = "def"; // Fallback
-            }
-        }
-    }
-    // Parse mode
-    display_mode_t mode = parse_display_mode(mode_str); // Convert mode to enum
-    
-    // Show selected mode for systemd logs
-    if (strcmp(mode_str, "def") != 0) { // If not default mode
-        printf("Selected mode: %s (temperatures + load displays)\n", mode_str);
-    } else { // Default mode
-        printf("Selected mode: %s (temperatures only, resource-efficient)\n", mode_str);
-    }
-    fflush(stdout);
     
     // Check if we were started by systemd
     int is_service_start = is_started_by_systemd();
@@ -336,11 +344,6 @@ int main(int argc, char *argv[]) {
     } else {
         printf("⚠ GPU monitor not available (no NVIDIA GPU?)\n");
     }
-    fflush(stdout);
-    
-    // Initialize coolant sensors
-    init_coolant_sensor_path(); // Set path to coolant sensors
-    printf("✓ Coolant monitor initialized\n");
     fflush(stdout);
     
     // Initialize CoolerControl session
@@ -387,7 +390,7 @@ int main(int argc, char *argv[]) {
     fflush(stdout);
     
     // Start daemon
-    int result = run_daemon(mode);
+    int result = run_daemon();
     
     // Cleanup - send shutdown image if not sent yet (only on normal termination)
     if (!shutdown_sent && is_session_initialized()) {

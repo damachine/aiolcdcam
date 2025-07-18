@@ -5,18 +5,31 @@
 // COOLANT TEMPERATURE MONITORING MODULE
 // =============================================================================
 
-// Coolant Temperature Functions
 /**
  * @brief Initialize the coolant temperature sensor path.
  *
- * This function detects and sets the path to the coolant temperature sensor file.
+ * Detects and sets the path to the coolant temperature sensor file.
+ *
+ * @return void
+ *
+ * Example:
+ * @code
+ * init_coolant_sensor_path();
+ * @endcode
  */
 void init_coolant_sensor_path(void);
 
 /**
  * @brief Read the current coolant temperature.
  *
- * @return The coolant temperature in degrees Celsius, or a negative value on error.
+ * Reads the temperature from the coolant sensor file set by init_coolant_sensor_path().
+ *
+ * @return The coolant temperature in degrees Celsius, or 0.0f on error.
+ *
+ * Example:
+ * @code
+ * float temp = read_coolant_temp();
+ * @endcode
  */
 float read_coolant_temp(void);
 

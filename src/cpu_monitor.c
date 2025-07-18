@@ -9,7 +9,16 @@
 char cpu_temp_path[512] = {0};
 
 /**
- * Initialize hwmon sensor path for CPU temperature at startup (once)
+ * @brief Initialize hwmon sensor path for CPU temperature at startup (once).
+ *
+ * Detects and sets the path to the CPU temperature sensor file by scanning available hwmon entries.
+ *
+ * @return void
+ *
+ * Example:
+ * @code
+ * init_cpu_sensor_path();
+ * @endcode
  */
 void init_cpu_sensor_path(void) {
     DIR *dir = opendir(HWMON_PATH);
@@ -42,9 +51,16 @@ void init_cpu_sensor_path(void) {
 }
 
 /**
- * Read CPU temperature from cached hwmon path.
+ * @brief Read CPU temperature from cached hwmon path.
+ *
+ * Reads the temperature from the CPU sensor file set by init_cpu_sensor_path().
  *
  * @return Temperature in degrees Celsius (float), 0.0f on error
+ *
+ * Example:
+ * @code
+ * float temp = read_cpu_temp();
+ * @endcode
  */
 float read_cpu_temp(void) {
     if (strlen(cpu_temp_path) == 0) return 0.0f;
@@ -62,10 +78,20 @@ float read_cpu_temp(void) {
 }
 
 /**
- * Read CPU statistics for usage calculation.
+ * @brief Read CPU statistics for usage calculation.
+ *
+ * Reads the current CPU statistics from /proc/stat and fills the provided structure.
  *
  * @param[out] stat CPU statistics structure
  * @return 1 on success, 0 on error
+ *
+ * Example:
+ * @code
+ * cpu_stat_t stat;
+ * if (get_cpu_stat(&stat)) {
+ *     // use stat
+ * }
+ * @endcode
  */
 int get_cpu_stat(cpu_stat_t *stat) {
     FILE *fstat = fopen("/proc/stat", "r");
@@ -92,11 +118,18 @@ int get_cpu_stat(cpu_stat_t *stat) {
 }
 
 /**
- * Calculate CPU usage between two time points.
+ * @brief Calculate CPU usage between two time points.
+ *
+ * Calculates the CPU usage as a percentage between two cpu_stat_t samples.
  *
  * @param last_stat Previous CPU statistics
  * @param curr_stat Current CPU statistics
  * @return CPU usage in percent (float), -1.0f on error
+ *
+ * Example:
+ * @code
+ * float usage = calculate_cpu_usage(&last, &curr);
+ * @endcode
  */
 float calculate_cpu_usage(const cpu_stat_t *last_stat, const cpu_stat_t *curr_stat) {
     if (!last_stat || !curr_stat) return -1.0f;
@@ -111,9 +144,16 @@ float calculate_cpu_usage(const cpu_stat_t *last_stat, const cpu_stat_t *curr_st
 }
 
 /**
- * Read RAM usage from /proc/meminfo.
+ * @brief Read RAM usage from /proc/meminfo.
+ *
+ * Reads the current RAM usage from /proc/meminfo and returns the usage as a percentage.
  *
  * @return RAM usage in percent (float), -1.0f on error
+ *
+ * Example:
+ * @code
+ * float ram = get_ram_usage();
+ * @endcode
  */
 float get_ram_usage(void) {
     FILE *fmem = fopen("/proc/meminfo", "r");

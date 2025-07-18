@@ -17,7 +17,7 @@ Requires=coolercontrold.service
 [Service]
 Type=simple
 ExecStartPre=/bin/sleep 10
-ExecStart=/opt/coolerdash/bin/coolerdash --mode def
+ExecStart=/opt/coolerdash/bin/coolerdash
 ExecReload=/bin/kill -HUP $MAINPID
 Restart=always
 RestartSec=5

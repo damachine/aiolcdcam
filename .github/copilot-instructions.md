@@ -5,7 +5,7 @@ applyTo: "**"
 Use german language to answer chat questions.
 Use english language in the README.md, AUR-README.md, CHANGELOG.md and the Linux man files. 
 Use english language for code comments.
-Use Doxygen-style comments for functions. Include a brief description, parameters, return values, and examples if useful.
+Use Doxygen-style comments for functions. Include a description, @brief, @param, @return values and examples if useful.
 Opening braces on the same line for functions and control structures (K&R style).
 Add comments for non-obvious code sections.
 

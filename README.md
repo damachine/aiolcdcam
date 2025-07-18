@@ -27,12 +27,12 @@ Transform your cooling system into an intelligent monitoring hub that keeps you 
 ## ✨ Features
 
 - **🏗️ Modular Architecture**: Separation of CPU, GPU, coolant, and display logic into separate modules
-- **⚡ Performance-Optimized**: Caching, change detection, minimal I/O operations, mode-dependent resource usage
+- **⚡ Performance-Optimized**: Caching, change detection, minimal I/O operations
 - **🔧 Automatic Device Detection**: Runtime UUID detection with persistent caching - no manual configuration required
 - **💾 Smart UUID Caching**: First-run detection saves to `/var/cache/coolerdash/device.uuid` for instant subsequent startups
-- **🎨 4 Display Modes**: Stable mode "def" (temperatures only) + 3 additional modes (1-3, see below)
+- **🎨 Display Modes (legacy)**: The program currently always runs in a fixed two-box layout (CPU/GPU temperature only). Mode selection is not available in this version. Support for selectable display modes (e.g. load bars, circular diagrams) may be reintroduced in a future version if there is sufficient demand.
 - **🌐 Native CoolerControl Integration**: REST API communication without Python dependencies
-- **📊 Efficient Sensor Polling**: Only necessary sensor data is queried depending on mode
+- **📊 Efficient Sensor Polling**: Only necessary sensor data is queried (no mode logic)
 - **🔄 Systemd Integration**: Service management with detailed logs
 - **🚀 Intelligent Installation**: Automatic dependency detection and installation for all major Linux distributions
 - **🔧 Built with strict C99 compliance** for maximum portability and standards conformance.
@@ -111,6 +111,31 @@ sudo systemctl start coolerdash.service
 There is no configuration needed.
 CoolerDash is pre-configured to use the default mode.
 
+### Important customizable values from `include/config.h`
+
+Below are the most important values you can adjust in `include/config.h` before building, to customize the display and behavior:
+
+| Name                   | Default                | Description                                                      |
+|------------------------|-----------------------|------------------------------------------------------------------|
+| DISPLAY_WIDTH          | 240                   | LCD display width in pixels                                      |
+| DISPLAY_HEIGHT         | 240                   | LCD display height in pixels                                     |
+| DISPLAY_REFRESH_INTERVAL_SEC  | 2            | Display update interval (seconds)                                |
+| TEMP_THRESHOLD_GREEN   | 55.0f                 | Temperature for green color (°C)                                 |
+| TEMP_THRESHOLD_ORANGE  | 65.0f                 | Temperature for orange color (°C)                                |
+| TEMP_THRESHOLD_RED     | 75.0f                 | Temperature for red color (°C)                                   |
+| BOX_WIDTH              | 240                   | Width of each temperature box (pixels)                           |
+| BOX_HEIGHT             | 120                   | Height of each temperature box (pixels)                          |
+| FONT_SIZE_LARGE        | 98.0                  | Font size for temperature numbers                                |
+| FONT_SIZE_LABELS       | 28.0                  | Font size for labels ("CPU", "GPU")                             |
+| FONT_FACE              | "Roboto Black"        | Font used for all display text                                   |
+| LCD_BRIGHTNESS         | 80                    | LCD brightness (0-100)                                           |
+| LCD_ORIENTATION        | "0"                   | LCD orientation for image upload ("0"=default, "1"=rotated)      |
+| GPU_CACHE_INTERVAL     | 2.5f                  | GPU data cache interval (seconds)                                |
+| CHANGE_TOLERANCE_TEMP  | 0.1f                  | Minimum temperature change to trigger update (°C)                |
+| IMAGE_PATH             | /opt/coolerdash/images/coolerdash.png | Path to generated display image                |
+
+> **Tip:** Edit these values in `include/config.h` before running `make` to change the look, update interval, thresholds, or LCD behavior to your needs.
+
 The daemon will:
 1. **Connect to CoolerControl** daemon at startup
 2. **Load cached UUID** from `/var/cache/coolerdash/device.uuid` (if available)
@@ -145,8 +170,7 @@ curl http://localhost:11987/devices | jq
 
 ### Performance Notes
 
-- **Mode "def"**: ✅ **Production ready** - Only temperature sensors, minimal I/O (~3.4MB RAM, <1% CPU)
-- **Modes 1-3**: 🧪 **Beta status** - Additional load data with intelligent caching (~3.5MB RAM, <2% CPU)
+- **Mode** - Only temperature sensors, minimal I/O (~3.4MB RAM, <1% CPU)
 - **Sensor caching**: hwmon paths cached at startup, GPU data cached for 2 seconds
 - **Change detection**: PNG only updated when significant changes occur
 
@@ -174,100 +198,7 @@ If you see errors like "conflicting files" or "manual installation detected" dur
 
 If you need help, open an issue at https://github.com/damachine/coolerdash/issues
 
-### Display Modes
-
-| Mode | Status | Description | Sensor Data |
-|------|--------|-------------|-------------|
-| `def` | ✅ **Stable** | Temperatures only (CPU, GPU, coolant) <img src="images/coolerdash.png" width="80" height="80"/> | Minimal I/O - temperatures only |
-| `1`   | ⚠️ **Beta** | Temperatures + vertical load bars<br><sub>Beta: This mode may have occasional issues or incomplete features.</sub> | All sensors + CPU/RAM/GPU load |
-| `2`   | ⚠️ **Beta** | Temperatures + circular diagrams<br><sub>Beta: This mode may have occasional issues or incomplete features.</sub> | All sensors + CPU/RAM/GPU load |
-| `3`   | ⚠️ **Beta** | Temperatures + horizontal load bars<br><sub>Beta: This mode may have occasional issues or incomplete features.</sub> | All sensors + CPU/RAM/GPU load |
-
-> **Recommended:** Use mode `def` for production environments (most stable)
-> 
-> **Beta modes:** Modes 1-3 are functional but may have occasional issues or incomplete features. Feedback is welcome!
-
-#### How to Change Display Mode
-
-**Via systemd service (recommended):**
-```bash
-# Edit systemd service file
-sudo systemctl edit coolerdash.service
-
-# Add this content (example for mode 2):
-[Service]
-ExecStart=
-ExecStart=/opt/coolerdash/bin/coolerdash 2
-
-# Apply changes
-sudo systemctl daemon-reload
-sudo systemctl restart coolerdash.service
-```
-
-**Manual execution:**
-```bash
-# Stop service first
-sudo systemctl stop coolerdash.service
-
-# Run manually with desired mode
-./coolerdash def      # Temperatures only
-./coolerdash 1        # Vertical bars
-./coolerdash 2        # Circular diagrams
-./coolerdash 3        # Horizontal bars
-
-# Or with --mode syntax
-./coolerdash --mode 2
-```
-
-### Temperature Color Scale
-
-> **Temperature colors:** 4-stage gradient based on temperature:
-> - **≤55°C**: 🟢 Green (cool)
-> - **≤65°C**: 🟠 Orange (warm)
-> - **≤75°C**: 🔥 Hot Orange (hot)
-> - **>75°C**: 🔴 Red (critical)
-
-### Advanced Configuration
-
-Edit `include/config.h` for customization:
-
-```c
-#define DAEMON_ADDRESS "http://localhost:11987"
-
-// Display settings
-#define DISPLAY_WIDTH 240 // Device display resolution
-#define DISPLAY_HEIGHT 240 // Device display resolution
-#define DISPLAY_REFRESH_INTERVAL_SEC 2 // 2 seconds (optional fine-tuning)
-#define DISPLAY_REFRESH_INTERVAL_NSEC 500000000  // 0.5 seconds (optional fine-tuning)
-
-// LCD display settings
-#define LCD_BRIGHTNESS 80 // Default LCD brightness (0-100)
-
-// Temperature thresholds (4-stage color gradient)
-#define TEMP_THRESHOLD_GREEN 55.0f    // ≤55°C: Green
-#define TEMP_THRESHOLD_ORANGE 65.0f   // ≤65°C: Orange  
-#define TEMP_THRESHOLD_RED 75.0f      // ≤75°C: Hot Orange, >75°C: Red
-
-// Cache and change detection settings
-#define GPU_CACHE_INTERVAL 2.5f // seconds (interval for GPU data refresh)
-#define CHANGE_TOLERANCE_TEMP 0.1f // temperature change tolerance in degrees Celsius
-#define CHANGE_TOLERANCE_USAGE 0.5f // usage change tolerance in percent
-
-// Paths (advanced)
-#define HWMON_PATH "/sys/class/hwmon" // path to hardware monitors
-#define IMAGE_DIR "/opt/coolerdash/images" // directory for images
-#define IMAGE_PATH "/opt/coolerdash/images/coolerdash.png" // path to temperature display image
-#define PID_FILE "/var/run/coolerdash.pid" // PID file for daemon
-#define DAEMON_PASSWORD "coolAdmin" // CoolerControl daemon password (default)
-```
-
-**Tip:**
-- `DISPLAY_REFRESH_INTERVAL_XY` allows you to fine-tune the refresh interval in nanoseconds (e.g., 0.5 seconds = 500000000).
-- `LCD_BRIGHTNESS` sets the default LCD brightness (range: 0-100).
-- `GPU_CACHE_INTERVAL` sets how often GPU data is refreshed (in seconds, supports decimals).
-- `CHANGE_TOLERANCE_TEMP` and `CHANGE_TOLERANCE_USAGE` control when a value change is considered significant (for display updates).
-- `HWMON_PATH`, `IMAGE_DIR`, `IMAGE_PATH`, and `PID_FILE` can be changed for advanced setups.
-- `DAEMON_PASSWORD` must match your CoolerControl configuration if changed from default.
+> **Note:** The program always runs in a fixed two-box layout (CPU/GPU temperature only). Mode selection is currently not available. Support for selectable display modes may be reintroduced in a future version if there is sufficient demand.
 
 ## 🔧 Usage & Tips
 
@@ -297,20 +228,13 @@ make logs       # journalctl -u coolerdash -f
 
 ```bash
 # Run manually (different modes) - both work after installation
-coolerdash def      # System-wide command (via symlink)
-coolerdash 1        # Vertical bars
-coolerdash 2        # Circular diagrams  
-coolerdash 3        # Horizontal bars
+coolerdash          # System-wide command (via symlink)
 
 # Or use full path
-/opt/coolerdash/bin/coolerdash def
-
-# Alternative syntax
-coolerdash --mode def
-coolerdash --mode 2
+/opt/coolerdash/bin/coolerdash
 
 # From project directory (before installation)
-./coolerdash def
+./coolerdash
 ```
 
 ### Build Commands

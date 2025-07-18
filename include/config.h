@@ -21,21 +21,22 @@
 #define TEMP_THRESHOLD_RED 75.0f // 75°C - Hot Orange threshold (above this = Red)
 
 // Layout Constants
-#define BOX_WIDTH 80 // 240 / 3
-#define BOX_HEIGHT 80 // 240 / 3
-#define BOX_GAP 0 // no gap for perfect 3x80 grid
-#define BAR_WIDTH 220 // 240 - (BOX_WIDTH * 3) - (BOX_GAP * 2) - 10 (for border)
-#define BAR_HEIGHT 20 // height of bars
-#define BAR_GAP 0 // spacing between bars
+#define BOX_WIDTH 240 // full width for two boxes
+#define BOX_HEIGHT 120 // half height for two boxes
+#define BOX_GAP 0 // no gap for perfect 2x120 grid
+#define BAR_WIDTH 230 // 240 - (BOX_WIDTH * 3) - (BOX_GAP * 2) - 10 (for border)
+#define BAR_HEIGHT 22 // height of bars
+#define BAR_GAP 10 // spacing between bars
+#define BORDER_LINE_WIDTH 1.5 // Line width for box and bar borders (in pixels)
 
 // Font Sizes
+#define FONT_FACE "Roboto Black" // Font face for all display text
 #define FONT_SIZE_LARGE 98.0  // BOX_HEIGHT * 1.50
-#define FONT_SIZE_DEGREE 78.0 // FONT_SIZE_LARGE * 0.75
-#define FONT_SIZE_COOLANT 26.0 // FONT_SIZE_LARGE * 0.30
-#define FONT_SIZE_LABELS 26.0 // FONT_SIZE_LARGE * 0.25
+#define FONT_SIZE_LABELS 28.0 // FONT_SIZE_LARGE * 0.25
 
 // LCD Display Settings
 #define LCD_BRIGHTNESS 80 // Default LCD brightness (0-100)
+#define LCD_ORIENTATION "0" // LCD orientation for image upload ("0"=default, "90"=rotated, "180"=flipped, "270"=rotated flipped)
 
 // Cache Settings
 #define GPU_CACHE_INTERVAL 2.5f // seconds (supports decimal values with millisecond precision)
@@ -71,14 +72,14 @@
 #define COLOR_RED_G 0
 #define COLOR_RED_B 0
 
-// Background Colors
-#define COLOR_BG_R 0.16
-#define COLOR_BG_G 0.16
-#define COLOR_BG_B 0.16
+// Background Colors bar
+#define COLOR_BG_R 0.20
+#define COLOR_BG_G 0.20
+#define COLOR_BG_B 0.20
 
-#define COLOR_BORDER_R 0.08
-#define COLOR_BORDER_G 0.08
-#define COLOR_BORDER_B 0.08
+#define COLOR_BORDER_R 0.70
+#define COLOR_BORDER_G 0.70
+#define COLOR_BORDER_B 0.70
 
 // Usage Bar Colors (RGB 0.0-1.0)
 #define COLOR_CPU_USAGE_R 0.3
@@ -101,22 +102,14 @@
 #define COLOR_GPU_USAGE_YELLOW_G 1.0
 #define COLOR_GPU_USAGE_YELLOW_B 0.0
 
-// Bar Settings (Mode 1)
-#define VERTICAL_BAR_BASE_X 10 // base position of vertical bars
-#define VERTICAL_BAR_BASE_Y 10 // base position of vertical bars
-#define VERTICAL_BAR_WIDTH 6 // width of vertical bars
-#define VERTICAL_BAR_HEIGHT (BOX_HEIGHT - 1) // height of vertical bars
-#define VERTICAL_BAR_SPACING 6 // spacing between vertical bars
+// Foreground/Text Color (for all temperature numbers)
+#define COLOR_TEMP_R 1.0
+#define COLOR_TEMP_G 1.0
+#define COLOR_TEMP_B 1.0
 
-// Circle Settings (Mode 2)
-#define CIRCLE_CENTER_X 26.0 // X position of circle center
-#define CIRCLE_CENTER_Y_TOP 26.0 // Y position of upper circle center
-#define CIRCLE_RADIUS 22.0 // circle radius
-#define CIRCLE_THICKNESS 6.0 // circle thickness
-#define CIRCLE_INNER_RADIUS (CIRCLE_RADIUS - CIRCLE_THICKNESS - 2.0) // inner circle radius
-
-// Small Bar Settings (Mode 3)
-#define SMALL_BAR_HEIGHT 5 // height of small bars
-#define SMALL_BAR_SPACING 6 // spacing between small bars
+// Foreground/Text Color (for all labels)
+#define COLOR_LABEL_R 0.90
+#define COLOR_LABEL_G 0.90
+#define COLOR_LABEL_B 0.90
 
 #endif // CONFIG_H

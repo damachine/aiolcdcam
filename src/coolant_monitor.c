@@ -9,7 +9,16 @@
 char coolant_temp_path[512] = {0};
 
 /**
- * Initializes the hwmon sensor path for coolant temperature at startup (once)
+ * @brief Initializes the hwmon sensor path for coolant temperature at startup (once).
+ *
+ * Detects and sets the path to the coolant temperature sensor file by scanning available hwmon entries.
+ *
+ * @return void
+ *
+ * Example:
+ * @code
+ * init_coolant_sensor_path();
+ * @endcode
  */
 void init_coolant_sensor_path(void) {
     DIR *dir = opendir(HWMON_PATH);
@@ -42,9 +51,16 @@ void init_coolant_sensor_path(void) {
 }
 
 /**
- * Reads coolant temperature from cached hwmon path.
+ * @brief Reads coolant temperature from cached hwmon path.
+ *
+ * Reads the temperature from the coolant sensor file set by init_coolant_sensor_path().
  *
  * @return Temperature in degrees Celsius (float), 0.0f on error
+ *
+ * Example:
+ * @code
+ * float temp = read_coolant_temp();
+ * @endcode
  */
 float read_coolant_temp(void) {
     if (strlen(coolant_temp_path) == 0) return 0.0f;

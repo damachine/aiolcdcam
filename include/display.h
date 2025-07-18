@@ -7,58 +7,73 @@
 // DISPLAY RENDERING MODULE
 // =============================================================================
 
-// Display Mode Types
-typedef enum {
-    DISPLAY_MODE_DEF,  // Temperatures only
-    DISPLAY_MODE_1,    // Temperatures + vertical bars
-    DISPLAY_MODE_2,    // Temperatures + circle diagrams
-    DISPLAY_MODE_3     // Temperatures + horizontal bars
-} display_mode_t;
-
-// Sensor Data Structure
+/**
+ * @brief Sensor data structure for display rendering.
+ *
+ * Holds temperature values for CPU and GPU. Fields for coolant temperature and usage are reserved for future multi-mode support.
+ *
+ * Example:
+ * @code
+ * sensor_data_t data = { .cpu_temp = 55.0f, .gpu_temp = 48.0f };
+ * @endcode
+ */
 typedef struct {
-    float cpu_temp;
-    float gpu_temp;
-    float coolant_temp;
-    float cpu_usage;    // Only for modes 1, 2, 3
-    float ram_usage;    // Only for modes 1, 2, 3
-    float gpu_usage;    // Only for modes 1, 2, 3
-    float gpu_ram_usage; // Only for modes 1, 2, 3
+    float cpu_temp; /**< CPU temperature in degrees Celsius */
+    float gpu_temp; /**< GPU temperature in degrees Celsius */
+    /*
+     * float coolant_temp; // Unused in current display mode (legacy: multi-mode support)
+     * float cpu_usage;
+     * float ram_usage;
+     * float gpu_usage;
+     * float gpu_ram_usage;
+     */
 } sensor_data_t;
 
-// Display Functions
 /**
- * Converts a mode string to the corresponding display mode enum.
- * @param mode_str Mode string ("def", "1", "2", "3")
- * @return Display mode enum value
- * @example
- *   display_mode_t mode = parse_display_mode("1");
- */
-display_mode_t parse_display_mode(const char *mode_str);
-
-/**
- * Renders the display image based on sensor data and display mode.
- * @param data Pointer to sensor data structure
- * @param mode Display mode enum
+ * @brief Render display based on sensor data (only default mode).
+ *
+ * Renders the LCD display image using the provided sensor data. Handles drawing, saving, and uploading the image.
+ *
+ * @param data Pointer to sensor data
  * @return 1 on success, 0 on error
- * @brief Creates and saves the LCD image for the current sensor state.
+ *
+ * Example:
+ * @code
+ * int result = render_display(&sensor_data);
+ * @endcode
  */
-int render_display(const sensor_data_t *data, display_mode_t mode);
+int render_display(const sensor_data_t *data);
 
 /**
- * Collects sensor data and renders the display in one step.
- * @param mode Display mode enum
- * @brief Simplified all-in-one function for updating the LCD image.
+ * @brief Collects sensor data and renders display (default mode only).
+ *
+ * Reads all relevant sensor data (temperatures) and renders the display image. Also uploads the image to the device if available.
+ *
+ * @return void
+ *
+ * Example:
+ * @code
+ * draw_combined_image();
+ * @endcode
  */
-void draw_combined_image(display_mode_t mode);
+void draw_combined_image(void);
 
 /**
- * Calculates the color gradient for temperature bars (green → orange → red).
+ * @brief Calculates the color gradient for temperature bars (green → orange → red).
+ *
+ * Utility function for temperature color mapping. Determines the RGB color for a given temperature value according to the defined thresholds.
+ *
  * @param val Temperature value
  * @param[out] r Red component (0-255)
  * @param[out] g Green component (0-255)
  * @param[out] b Blue component (0-255)
- * @brief Utility function for temperature color mapping.
+ * @return void
+ *
+ * Example:
+ * @code
+ * int r, g, b;
+ * lerp_temp_color(65.0f, &r, &g, &b);
+ * @endcode
  */
 void lerp_temp_color(float val, int* r, int* g, int* b);
 

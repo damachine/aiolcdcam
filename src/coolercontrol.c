@@ -14,6 +14,27 @@ struct http_response {
 };
 
 // Callback function to write HTTP response data
+/**
+ * @brief Callback function to write HTTP response data.
+ *
+ * Writes received HTTP response data into a dynamically growing buffer.
+ *
+ * @param contents Pointer to the data received
+ * @param size Size of each data element
+ * @param nmemb Number of data elements
+ * @param response Pointer to http_response struct to write into
+ * @return Number of bytes actually handled
+ *
+ * Example:
+ * @code
+ * struct http_response resp = {0};
+ * resp.data = malloc(1);
+ * resp.size = 0;
+ * // ...
+ * curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
+ * curl_easy_setopt(curl, CURLOPT_WRITEDATA, &resp);
+ * @endcode
+ */
 static size_t write_callback(void *contents, size_t size, size_t nmemb, struct http_response *response) {
     size_t realsize = size * nmemb;
     char *ptr = realloc(response->data, response->size + realsize + 1);
@@ -38,9 +59,18 @@ static char cached_aio_uuid[128] = {0};  // Cache for detected AIO UUID
 #define UUID_CACHE_FILE "/var/cache/coolerdash/device.uuid"
 
 /**
- * Initializes cURL and authenticates with the CoolerControl daemon
+ * @brief Initializes cURL and authenticates with the CoolerControl daemon.
+ *
+ * Sets up the cURL handle and logs in to the CoolerControl daemon using basic authentication.
  *
  * @return 1 on success, 0 on error
+ *
+ * Example:
+ * @code
+ * if (!init_coolercontrol_session()) {
+ *     // handle error
+ * }
+ * @endcode
  */
 int init_coolercontrol_session(void) {
     curl_global_init(CURL_GLOBAL_DEFAULT); 
@@ -79,11 +109,18 @@ int init_coolercontrol_session(void) {
 }
 
 /**
- * Sends an image directly to the LCD of the CoolerControl device
+ * @brief Sends an image directly to the LCD of the CoolerControl device.
+ *
+ * Uploads an image to the AIO LCD display using a multipart HTTP PUT request.
  *
  * @param image_path Path to the image
  * @param device_uid Device UID
  * @return 1 on success, 0 on error
+ *
+ * Example:
+ * @code
+ * send_image_to_lcd("/opt/coolerdash/images/coolerdash.png", uuid);
+ * @endcode
  */
 int send_image_to_lcd(const char* image_path, const char* device_uid) {
     if (!curl_handle || !image_path || !device_uid || !session_initialized) return 0;
@@ -125,7 +162,7 @@ int send_image_to_lcd(const char* image_path, const char* device_uid) {
     // orientation field
     field = curl_mime_addpart(form);
     curl_mime_name(field, "orientation");
-    curl_mime_data(field, "0", CURL_ZERO_TERMINATED);
+    curl_mime_data(field, LCD_ORIENTATION, CURL_ZERO_TERMINATED); // Use LCD_ORIENTATION from config.h
     
     // images[] field (the actual image)
     field = curl_mime_addpart(form);
@@ -153,44 +190,81 @@ int send_image_to_lcd(const char* image_path, const char* device_uid) {
 }
 
 /**
- * Alias function for send_image_to_lcd (for better API compatibility)
+ * @brief Alias function for send_image_to_lcd (for better API compatibility).
+ *
+ * @param image_path Path to the image
+ * @param device_uid Device UID
+ * @return 1 on success, 0 on error
+ *
+ * Example:
+ * @code
+ * upload_image_to_device("/opt/coolerdash/images/coolerdash.png", uuid);
+ * @endcode
  */
 int upload_image_to_device(const char* image_path, const char* device_uid) {
     return send_image_to_lcd(image_path, device_uid);
 }
 
 /**
- * Terminates the CoolerControl session and cleans up
+ * @brief Terminates the CoolerControl session and cleans up.
+ *
+ * Frees all resources, cleans up cURL, and removes the session cookie file.
+ *
+ * @return void
+ *
+ * Example:
+ * @code
+ * cleanup_coolercontrol_session();
+ * @endcode
  */
 void cleanup_coolercontrol_session(void) {
     static int cleanup_done = 0;
     if (cleanup_done) return;
-    cleanup_done = 1;
-    
+    int all_cleaned = 1;
     if (curl_handle) {
         curl_easy_cleanup(curl_handle);
         curl_handle = NULL;
     }
     curl_global_cleanup();
-    unlink(cookie_jar); // Delete cookie file
+    if (unlink(cookie_jar) != 0) {
+        all_cleaned = 0;
+    }
     session_initialized = 0;
+    if (all_cleaned) cleanup_done = 1;
 }
 
 /**
- * Returns whether the session is initialized
+ * @brief Returns whether the session is initialized.
  *
  * @return 1 if initialized, 0 if not
+ *
+ * Example:
+ * @code
+ * if (is_session_initialized()) {
+ *     // session is ready
+ * }
+ * @endcode
  */
 int is_session_initialized(void) {
     return session_initialized;
 }
 
 /**
- * Retrieves the full name of the AIO LCD device
+ * @brief Retrieves the full name of the AIO LCD device.
+ *
+ * Queries the CoolerControl API for the device name and writes it to the provided buffer.
  *
  * @param name_buffer Buffer for the device name
  * @param buffer_size Size of the buffer
  * @return 1 on success, 0 on error
+ *
+ * Example:
+ * @code
+ * char name[128];
+ * if (get_aio_device_name(name, sizeof(name))) {
+ *     // use name
+ * }
+ * @endcode
  */
 int get_aio_device_name(char* name_buffer, size_t buffer_size) {
     if (!curl_handle || !name_buffer || buffer_size == 0 || !session_initialized) return 0;
@@ -231,11 +305,21 @@ int get_aio_device_name(char* name_buffer, size_t buffer_size) {
 }
 
 /**
- * Retrieves the UUID of the first AIO LCD device found
+ * @brief Retrieves the UUID of the first AIO LCD device found.
+ *
+ * Queries the CoolerControl API for the device UUID and writes it to the provided buffer.
  *
  * @param uuid_buffer Buffer for the device UUID
  * @param buffer_size Size of the buffer
  * @return 1 on success, 0 on error
+ *
+ * Example:
+ * @code
+ * char uuid[128];
+ * if (get_aio_device_uuid(uuid, sizeof(uuid))) {
+ *     // use uuid
+ * }
+ * @endcode
  */
 int get_aio_device_uuid(char* uuid_buffer, size_t buffer_size) {
     if (!curl_handle || !uuid_buffer || buffer_size == 0 || !session_initialized) return 0;
@@ -340,10 +424,19 @@ int get_aio_device_uuid(char* uuid_buffer, size_t buffer_size) {
 }
 
 /**
- * Returns the cached AIO UUID (automatically detected at runtime)
- * This function will attempt to detect the UUID on first call if not cached
+ * @brief Returns the cached AIO UUID (automatically detected at runtime).
+ *
+ * This function will attempt to detect the UUID on first call if not cached.
  *
  * @return Pointer to cached UUID string, or NULL on error
+ *
+ * Example:
+ * @code
+ * const char* uuid = get_cached_aio_uuid();
+ * if (uuid) {
+ *     // use uuid
+ * }
+ * @endcode
  */
 const char* get_cached_aio_uuid(void) {
     // If already cached in memory, validate it first
@@ -379,9 +472,16 @@ const char* get_cached_aio_uuid(void) {
 }
 
 /**
- * Loads cached UUID from persistent storage
+ * @brief Loads cached UUID from persistent storage.
  *
  * @return 1 on success, 0 if no valid cache found
+ *
+ * Example:
+ * @code
+ * if (!load_cached_uuid()) {
+ *     // no valid cache
+ * }
+ * @endcode
  */
 int load_cached_uuid(void) {
     FILE *cache_file = fopen(UUID_CACHE_FILE, "r");
@@ -411,10 +511,15 @@ int load_cached_uuid(void) {
 }
 
 /**
- * Saves UUID to persistent cache file
+ * @brief Saves UUID to persistent cache file.
  *
  * @param uuid The UUID to cache
  * @return 1 on success, 0 on error
+ *
+ * Example:
+ * @code
+ * save_cached_uuid(uuid);
+ * @endcode
  */
 int save_cached_uuid(const char* uuid) {
     if (!uuid || strlen(uuid) == 0) {
@@ -445,10 +550,17 @@ int save_cached_uuid(const char* uuid) {
 }
 
 /**
- * Validates if a cached UUID is still valid by testing it with CoolerControl
+ * @brief Validates if a cached UUID is still valid by testing it with CoolerControl.
  *
  * @param uuid The UUID to validate
  * @return 1 if valid, 0 if invalid
+ *
+ * Example:
+ * @code
+ * if (!validate_cached_uuid(uuid)) {
+ *     // uuid is invalid
+ * }
+ * @endcode
  */
 int validate_cached_uuid(const char* uuid) {
     if (!uuid || !curl_handle || !session_initialized) {
@@ -504,7 +616,14 @@ int validate_cached_uuid(const char* uuid) {
 }
 
 /**
- * Clears the UUID cache (both memory and file)
+ * @brief Clears the UUID cache (both memory and file).
+ *
+ * @return void
+ *
+ * Example:
+ * @code
+ * clear_uuid_cache();
+ * @endcode
  */
 void clear_uuid_cache(void) {
     cached_aio_uuid[0] = '\0';

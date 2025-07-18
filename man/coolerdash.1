@@ -3,18 +3,16 @@
 coolerdash \- CoolerDash Temperature Monitor (Professional Modular C Daemon)
 .SH SYNOPSIS
 .B coolerdash
-[\fIMODE\fR]
 .br
 .B coolerdash
-[\fB\-\-mode\fR \fIMODE\fR]
-.br
-.B coolerdash
-[\fB\-h\fR|\fB\-\-help\fR]
+[B\-hR|\fB\-\-help\fR]
 .SH DESCRIPTION
 .B coolerdash
 is a high-performance, modular C-based daemon with professional systemd integration that monitors CPU and GPU temperatures and displays them graphically on the LCD display of an NZXT AIO water cooler. The program is fully developed in modular C99 architecture for maximum efficiency, maintainability, and production stability.
 
-The modular architecture separates CPU, GPU, coolant, and display logic into separate modules. Depending on the selected mode, only the required sensor data is queried, which significantly optimizes I/O performance (def mode uses only temperature sensors, modes 1-3 additionally load data).
+The program always runs in a fixed two-box layout (CPU top, GPU bottom) and does not support display mode selection. All mode logic and coolant display have been removed for simplicity and reliability.
+
+Note: Support for selectable display modes (e.g. load bars, circular diagrams) may be reintroduced in a future version if there is sufficient demand.
 
 The program communicates with the AIO device via the native CoolerControl REST API without Python dependencies and provides detailed systemd logs for professional service management.
 
@@ -56,23 +54,6 @@ REST API communication and session management
 
 .SH OPTIONS
 .TP
-.I MODE
-Sets the display mode for the LCD display. Available modes:
-.RS
-.TP
-.B def
-Default mode (temperatures only) - Minimal I/O, no load data
-.TP
-.B 1
-Temperatures + vertical load bars
-.TP
-.B 2
-Temperatures + circular diagrams for load
-.TP
-.B 3
-Temperatures + horizontal load bars
-.RE
-.TP
 .BR \-h ", " \-\-help
 Shows help information and usage examples
 .SH FILES
@@ -93,17 +74,8 @@ Systemd service file
 PID file for process management
 .SH EXAMPLES
 .TP
-Start program in default mode (temperatures only):
-.B coolerdash def
-.TP
-Start program with vertical load bars:
-.B coolerdash 1
-.TP
-Start program with circular diagrams:
-.B coolerdash 2
-.TP
-Start program with horizontal load bars:
-.B coolerdash 3
+Start program (fixed two-box layout, CPU/GPU temperature only):
+.B coolerdash
 .TP
 Show help:
 .B coolerdash --help
@@ -139,19 +111,17 @@ Shows module initialization, CoolerControl connection, and operating status.
 .B make start, make stop, make restart, make status, make logs
 
 .SH PERFORMANCE OPTIMIZATIONS
-The modular design offers the following performance benefits:
+The streamlined design offers the following performance benefits:
 .TP
-.B Mode-dependent I/O optimization
-Mode "def" reads only temperature sensors for minimal I/O.
-Modes 1-3 read additional load data with intelligent caching.
+.B Minimal I/O
+Only temperature sensors are read for CPU and GPU (no mode-dependent logic).
 .TP
 .B Sensor data caching
-CPU/Coolant: hwmon paths are cached at startup.
-GPU: 2-second cache with nvidia-smi.
-CPU load: Stateful between measurements.
+CPU: hwmon paths are cached at startup.
+GPU: 2.5-second cache with nvidia-smi.
 .TP
 .B Change detection
-Display updates only on significant changes (0.1°C for temperatures, 0.5% for load).
+Display updates only on significant changes (0.1°C for temperatures).
 
 .SH CONFIGURATION
 All important settings are located in the build-time configuration file \fBinclude/config.h\fR:
@@ -200,16 +170,14 @@ For older CPUs: \fBCFLAGS=-march=x86-64 make\fR
 
 .SH PERFORMANCE
 .TP
-.B Mode-dependent I/O
-Mode "def": Only temperature sensors (minimal I/O)
-.br
-Modes 1-3: Additional CPU/GPU/RAM load data
+.B Minimal I/O
+Only temperature sensors for CPU and GPU are read (no mode logic).
 .TP
 .B Sensor Caching
-Hwmon paths cached at startup, GPU data cached for 2 seconds
+Hwmon paths cached at startup, GPU data cached for 2.5 seconds
 .TP
 .B Change Detection
-PNG regenerated only on significant temperature/load changes
+PNG regenerated only on significant temperature changes
 
 .SH DATA SOURCES
 .TP
