@@ -33,7 +33,7 @@ pkgname=coolerdash-git
 pkgver() {
     cd "$srcdir/coolerdash"
     # Version: 0.<year>.<month>.<day>.<commits> (z.B. 0.2025.07.18.123)
-    echo "0.$(date +%Y.%m.%d).$(git rev-list --count HEAD)"
+    echo "0.$(date +%y.%m.%d).$(git rev-list --count HEAD)"
 }
 pkgrel=1
 pkgdesc="CoolerDash - build from latest git (AIO LCD system monitor for CoolerControl)"
