@@ -10,7 +10,7 @@
 
 **Take full control of your AIO liquid cooling system with integrated LCD display to monitor real-time sensor data in style.**
 
-This high-performance, modular C-based daemon empowers you to harness the potential of your LCD-equipped AIO liquid coolers. Display comprehensive system monitoring data including CPU and GPU temperatures directly on your LCD screen through seamless CoolerControl API integration.
+This system daemon empowers you to harness the potential of your LCD-equipped AIO liquid coolers. Display comprehensive system monitoring data including CPU and GPU temperatures directly on your LCD screen through seamless CoolerControl API integration.
 
 Transform your cooling system into an intelligent monitoring hub that keeps you informed about your system's vital signs at a glance.
 
@@ -74,22 +74,22 @@ Right: AI-generated image to demonstrate LCD output*
 #### Arch Linux (Recommended)
 
 ```bash
-# STEP 1: Clone and configure UUID FIRST
+# STEP 1: Clone repository
 git clone https://github.com/damachine/coolerdash.git
 cd coolerdash
 
-# STEP 2: Start CoolerControl daemon
-# The AIO device UUID is now automatically detected at runtime and cached!
+# STEP 2: Start CoolerControl daemon  if not already running
 sudo systemctl start coolercontrold
 
 # STEP 3: Build and install (includes automatic dependency management)
 makepkg -si
 
-# STEP 4: Enable autostart
-sudo systemctl enable coolerdash.service
+# STEP 4: Enable autostart and start CoolerDash
+sudo systemctl enable --now coolerdash.service
 
-# STEP 5: Start CoolerDash service
-sudo systemctl start coolerdash.service
+# STEP 5: Status CoolerDash service
+sudo systemctl status coolerdash.service
+journalctl -xeu coolerdash.service
 ```
 
 #### Manual Installation (All Distributions)
@@ -107,15 +107,34 @@ sudo systemctl start coolercontrold
 sudo make install
 
 # STEP 4: Enable autostart
-sudo systemctl enable coolerdash.service
+sudo systemctl enable --now coolerdash.service
 
-# STEP 5: Start CoolerDash service
-sudo systemctl start coolerdash.service
+# STEP 5: Status CoolerDash service
+sudo systemctl status coolerdash.service
+journalctl -xeu coolerdash.service
+```
+
+> **Note:**  
+> When starting `coolerdash` as a systemd service, there is a default delay of up to 10 seconds before the service is marked as "active". This is due to systemd's startup and dependency handling. The LCD image may also appear with a short delay on first start, as CoolerDash waits for the CoolerControl daemon and device detection to complete.
+
+### Manual Usage 
+
+```bash
+# Run manually
+coolerdash
+
+# Or use full path
+/opt/coolerdash/bin/coolerdash
+
+# From directory
+./coolerdash
 ```
 
 ## ⚙️ Configuration
 There is no configuration needed.
 CoolerDash is pre-configured to use the default mode.
+
+> **Note:** A configuration file like (`coolerdash.conf`) and/or a graphical configuration tool are planned for a future release. This will allow you to adjust all important parameters at runtime, without recompiling the program.
 
 ### Important customizable values from `include/config.h`
 
@@ -184,9 +203,9 @@ curl http://localhost:11987/devices | jq
 
 ### Common Issues
 
+- **"Image send fails on first attempt"**: Occasionally, on launch, the CoolerControl daemon may return an error when sending the image to the device. This is usually a transient issue—on the next update cycle, the image will be sent successfully and appear on the LCD. No user action  is required.
 - **"Connection refused"**: CoolerControl daemon not running → `sudo systemctl start coolercontrold`
 - **"Device not found"**: LCD AIO not configured in CoolerControl → Use CoolerControl GUI  
-- **"Permission denied"**: Run with appropriate permissions → `sudo coolerdash def`
 - **"Empty JSON response"**: No devices found → Check CoolerControl configuration and LCD AIO connection
 - **"UUID not working"**: Wrong device UUID → Verify with `curl http://localhost:11987/devices | jq` and copy exact UUID
 
@@ -230,19 +249,6 @@ make status     # systemctl status coolerdash
 make logs       # journalctl -u coolerdash -f
 ```
 
-### Manual Usage
-
-```bash
-# Run manually (different modes) - both work after installation
-coolerdash          # System-wide command (via symlink)
-
-# Or use full path
-/opt/coolerdash/bin/coolerdash
-
-# From project directory (before installation)
-./coolerdash
-```
-
 ### Build Commands
 
 ```bash
@@ -262,10 +268,10 @@ sudo systemctl status coolercontrold
 curl http://localhost:11987/devices
 
 # 2. Test CoolerDash manually
-coolerdash def
+coolerdash
 
 # 3. Debug build for detailed information
-make debug && coolerdash def
+make debug && coolerdash
 
 # 4. Check service logs
 sudo journalctl -u coolerdash.service -f
