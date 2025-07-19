@@ -112,7 +112,7 @@ int render_display(const sensor_data_t *data) {
         success = 1;
 
         if (is_session_initialized()) {
-            const char* device_uuid = get_cached_aio_uuid();
+            const char* device_uuid = get_cached_uuid();
             if (device_uuid) {
                 // Workaround: send image twice to avoid LCD artifacts
                 send_image_to_lcd(IMAGE_PATH, device_uuid);

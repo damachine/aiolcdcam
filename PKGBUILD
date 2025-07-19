@@ -21,7 +21,7 @@ plain '      \___)=(___/ '
 plain ' '
 
 pkgname=coolerdash
-pkgver=0.25.07.18.2360
+pkgver=0.25.07.19.1
 pkgrel=1
 pkgdesc="CoolerDash a Wrapper for LCD Device Image Control in CoolerControl. To take full control of your AIO liquid cooling system with integrated LCD display to monitor real-time sensor data in style."
 arch=('x86_64')

@@ -109,13 +109,13 @@ int get_aio_device_uuid(char* uuid_buffer, size_t buffer_size);
  *
  * Example:
  * @code
- * const char* uuid = get_cached_aio_uuid();
+ * const char* uuid = get_cached_uuid();
  * if (uuid) {
  *     // use uuid
  * }
  * @endcode
  */
-const char* get_cached_aio_uuid(void);
+const char* get_cached_uuid(void);
 
 // UUID Caching Functions
 /**

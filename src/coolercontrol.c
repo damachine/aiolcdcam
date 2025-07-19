@@ -13,7 +13,27 @@ struct http_response {
     size_t size;
 };
 
-// Callback function to write HTTP response data
+// =====================
+// API-FUNKTIONEN
+// =====================
+
+int init_coolercontrol_session(void);
+int send_image_to_lcd(const char* image_path, const char* device_uid);
+int upload_image_to_device(const char* image_path, const char* device_uid);
+void cleanup_coolercontrol_session(void);
+int is_session_initialized(void);
+int get_aio_device_name(char* name_buffer, size_t buffer_size);
+int get_aio_device_uuid(char* uuid_buffer, size_t buffer_size);
+const char* get_cached_uuid(void);
+int load_cached_uuid(void);
+int save_cached_uuid(const char* uuid);
+int validate_cached_uuid(const char* uuid);
+void clear_uuid_cache(void);
+
+// =====================
+// INTERNE HILFSFUNKTIONEN
+// =====================
+
 /**
  * @brief Callback function to write HTTP response data.
  *
@@ -250,6 +270,108 @@ int is_session_initialized(void) {
 }
 
 /**
+ * @brief Parses the first Liquidctl AIO device and extracts name and/or uuid.
+ *
+ * @param name_buffer Buffer for the device name (can be NULL if not needed)
+ * @param name_size Size of the name buffer
+ * @param uuid_buffer Buffer for the device UUID (can be NULL if not needed)
+ * @param uuid_size Size of the uuid buffer
+ * @return 1 on success, 0 on error
+ *
+ * Example:
+ * @code
+ * char name[128], uuid[128];
+ * parse_aio_device_fields(name, sizeof(name), uuid, sizeof(uuid));
+ * @endcode
+ */
+static int parse_aio_device_fields(char* name_buffer, size_t name_size, char* uuid_buffer, size_t uuid_size) {
+    // Initialize response buffer
+    struct http_response response = {0};
+    response.data = malloc(1);
+    response.size = 0;
+    if (!response.data) return 0;
+    
+    // URL for device list
+    char devices_url[128];
+    snprintf(devices_url, sizeof(devices_url), "%s/devices", DAEMON_ADDRESS);
+    
+    // Configure cURL for GET request
+    curl_easy_setopt(curl_handle, CURLOPT_URL, devices_url);
+    curl_easy_setopt(curl_handle, CURLOPT_HTTPGET, 1L);
+    curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, write_callback);
+    curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, &response);
+    
+    CURLcode res = curl_easy_perform(curl_handle);
+    if (res != CURLE_OK) {
+        fprintf(stderr, "[CoolerDash] cURL request failed: %s\n", curl_easy_strerror(res));
+    }
+    long response_code = 0;
+    if (curl_easy_getinfo(curl_handle, CURLINFO_RESPONSE_CODE, &response_code) != CURLE_OK) {
+        fprintf(stderr, "[CoolerDash] Failed to get HTTP response code.\n");
+    }
+    curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, NULL);
+    curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, NULL);
+    int found = 0;
+    if (res == CURLE_OK && response_code == 200 && response.data) {
+        char *search_pos = response.data;
+        while ((search_pos = strstr(search_pos, "\"uid\":\"")) != NULL) {
+            char *device_start = search_pos;
+            while (device_start > response.data && *device_start != '{') device_start--;
+            char *device_end = strchr(search_pos, '}');
+            if (!device_end) device_end = response.data + response.size;
+            char device_section[4096];
+            size_t section_length = device_end - device_start;
+            if (section_length < sizeof(device_section)) {
+                strncpy(device_section, device_start, section_length);
+                device_section[section_length] = '\0';
+                if (strstr(device_section, "\"type\":\"Liquidctl\"")) {
+                    // Extract name if requested
+                    if (name_buffer && name_size > 0) {
+                        char *name_pos = strstr(device_section, "\"name\":\"");
+                        if (name_pos) {
+                            name_pos += 8;
+                            char *name_end = strchr(name_pos, '"');
+                            if (name_end) {
+                                size_t name_length = name_end - name_pos;
+                                if (name_length < name_size) {
+                                    strncpy(name_buffer, name_pos, name_length);
+                                    name_buffer[name_length] = '\0';
+                                    found = 1;
+                                }
+                            }
+                        }
+                    }
+                    // Extract uuid if requested
+                    if (uuid_buffer && uuid_size > 0) {
+                        char *uid_pos = strstr(device_section, "\"uid\":\"");
+                        if (uid_pos) {
+                            uid_pos += 7;
+                            char *uid_end = strchr(uid_pos, '"');
+                            if (uid_end) {
+                                size_t uid_length = uid_end - uid_pos;
+                                if (uid_length < uuid_size) {
+                                    strncpy(uuid_buffer, uid_pos, uid_length);
+                                    uuid_buffer[uid_length] = '\0';
+                                    found = 1;
+                                }
+                            }
+                        }
+                    }
+                    // Wenn mindestens eins gefunden, abbrechen
+                    if (found) break;
+                }
+            }
+            search_pos = device_end;
+        }
+    }
+    if (response.data) {
+        free(response.data);
+        response.data = NULL;
+    }
+    return found;
+}
+
+/**
  * @brief Retrieves the full name of the AIO LCD device.
  *
  * Queries the CoolerControl API for the device name and writes it to the provided buffer.
@@ -268,40 +390,7 @@ int is_session_initialized(void) {
  */
 int get_aio_device_name(char* name_buffer, size_t buffer_size) {
     if (!curl_handle || !name_buffer || buffer_size == 0 || !session_initialized) return 0;
-    
-    // Initialize response buffer
-    struct http_response response = {0};
-    response.data = malloc(1);  // Will be grown as needed by realloc
-    response.size = 0;
-    if (!response.data) return 0;
-    
-    // URL for device list
-    char devices_url[128];
-    snprintf(devices_url, sizeof(devices_url), "%s/devices", DAEMON_ADDRESS);
-    
-    // Configure cURL for GET request
-    curl_easy_setopt(curl_handle, CURLOPT_URL, devices_url);
-    curl_easy_setopt(curl_handle, CURLOPT_HTTPGET, 1L);  // GET request
-    curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, write_callback);
-    curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, &response);
-    
-    // Execute request
-    long response_code = 0;
-    curl_easy_getinfo(curl_handle, CURLINFO_RESPONSE_CODE, &response_code);
-    
-    // Reset cURL options
-    curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, NULL);
-    curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, NULL);
-    
-    int success = 0;
-    
-    // Cleanup
-    if (response.data) {
-        free(response.data);
-        response.data = NULL;
-    }
-    
-    return success;
+    return parse_aio_device_fields(name_buffer, buffer_size, NULL, 0);
 }
 
 /**
@@ -323,104 +412,7 @@ int get_aio_device_name(char* name_buffer, size_t buffer_size) {
  */
 int get_aio_device_uuid(char* uuid_buffer, size_t buffer_size) {
     if (!curl_handle || !uuid_buffer || buffer_size == 0 || !session_initialized) return 0;
-    
-    // Initialize response buffer
-    struct http_response response = {0};
-    response.data = malloc(1);  // Will be grown as needed by realloc
-    response.size = 0;
-    if (!response.data) return 0;
-    
-    // URL for device list
-    char devices_url[128];
-    snprintf(devices_url, sizeof(devices_url), "%s/devices", DAEMON_ADDRESS);
-    
-    // Configure cURL for GET request
-    curl_easy_setopt(curl_handle, CURLOPT_URL, devices_url);
-    curl_easy_setopt(curl_handle, CURLOPT_HTTPGET, 1L);  // GET request
-    curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, write_callback);
-    curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, &response);
-    
-    // Execute request
-    CURLcode res;
-    res = curl_easy_perform(curl_handle);
-    long response_code = 0;
-    curl_easy_getinfo(curl_handle, CURLINFO_RESPONSE_CODE, &response_code);
-    // Reset cURL options
-    curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, NULL);
-    curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, NULL);
-    
-    int success = 0;
-    if (res == CURLE_OK && response_code == 200 && response.data) {
-        // Search for Liquidctl devices (AIO controllers)
-        // Liquidctl devices are the most reliable indicator for AIO systems
-        char *search_pos = response.data;
-        char *uuid_start = NULL;
-        
-        while ((search_pos = strstr(search_pos, "\"uid\":\"")) != NULL) {
-            // Found a UID, check if this device is an AIO with LCD
-            uuid_start = search_pos + 7;  // Skip "uid":"
-            char *uuid_end = strchr(uuid_start, '"');
-            if (!uuid_end) {
-                search_pos = uuid_start;
-                continue;
-            }
-            
-            // Extract the UUID
-            size_t uuid_length = uuid_end - uuid_start;
-            char temp_uuid[128];
-            if (uuid_length >= sizeof(temp_uuid)) {
-                search_pos = uuid_end;
-                continue;
-            }
-            strncpy(temp_uuid, uuid_start, uuid_length);
-            temp_uuid[uuid_length] = '\0';
-            
-            // Check if this device is a Liquidctl AIO device
-            // Look for "type": "Liquidctl" which indicates an AIO controller
-            char *device_start = search_pos;
-            while (device_start > response.data && *device_start != '{') device_start--;
-            char *device_end = strchr(search_pos, '}');
-            if (!device_end) device_end = response.data + response.size;
-            
-            // Look for indicators that this is an AIO LCD device
-            char device_section[4096];
-            size_t section_length = device_end - device_start;
-            if (section_length < sizeof(device_section)) {
-                strncpy(device_section, device_start, section_length);
-                device_section[section_length] = '\0';
-                
-                // Check for Liquidctl type - this is the most reliable indicator for AIO devices
-                if (strstr(device_section, "\"type\":\"Liquidctl\"")) {
-                    
-                    // Found a Liquidctl device (AIO controller)
-                    if (uuid_length < buffer_size) {
-                        strncpy(uuid_buffer, temp_uuid, uuid_length);
-                        uuid_buffer[uuid_length] = '\0';
-                        
-                        // Cache the UUID for future use
-                        if (uuid_length < sizeof(cached_aio_uuid)) {
-                            strcpy(cached_aio_uuid, uuid_buffer);
-                            // Save to persistent cache
-                            save_cached_uuid(uuid_buffer);
-                        }
-                        
-                        success = 1;
-                        break;
-                    }
-                }
-            }
-            
-            search_pos = uuid_end;
-        }
-    }
-    
-    // Cleanup
-    if (response.data) {
-        free(response.data);
-        response.data = NULL;
-    }
-    
-    return success;
+    return parse_aio_device_fields(NULL, 0, uuid_buffer, buffer_size);
 }
 
 /**
@@ -432,13 +424,13 @@ int get_aio_device_uuid(char* uuid_buffer, size_t buffer_size) {
  *
  * Example:
  * @code
- * const char* uuid = get_cached_aio_uuid();
+ * const char* uuid = get_cached_uuid();
  * if (uuid) {
  *     // use uuid
  * }
  * @endcode
  */
-const char* get_cached_aio_uuid(void) {
+const char* get_cached_uuid(void) {
     // If already cached in memory, validate it first
     if (cached_aio_uuid[0] != '\0') {
         if (validate_cached_uuid(cached_aio_uuid)) {
