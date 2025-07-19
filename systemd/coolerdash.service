@@ -16,8 +16,8 @@ Requires=coolercontrold.service
 
 [Service]
 Type=simple
-ExecStart=sh -c '/opt/coolerdash/bin/coolerdash'
-Restart=on-failure
+ExecStart=/opt/coolerdash/bin/coolerdash
+Restart=always
 RestartSec=1
 TimeoutStopSec=5
 
