@@ -66,7 +66,7 @@ Right: AI-generated image to demonstrate LCD output*
 1. **Install CoolerControl**: [Installation Guide](https://gitlab.com/coolercontrol/coolercontrol/-/blob/main/README.md)
 2. **Start CoolerControl daemon**: `sudo systemctl start coolercontrold`
 3. **Configure your LCD** in CoolerControl GUI
-4. **Set LCD mode**: In CoolerControl GUI, set your LCD display to **"NONE"** mode!
+4. **Set LCD mode**: In CoolerControl GUI, set your LCD display to **"Image/gif"** mode!
 
 ### Install CoolerDash
 
@@ -208,7 +208,6 @@ curl http://localhost:11987/devices | jq
   ```
 
   **Solution:** 
-  - In CoolerControl GUI, set your LCD display to **"NONE"** mode! 
   - In most cases, this error can be ignored: CoolerDash will send the image again on the next update cycle and it will appear on the LCD automatically. 
 
 > If you encounter persistent segmentation faults or assertion errors in the CoolerControl backend, please report them upstream at [CoolerControl GitLab](https://gitlab.com/coolercontrol/coolercontrol/-/issues) with detailed logs.
