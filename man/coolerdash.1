@@ -8,13 +8,13 @@ coolerdash \- CoolerDash Temperature Monitor (Professional Modular C Daemon)
 [B\-hR|\fB\-\-help\fR]
 .SH DESCRIPTION
 .B coolerdash
-is a high-performance, modular C-based daemon with professional systemd integration that monitors CPU and GPU temperatures and displays them graphically on the LCD display of an NZXT AIO water cooler. The program is fully developed in modular C99 architecture for maximum efficiency, maintainability, and production stability.
+is a high-performance, modular C-based daemon with professional systemd integration that monitors CPU and GPU temperatures and displays them graphically on the LCD display of an NZXT water cooler. The program is fully developed in modular C99 architecture for maximum efficiency, maintainability, and production stability.
 
 The program always runs in a fixed two-box layout (CPU top, GPU bottom) and does not support display mode selection. All mode logic and coolant display have been removed for simplicity and reliability.
 
 Note: Support for selectable display modes (e.g. load bars, circular diagrams) may be reintroduced in a future version if there is sufficient demand.
 
-The program communicates with the AIO device via the native CoolerControl REST API without Python dependencies and provides detailed systemd logs for professional service management.
+The program communicates with the device via the native CoolerControl REST API without Python dependencies and provides detailed systemd logs for professional service management.
 
 .SH ARCHITECTURE
 The program follows the standard C project structure:
@@ -127,7 +127,7 @@ Display updates only on significant changes (0.1°C for temperatures).
 All important settings are located in the build-time configuration file \fBinclude/config.h\fR:
 .TP
 .B Device UID (AUTOMATIC)
-AIO device identification is automatically detected at runtime via CoolerControl API
+LCD device identification is automatically detected at runtime via CoolerControl API
 .br
 No manual configuration required - device UUID is discovered automatically
 .TP
@@ -225,8 +225,8 @@ Follow: https://gitlab.com/coolercontrol/coolercontrol/-/blob/main/README.md
 .br
 \fBsudo systemctl start coolercontrold\fR
 .TP
-.B 2. Configure LCD AIO in CoolerControl GUI
-Set your AIO LCD display to "Image" mode (not temperature mode)
+.B 2. Configure LCD in CoolerControl GUI
+Set your LCD display to "Image" mode (not temperature mode)
 .TP
 .B 3. Build and install (automatic device detection)
 \fBsudo make install\fR
@@ -239,7 +239,17 @@ Device UUID is automatically detected at startup
 
 .TP
 .B Tested with
-NZXT AIO Kraken 2023 (Z-Series)
+NZXT Kraken 2023 (Z-Series)
 .TP
 .B Compatible with
-NZXT AIO Kraken X-Series, Z-Series and other LCD-capable models
+NZXT Kraken X-Series, Z-Series and other LCD-capable models
+.SH IMAGES
+The shutdown image is always /opt/coolerdash/images/shutdown.png (configurable via SHUTDOWN_IMAGE_PATH macro in config.h).
+No cache directories or UID files are created or used.
+
+.SH INSTALLATION
+Installs to /opt/coolerdash/bin/ and /opt/coolerdash/images/.
+
+.SH UNINSTALL
+Removes all files from /opt/coolerdash/ and disables the service.
+No cache or UID files remain after uninstall.

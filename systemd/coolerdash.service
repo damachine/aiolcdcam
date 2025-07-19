@@ -10,34 +10,16 @@
 [Unit]
 Description=CoolerDash daemon
 Documentation=man:coolerdash(1)
-After=network.target coolercontrold.service
-Wants=coolercontrold.service
+After=network.target coolercontrol-liqctld.service coolercontrold.service
+Requires=coolercontrol-liqctld.service
 Requires=coolercontrold.service
 
 [Service]
 Type=simple
-ExecStartPre=/bin/sleep 10
-ExecStart=/opt/coolerdash/bin/coolerdash
-ExecReload=/bin/kill -HUP $MAINPID
-Restart=always
-RestartSec=5
-User=root
-Group=root
-
-# Sicherheitseinstellungen
-NoNewPrivileges=true
-ProtectSystem=full
-ProtectHome=true
-ReadWritePaths=/opt/coolerdash/images /tmp /var/cache/coolerdash
-PrivateTmp=true
-ProtectKernelTunables=true
-ProtectKernelModules=true
-ProtectControlGroups=true
-
-# Logging
-StandardOutput=journal
-StandardError=journal
-SyslogIdentifier=coolerdash
+ExecStart=sh -c '/opt/coolerdash/bin/coolerdash'
+Restart=on-failure
+RestartSec=1
+TimeoutStopSec=5
 
 [Install]
 WantedBy=multi-user.target

@@ -1,3 +1,19 @@
+/**
+ * @file main.c
+ * @brief Main entry point for CoolerDash daemon.
+ *
+ * Coding Standards (C99, ISO/IEC 9899:1999):
+ * - All code comments in English.
+ * - Doxygen-style comments for all functions (description, @brief, @param, @return, examples).
+ * - Opening braces on the same line (K&R style).
+ * - Always check return values of malloc(), calloc(), realloc().
+ * - Free all dynamically allocated memory and set pointers to NULL after freeing.
+ * - Use include guards in all headers.
+ * - Include only necessary headers, system headers before local headers.
+ * - Function names are verbs, use snake_case for functions/variables, UPPER_CASE for macros, PascalCase for typedef structs.
+ * - Use descriptive names, avoid abbreviations.
+ * - Document complex algorithms and data structures.
+ */
 #define _POSIX_C_SOURCE 200112L
 #define _XOPEN_SOURCE 600
 #include <unistd.h>
@@ -14,8 +30,8 @@
  * CoolerDash - Main Program
  * =========================
  *
- * Professional, modular C daemon for AIO LCD Temperature Monitor.
- * Displays CPU and GPU temperatures on an AIO LCD display (two-box layout).
+ * Modular C daemon for LCD Temperature Monitor.
+ * Displays CPU and GPU temperatures on an LCD display (two-box layout).
  *
  * Compile with: make
  * Or manually: gcc -Wall -Wextra -O2 -std=c99 main.c cpu_monitor.c gpu_monitor.c \
@@ -55,7 +71,7 @@ static const char *pid_file = PID_FILE; // PID file for daemon
 /**
  * @brief Signal handler for clean daemon termination with shutdown image.
  *
- * Sends a shutdown image to the AIO LCD (if not already sent), removes the PID file, and sets the running flag to 0 for clean termination.
+ * Sends a shutdown image to the LCD (if not already sent), removes the PID file, and sets the running flag to 0 for clean termination.
  *
  * @param sig Signal number (unused)
  * @return void
@@ -67,25 +83,22 @@ static const char *pid_file = PID_FILE; // PID file for daemon
  */
 static void cleanup_and_exit(int sig) {
     (void)sig; // parameter is not used
-    
     // Send shutdown image only once
     if (!shutdown_sent && is_session_initialized()) {
-        const char* shutdown_image = "/opt/coolerdash/images/face.png";
-        const char* device_uuid = get_cached_uuid();
-        
+        const char* shutdown_image = SHUTDOWN_IMAGE_PATH;
+        const char* device_uid = get_cached_device_uid();
         printf("CoolerDash: Sending shutdown image to LCD...\n");
         fflush(stdout);
-        
-        if (device_uuid && send_image_to_lcd(shutdown_image, device_uuid)) {
+        if (device_uid[0]) {
+            send_image_to_lcd(shutdown_image, device_uid);
+            send_image_to_lcd(shutdown_image, device_uid);
             printf("CoolerDash: Shutdown image sent successfully\n");
             shutdown_sent = 1; // set flag so it's only sent once
         } else {
-            printf("CoolerDash: Warning - Could not send shutdown image%s\n", 
-                   device_uuid ? "" : " (device UUID not detected)");
+            printf("CoolerDash: Warning - Could not send shutdown image (device UID not detected)\n");
         }
         fflush(stdout);
     }
-    
     unlink(pid_file); // remove PID file
     running = 0; // set flag to terminate daemon
 }
@@ -350,27 +363,18 @@ int main(int argc, char *argv[]) {
     if (init_coolercontrol_session()) { // Check return value
         printf("✓ CoolerControl session initialized\n");
         
-        // Get and display AIO device UUID only if detected and changed
-        static char last_device_uuid[128] = {0};
-        char device_uuid[128] = {0};
-        if (get_aio_device_uuid(device_uuid, sizeof(device_uuid))) {
-            if (strcmp(last_device_uuid, device_uuid) != 0) {
-                printf("CoolerControl: Detected LCD device UUID: %.20s...\n", device_uuid);
-                strncpy(last_device_uuid, device_uuid, sizeof(last_device_uuid));
-            }
-        } else {
-            fprintf(stderr, "Error: Could not detect LCD device UUID\n");
-            fprintf(stderr, "Please check:\n");
-            fprintf(stderr, "  - Is your AIO device connected?\n");
-            fprintf(stderr, "  - Does your device support LCD display?\n");
-            fprintf(stderr, "  - Run 'curl http://localhost:11987/devices' to see available devices\n");
-            fflush(stderr);
-            return 1;
+        // Get and display LCD device UID only if detected and changed
+        static char last_device_uid[128] = {0};
+        char device_uid[128] = {0};
+        get_device_uid(device_uid, sizeof(device_uid));
+        if (strcmp(last_device_uid, device_uid) != 0) {
+            printf("CoolerControl: Detected LCD device UID: %.20s...\n", device_uid);
+            strncpy(last_device_uid, device_uid, sizeof(last_device_uid));
         }
         
-        // Get and display full AIO device name only if detected
+        // Get and display full LCD device name only if detected
         char device_name[128] = {0};
-        if (get_aio_device_name(device_name, sizeof(device_name))) {
+        if (get_device_name(device_name, sizeof(device_name))) {
             printf("CoolerControl: Connected to %s\n", device_name);
         } else {
             printf("CoolerControl: Connected to Unknow LCD device\n");
@@ -385,7 +389,10 @@ int main(int argc, char *argv[]) {
         fflush(stderr);
         return 1;
     }
-    
+    if (!init_cached_device_uid()) {
+        fprintf(stderr, "CoolerDash: Failed to detect LCD device UID\n");
+        return 1;
+    }
     printf("All modules successfully initialized!\n\n");
     fflush(stdout);
     
@@ -394,17 +401,16 @@ int main(int argc, char *argv[]) {
     
     // Cleanup - send shutdown image if not sent yet (only on normal termination)
     if (!shutdown_sent && is_session_initialized()) {
-        const char* shutdown_image = "/opt/coolerdash/images/face.png";
-        const char* device_uuid = get_cached_uuid();
-        
+        const char* shutdown_image = SHUTDOWN_IMAGE_PATH;
+        const char* device_uid = get_cached_device_uid();
         printf("CoolerDash: Sending final shutdown image...\n");
         fflush(stdout);
-        
-        if (device_uuid && send_image_to_lcd(shutdown_image, device_uuid)) {
+        if (device_uid[0]) {
+            send_image_to_lcd(shutdown_image, device_uid);
+            send_image_to_lcd(shutdown_image, device_uid);
             printf("CoolerDash: Final shutdown image sent successfully\n");
         } else {
-            printf("CoolerDash: Warning - Could not send final shutdown image%s\n",
-                   device_uuid ? "" : " (device UUID not detected)");
+            printf("CoolerDash: Warning - Could not send final shutdown image (device UID not detected)\n");
         }
         fflush(stdout);
     }

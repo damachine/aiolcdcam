@@ -1,3 +1,19 @@
+/**
+ * @file cpu_monitor.c
+ * @brief CPU temperature and usage monitoring implementation for CoolerDash.
+ *
+ * Coding Standards (C99, ISO/IEC 9899:1999):
+ * - All code comments in English.
+ * - Doxygen-style comments for all functions (description, @brief, @param, @return, examples).
+ * - Opening braces on the same line (K&R style).
+ * - Always check return values of malloc(), calloc(), realloc().
+ * - Free all dynamically allocated memory and set pointers to NULL after freeing.
+ * - Use include guards in all headers.
+ * - Include only necessary headers, system headers before local headers.
+ * - Function names are verbs, use snake_case for functions/variables, UPPER_CASE for macros, PascalCase for typedef structs.
+ * - Use descriptive names, avoid abbreviations.
+ * - Document complex algorithms and data structures.
+ */
 #include "../include/cpu_monitor.h"
 #include "../include/config.h"
 #include <stdio.h>
@@ -27,16 +43,19 @@ void init_cpu_sensor_path(void) {
     struct dirent *entry;
     char label_path[512], label[64];
     
+    // Scan through hwmon directory entries
     while ((entry = readdir(dir)) != NULL) {
-        if (entry->d_name[0] == '.') continue;
+        if (entry->d_name[0] == '.') continue; // Skip hidden files/directories
         
+        // Check each possible temp label for the current hwmon entry
         for (int i = 1; i <= 9; ++i) {
             snprintf(label_path, sizeof(label_path), HWMON_PATH"/%s/temp%d_label", entry->d_name, i);
             FILE *flabel = fopen(label_path, "r");
             if (!flabel) continue;
             
+            // Read the label and check if it matches "Package id 0"
             if (fgets(label, sizeof(label), flabel)) {
-                // Cache CPU temperature path
+                // Cache CPU temperature path for later use
                 if (strstr(label, "Package id 0") && strlen(cpu_temp_path) == 0) {
                     snprintf(cpu_temp_path, sizeof(cpu_temp_path), HWMON_PATH"/%s/temp%d_input", entry->d_name, i);
                     fclose(flabel);
@@ -70,6 +89,7 @@ float read_cpu_temp(void) {
     
     int t = 0;
     float temp = 0.0f;
+    // Read the integer temperature value, convert to float
     if (fscanf(finput, "%d", &t) == 1) {
         temp = t > 200 ? t / 1000.0f : (float)t;
     }
@@ -107,6 +127,7 @@ int get_cpu_stat(cpu_stat_t *stat) {
     fclose(fstat);
     
     if (result == 8) {
+        // Calculate total and idle time for CPU
         stat->idle = idle_val + iowait;
         stat->total = stat->idle + user + nice + system + irq + softirq + steal;
         return 1;
@@ -163,6 +184,7 @@ float get_ram_usage(void) {
     char line[128];
     int found = 0;
     
+    // Read and parse relevant lines from /proc/meminfo
     while (fgets(line, sizeof(line), fmem) && found < 4) {
         if (sscanf(line, "MemTotal: %ld", &mem_total) == 1) found++;
         else if (sscanf(line, "MemFree: %ld", &mem_free) == 1) found++;

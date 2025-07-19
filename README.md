@@ -8,9 +8,9 @@
 
 ## 📖 Description
 
-**Take full control of your AIO liquid cooling system with integrated LCD display to monitor real-time sensor data in style.**
+**Take full control of your liquid cooling system with integrated LCD display to monitor real-time sensor data in style.**
 
-This system daemon empowers you to harness the potential of your LCD-equipped AIO liquid coolers. Display comprehensive system monitoring data including CPU and GPU temperatures directly on your LCD screen through seamless CoolerControl API integration.
+This system daemon empowers you to harness the potential of your LCD-equipped liquid coolers. Display comprehensive system monitoring data including CPU and GPU temperatures directly on your LCD screen through seamless CoolerControl API integration.
 
 Transform your cooling system into an intelligent monitoring hub that keeps you informed about your system's vital signs at a glance.
 
@@ -27,15 +27,14 @@ Transform your cooling system into an intelligent monitoring hub that keeps you 
 Right: AI-generated image to demonstrate LCD output*
 
 **👨‍💻 Author:** DAMACHINE ([christkue79@gmail.com](mailto:christkue79@gmail.com))  
-**🧪 Tested with:** NZXT AIO Kraken 2023 (Z-Series) - Developer's personal system  
-**🔗 Compatible:** NZXT AIO Kraken X-Series, Z-Series and other LCD-capable models *(theoretical)*
+**🧪 Tested with:** NZXT Kraken 2023 (Z-Series) - Developer's personal system  
+**🔗 Compatible:** NZXT Kraken X-Series, Z-Series and other LCD-capable models *(theoretical)*
 
 ## ✨ Features
 
 - **🏗️ Modular Architecture**: Separation of CPU, GPU, coolant, and display logic into separate modules
 - **⚡ Performance-Optimized**: Caching, change detection, minimal I/O operations
-- **🔧 Automatic Device Detection**: Runtime UUID detection with persistent caching - no manual configuration required
-- **💾 Smart UUID Caching**: First-run detection saves to `/var/cache/coolerdash/device.uuid` for instant subsequent startups
+- **🔧 Automatic Device Detection**: Runtime UID detection.
 - **🎨 Display Modes (legacy)**: The program currently always runs in a fixed two-box layout (CPU/GPU temperature only). Mode selection is not available in this version. Support for selectable display modes (e.g. load bars, circular diagrams) may be reintroduced in a future version if there is sufficient demand.
 - **🌐 Native CoolerControl Integration**: REST API communication without Python dependencies
 - **📊 Efficient Sensor Polling**: Only necessary sensor data is queried (no mode logic)
@@ -56,15 +55,15 @@ Right: AI-generated image to demonstrate LCD output*
 
 1. **Install CoolerControl**: [Installation Guide](https://gitlab.com/coolercontrol/coolercontrol/-/blob/main/README.md)
 2. **Start CoolerControl daemon**: `sudo systemctl start coolercontrold`
-3. **Configure your LCD AIO** in CoolerControl GUI
-4. **Set LCD to Image mode**: In CoolerControl GUI, set your AIO LCD display to "Image" mode
+3. **Configure your LCD** in CoolerControl GUI
+4. **Set LCD to Image mode**: In CoolerControl GUI, set your LCD display to "Image" mode
 
 ### System Requirements
 
 - **OS**: Linux (hwmon support required)
 - **CoolerControl**: Version 1.0+ (REQUIRED - must be installed and running)
 - **CPU**: x86-64-v3 compatible (Intel Haswell+ 2013+ / AMD Excavator+ 2015+)
-- **LCD**: LCD AIO displays supported by CoolerControl (Asus, NZXT, etc.)
+- **LCD**: LCD displays supported by CoolerControl (Asus, NZXT, etc.)
 - **Resources**: < 4 MB RAM, < 1-2% CPU load
 
 **For older CPUs**: Use `CFLAGS=-march=x86-64 make` for compatibility
@@ -100,7 +99,7 @@ git clone https://github.com/damachine/coolerdash.git
 cd coolerdash
 
 # STEP 2: Start CoolerControl daemon
-# The AIO device UUID is now automatically detected at runtime and cached!
+# The LCD device UID is now automatically detected at runtime and cached!
 sudo systemctl start coolercontrold
 
 # STEP 3: Build and install (auto-detects Linux distribution and installs dependencies)
@@ -113,9 +112,6 @@ sudo systemctl enable --now coolerdash.service
 sudo systemctl status coolerdash.service
 journalctl -xeu coolerdash.service
 ```
-
-> **Note:**  
-> When starting `coolerdash` as a systemd service, there is a default delay of up to 10 seconds before the service is marked as "active". This is due to systemd's startup and dependency handling. The LCD image may also appear with a short delay on first start, as CoolerDash waits for the CoolerControl daemon and device detection to complete.
 
 ### Manual Usage 
 
@@ -163,10 +159,7 @@ Below are the most important values you can adjust in `include/config.h` before 
 
 The daemon will:
 1. **Connect to CoolerControl** daemon at startup
-2. **Load cached UUID** from `/var/cache/coolerdash/device.uuid` (if available)
-3. **Validate cached UUID** against current device list
-4. **Auto-detect new UUID** if cache is invalid or missing
-5. **Save detected UUID** to cache for future startups
+4. **Auto-detect new UID** if cache is invalid or missing
 6. **Display the active device** in the startup logs
 
 **For troubleshooting**, you can manually check devices:
@@ -191,7 +184,7 @@ curl http://localhost:11987/devices | jq
         "unknown_asetek": false
       }
 ```
-> **💡 Note**: The daemon automatically finds and uses AIO devices with LCD capability.
+> **💡 Note**: The daemon automatically finds and uses devices with LCD capability.
 
 ### Performance Notes
 
@@ -205,9 +198,21 @@ curl http://localhost:11987/devices | jq
 
 - **"Image send fails on first attempt"**: Occasionally, on launch, the CoolerControl daemon may return an error when sending the image to the device. This is usually a transient issue—on the next update cycle, the image will be sent successfully and appear on the LCD. No user action  is required.
 - **"Connection refused"**: CoolerControl daemon not running → `sudo systemctl start coolercontrold`
-- **"Device not found"**: LCD AIO not configured in CoolerControl → Use CoolerControl GUI  
-- **"Empty JSON response"**: No devices found → Check CoolerControl configuration and LCD AIO connection
-- **"UUID not working"**: Wrong device UUID → Verify with `curl http://localhost:11987/devices | jq` and copy exact UUID
+- **"Device not found"**: LCD not configured in CoolerControl → Use CoolerControl GUI  
+- **"Empty JSON response"**: No devices found → Check CoolerControl configuration and LCD connection
+- **"UID not working"**: Wrong device UID → Verify with `curl http://localhost:11987/devices | jq` and copy exact UID
+- **"Segmentation fault or assertion error in coolercontrol-liqctld"**:  
+  If you see errors like  
+  ```
+  AssertionError: missing messages (attempts=12, missing=1)
+
+  or a segmentation fault in the `coolercontrol-liqctld` service.
+  ```
+
+  **Solution:**  
+  - In most cases, this error can be ignored: CoolerDash will send the image again on the next update cycle and it will appear on the LCD automatically.
+
+> If you encounter persistent segmentation faults or assertion errors in the CoolerControl backend, please report them upstream at [CoolerControl GitLab](https://gitlab.com/coolercontrol/coolercontrol/-/issues) with detailed logs.
 
 ## Troubleshooting: Manual Installation Conflicts
 If you see errors like "conflicting files" or "manual installation detected" during `makepkg -si`, this means CoolerDash was previously installed manually (via `make install`).

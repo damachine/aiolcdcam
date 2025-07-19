@@ -154,3 +154,19 @@ The PKGBUILD now includes intelligent conflict detection:
 - A symlink in `/usr/bin/coolerdash` provides system-wide access
 - Source code is included for post-installation UUID configuration
 - The package properly handles systemd service management and cleanup
+
+## Images
+
+- `shutdown.png`: The image displayed on the LCD when the service is stopped or shut down. The path is configurable via the `SHUTDOWN_IMAGE_PATH` macro in `config.h`.
+- `coolerdash.png`: The main sensor/status image, created at runtime.
+
+## Installation
+
+- Installs to `/opt/coolerdash/bin/` and `/opt/coolerdash/images/`.
+- No cache directories or UID files are created or used.
+- The shutdown image is always `/opt/coolerdash/images/shutdown.png` (configurable in code).
+
+## Uninstallation
+
+- Removes all files from `/opt/coolerdash/` and disables the service.
+- No cache or UID files remain after uninstall.

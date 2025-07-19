@@ -21,9 +21,9 @@ plain '      \___)=(___/ '
 plain ' '
 
 pkgname=coolerdash
-pkgver=0.25.07.19.1
+pkgver=0.25.07.19.2
 pkgrel=1
-pkgdesc="CoolerDash a Wrapper for LCD Device Image Control in CoolerControl. To take full control of your AIO liquid cooling system with integrated LCD display to monitor real-time sensor data in style."
+pkgdesc="CoolerDash a Wrapper for LCD Device Image Control in CoolerControl. To take full control of your liquid cooling system with integrated LCD display to monitor real-time sensor data in style."
 arch=('x86_64')
 url="https://github.com/damachine/coolerdash"
 license=('MIT')
@@ -94,9 +94,6 @@ prepare() {
                 sudo rm -f /opt/coolerdash/CHANGELOG.md
                 sudo rm -rf /opt/coolerdash/images/
                 sudo rm -rf /opt/coolerdash/
-                sudo rm -rf /var/cache/coolerdash/
-                sudo rm -f /usr/bin/coolerdash 2>/dev/null || true
-                sudo systemctl daemon-reload
                 # All files and images are removed above; no need for extra image cleanup
                 echo "✅ Complete manual cleanup completed"
             fi
@@ -114,7 +111,6 @@ prepare() {
             sudo rm -f /opt/coolerdash/CHANGELOG.md
             sudo rm -rf /opt/coolerdash/images/
             sudo rm -rf /opt/coolerdash/
-            sudo rm -rf /var/cache/coolerdash/
             sudo rm -f /usr/bin/coolerdash 2>/dev/null || true
             sudo systemctl daemon-reload
             
@@ -161,40 +157,14 @@ check() {
 }
 
 package() {
-    cd "$startdir"
-    
-    # Create directory structure
-    install -dm755 "$pkgdir/opt/coolerdash/bin"
-    install -dm755 "$pkgdir/opt/coolerdash/images"
-    install -dm755 "$pkgdir/usr/lib/systemd/system"
-    install -dm755 "$pkgdir/usr/share/man/man1"
-    install -dm755 "$pkgdir/usr/bin"
-    install -dm755 "$pkgdir/var/cache/coolerdash"
-    
-    # Install binary
-    install -Dm755 "bin/coolerdash" "$pkgdir/opt/coolerdash/bin/coolerdash"
-    
-    # Install default image
-    if [[ -f "images/face.png" ]]; then
-        install -Dm644 "images/face.png" "$pkgdir/opt/coolerdash/images/face.png"
-    fi
-    
-    # Install coolerdash sensor image
-    if [[ -f "images/coolerdash.png" ]]; then
-        install -Dm644 "images/coolerdash.png" "$pkgdir/opt/coolerdash/images/coolerdash.png"
-    fi
-    
-    # Install systemd service
-    install -Dm644 "systemd/coolerdash.service" "$pkgdir/usr/lib/systemd/system/coolerdash.service"
-    
-    # Install man page
-    install -Dm644 "man/coolerdash.1" "$pkgdir/usr/share/man/man1/coolerdash.1"
-    
-    # Install documentation
-    install -Dm644 README.md "$pkgdir/opt/coolerdash/README.md"
-    install -Dm644 LICENSE "$pkgdir/opt/coolerdash/LICENSE"
-    install -Dm644 CHANGELOG.md "$pkgdir/opt/coolerdash/CHANGELOG.md"
-    
-    # Create symlink for system-wide access
-    ln -sf "/opt/coolerdash/bin/coolerdash" "$pkgdir/usr/bin/coolerdash"
+  install -dm755 "$pkgdir/opt/coolerdash/bin"
+  install -Dm755 "$srcdir/bin/coolerdash" "$pkgdir/opt/coolerdash/bin/coolerdash"
+  install -dm755 "$pkgdir/opt/coolerdash/images"
+  install -Dm644 "$srcdir/images/shutdown.png" "$pkgdir/opt/coolerdash/images/shutdown.png"
+  install -Dm644 "$srcdir/images/coolerdash.png" "$pkgdir/opt/coolerdash/images/coolerdash.png"
+  install -Dm644 "$srcdir/README.md" "$pkgdir/opt/coolerdash/README.md"
+  install -Dm644 "$srcdir/LICENSE" "$pkgdir/opt/coolerdash/LICENSE"
+  install -Dm644 "$srcdir/CHANGELOG.md" "$pkgdir/opt/coolerdash/CHANGELOG.md"
+  install -Dm644 "$srcdir/systemd/coolerdash.service" "$pkgdir/etc/systemd/system/coolerdash.service"
+  install -Dm644 "$srcdir/man/coolerdash.1" "$pkgdir/usr/share/man/man1/coolerdash.1"
 }

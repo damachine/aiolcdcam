@@ -41,8 +41,8 @@ BINDIR = bin
 
 # Source code files
 MAIN_SOURCE = $(SRCDIR)/main.c
-MODULES = $(SRCDIR)/cpu_monitor.c $(SRCDIR)/gpu_monitor.c $(SRCDIR)/coolant_monitor.c $(SRCDIR)/display.c $(SRCDIR)/coolercontrol.c
-HEADERS = $(INCDIR)/config.h $(INCDIR)/cpu_monitor.h $(INCDIR)/gpu_monitor.h $(INCDIR)/coolant_monitor.h $(INCDIR)/display.h $(INCDIR)/coolercontrol.h
+MODULES = $(SRCDIR)/cpu_monitor.c $(SRCDIR)/gpu_monitor.c $(SRCDIR)/display.c $(SRCDIR)/coolercontrol.c
+HEADERS = $(INCDIR)/config.h $(INCDIR)/cpu_monitor.h $(INCDIR)/gpu_monitor.h $(INCDIR)/display.h $(INCDIR)/coolercontrol.h
 OBJECTS = $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(MODULES))
 ALL_SOURCES = $(MAIN_SOURCE) $(MODULES)
 
@@ -245,16 +245,15 @@ install: check-deps-for-install $(TARGET)
 	@printf "$(ICON_INFO) $(CYAN)Creating directories...$(RESET)\n"
 	sudo mkdir -p /opt/coolerdash/bin
 	sudo mkdir -p /opt/coolerdash/images
-	sudo mkdir -p /var/cache/coolerdash
 	@printf "$(ICON_SUCCESS) $(GREEN)Directories created$(RESET)\n"
 	@printf "\n"
 	@printf "$(ICON_INFO) $(CYAN)Copying files...$(RESET)\n"
 	sudo cp $(BINDIR)/$(TARGET) /opt/coolerdash/bin/
 	sudo chmod +x /opt/coolerdash/bin/$(TARGET)
-	sudo cp images/face.png /opt/coolerdash/images/
+	sudo cp images/shutdown.png /opt/coolerdash/images/
 	sudo cp $(README) /opt/coolerdash/
 	@printf "  $(GREEN)→$(RESET) Program: /opt/coolerdash/bin/$(TARGET)\n"
-	@printf "  $(GREEN)→$(RESET) Shutdown image: /opt/coolerdash/images/face.png\n"
+	@printf "  $(GREEN)→$(RESET) Shutdown image: /opt/coolerdash/images/shutdown.png\n"
 	@printf "  $(GREEN)→$(RESET) Sensor image: will be created at runtime as coolerdash.png\n"
 	@printf "  $(GREEN)→$(RESET) README: /opt/coolerdash/README.md\n"
 	@printf "\n"
@@ -312,7 +311,6 @@ uninstall:
 	sudo rm -rf /opt/coolerdash/bin/
 	sudo rm -rf /opt/coolerdash/images/
 	sudo rm -rf /opt/coolerdash/
-	sudo rm -rf /var/cache/coolerdash/
 	sudo rm -f /usr/bin/coolerdash 2>/dev/null || true
 	sudo rm -f /var/run/coolerdash.pid 2>/dev/null || true
 	# Remove any remaining files in /opt/coolerdash (catch-all, safe if dir already gone)
@@ -323,7 +321,6 @@ uninstall:
 	@printf "  $(RED)✗$(RESET) Documentation: /opt/coolerdash/README.md, LICENSE, CHANGELOG.md\n"
 	@printf "  $(RED)✗$(RESET) Images: /opt/coolerdash/images/\n"
 	@printf "  $(RED)✗$(RESET) Installation: /opt/coolerdash/\n"
-	@printf "  $(RED)✗$(RESET) Cache: /var/cache/coolerdash/\n"
 	@printf "  $(RED)✗$(RESET) Symlink: /usr/bin/coolerdash\n"
 	@printf "\n"
 	@printf "$(ICON_INFO) $(CYAN)Updating system...$(RESET)\n"
@@ -393,14 +390,14 @@ help:
 	@printf "\n"
 	@printf "$(YELLOW)⚙️  Service Management:$(RESET)\n"
 	@printf "  $(GREEN)sudo systemctl start coolerdash.service$(RESET)    - Starts the service\n"
-	@printf "  $(GREEN)sudo systemctl stop coolerdash.service$(RESET)     - Stops the service (sends face.png to LCD automatically)\n"
+	@printf "  $(GREEN)sudo systemctl stop coolerdash.service$(RESET)     - Stops the service (sends shutdown.png to LCD automatically)\n"
 	@printf "  $(GREEN)sudo systemctl restart coolerdash.service$(RESET)  - Restarts the service\n"
 	@printf "  $(GREEN)sudo systemctl status coolerdash.service$(RESET)   - Shows service status\n"
 	@printf "  $(GREEN)sudo systemctl enable coolerdash.service$(RESET)   - Enables autostart\n"
 	@printf "  $(GREEN)sudo systemctl disable coolerdash.service$(RESET)  - Disables autostart\n"
 	@printf "  $(GREEN)sudo journalctl -u coolerdash.service -f$(RESET)   - Shows live logs\n"
 	@printf "  $(BLUE)Note:$(RESET) Shortcuts available: make start/stop/restart/status/enable/disable/logs\n"
-	@printf "  $(BLUE)Shutdown:$(RESET) Service automatically displays face.png when stopped (integrated in C code)\n"
+	@printf "  $(BLUE)Shutdown:$(RESET) Service automatically displays shutdown.png when stopped (integrated in C code)\n"
 	@printf "\n"
 	@printf "$(YELLOW)📚 Documentation:$(RESET)\n"
 	@printf "  $(GREEN)man coolerdash$(RESET) - Shows manual page\n"

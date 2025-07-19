@@ -1,3 +1,19 @@
+/**
+ * @file display.c
+ * @brief LCD rendering and image upload for CoolerDash.
+ *
+ * Coding Standards (C99, ISO/IEC 9899:1999):
+ * - All code comments in English.
+ * - Doxygen-style comments for all functions (description, @brief, @param, @return, examples).
+ * - Opening braces on the same line (K&R style).
+ * - Always check return values of malloc(), calloc(), realloc().
+ * - Free all dynamically allocated memory and set pointers to NULL after freeing.
+ * - Use include guards in all headers.
+ * - Include only necessary headers, system headers before local headers.
+ * - Function names are verbs, use snake_case for functions/variables, UPPER_CASE for macros, PascalCase for typedef structs.
+ * - Use descriptive names, avoid abbreviations.
+ * - Document complex algorithms and data structures.
+ */
 #include "../include/display.h"
 #include "../include/config.h"
 #include "../include/coolercontrol.h"
@@ -8,6 +24,7 @@
 #include <sys/stat.h>
 #include <math.h>
 #include <stdio.h>
+#include <unistd.h>
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -112,11 +129,10 @@ int render_display(const sensor_data_t *data) {
         success = 1;
 
         if (is_session_initialized()) {
-            const char* device_uuid = get_cached_uuid();
-            if (device_uuid) {
-                // Workaround: send image twice to avoid LCD artifacts
-                send_image_to_lcd(IMAGE_PATH, device_uuid);
-                send_image_to_lcd(IMAGE_PATH, device_uuid);
+            const char* device_uid = get_cached_device_uid();
+            if (device_uid[0]) {
+                send_image_to_lcd(IMAGE_PATH, device_uid);
+                send_image_to_lcd(IMAGE_PATH, device_uid);
             }
         }
     }

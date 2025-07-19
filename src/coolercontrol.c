@@ -1,3 +1,19 @@
+/**
+ * @file coolercontrol.c
+ * @brief CoolerControl API implementation for LCD device communication.
+ *
+ * Coding Standards (C99, ISO/IEC 9899:1999):
+ * - All code comments in English.
+ * - Doxygen-style comments for all functions (description, @brief, @param, @return, examples).
+ * - Opening braces on the same line (K&R style).
+ * - Always check return values of malloc(), calloc(), realloc().
+ * - Free all dynamically allocated memory and set pointers to NULL after freeing.
+ * - Use include guards in all headers.
+ * - Include only necessary headers, system headers before local headers.
+ * - Function names are verbs, use snake_case for functions/variables, UPPER_CASE for macros, PascalCase for typedef structs.
+ * - Use descriptive names, avoid abbreviations.
+ * - Document complex algorithms and data structures.
+ */
 #include "../include/coolercontrol.h"
 #include "../include/config.h"
 #include <curl/curl.h>
@@ -22,13 +38,8 @@ int send_image_to_lcd(const char* image_path, const char* device_uid);
 int upload_image_to_device(const char* image_path, const char* device_uid);
 void cleanup_coolercontrol_session(void);
 int is_session_initialized(void);
-int get_aio_device_name(char* name_buffer, size_t buffer_size);
-int get_aio_device_uuid(char* uuid_buffer, size_t buffer_size);
-const char* get_cached_uuid(void);
-int load_cached_uuid(void);
-int save_cached_uuid(const char* uuid);
-int validate_cached_uuid(const char* uuid);
-void clear_uuid_cache(void);
+int get_device_name(char* name_buffer, size_t buffer_size);
+int get_device_uid(char* uid_buffer, size_t buffer_size);
 
 // =====================
 // INTERNE HILFSFUNKTIONEN
@@ -72,11 +83,9 @@ static size_t write_callback(void *contents, size_t size, size_t nmemb, struct h
 static CURL *curl_handle = NULL;
 static char cookie_jar[256] = {0};
 static int session_initialized = 0;
-static char cached_aio_uuid[128] = {0};  // Cache for detected AIO UUID
 
-// UUID cache file path
-#define UUID_CACHE_DIR "/var/cache/coolerdash"
-#define UUID_CACHE_FILE "/var/cache/coolerdash/device.uuid"
+// Global cached UID for LCD device
+static char cached_device_uid[128] = {0};
 
 /**
  * @brief Initializes cURL and authenticates with the CoolerControl daemon.
@@ -98,7 +107,7 @@ int init_coolercontrol_session(void) {
     if (!curl_handle) return 0;
     
     // Cookie jar for session management
-    snprintf(cookie_jar, sizeof(cookie_jar), "/tmp/aio_cookie_%d.txt", getpid());
+    snprintf(cookie_jar, sizeof(cookie_jar), "/tmp/lcd_cookie_%d.txt", getpid());
     curl_easy_setopt(curl_handle, CURLOPT_COOKIEJAR, cookie_jar);
     curl_easy_setopt(curl_handle, CURLOPT_COOKIEFILE, cookie_jar);
     
@@ -131,7 +140,7 @@ int init_coolercontrol_session(void) {
 /**
  * @brief Sends an image directly to the LCD of the CoolerControl device.
  *
- * Uploads an image to the AIO LCD display using a multipart HTTP PUT request.
+ * Uploads an image to the LCD display using a multipart HTTP PUT request.
  *
  * @param image_path Path to the image
  * @param device_uid Device UID
@@ -139,7 +148,7 @@ int init_coolercontrol_session(void) {
  *
  * Example:
  * @code
- * send_image_to_lcd("/opt/coolerdash/images/coolerdash.png", uuid);
+ * send_image_to_lcd("/opt/coolerdash/images/coolerdash.png", uid);
  * @endcode
  */
 int send_image_to_lcd(const char* image_path, const char* device_uid) {
@@ -218,7 +227,7 @@ int send_image_to_lcd(const char* image_path, const char* device_uid) {
  *
  * Example:
  * @code
- * upload_image_to_device("/opt/coolerdash/images/coolerdash.png", uuid);
+ * upload_image_to_device("/opt/coolerdash/images/coolerdash.png", uid);
  * @endcode
  */
 int upload_image_to_device(const char* image_path, const char* device_uid) {
@@ -270,21 +279,21 @@ int is_session_initialized(void) {
 }
 
 /**
- * @brief Parses the first Liquidctl AIO device and extracts name and/or uuid.
+ * @brief Parses the first Liquidctl device and extracts name and/or uid.
  *
  * @param name_buffer Buffer for the device name (can be NULL if not needed)
  * @param name_size Size of the name buffer
- * @param uuid_buffer Buffer for the device UUID (can be NULL if not needed)
- * @param uuid_size Size of the uuid buffer
+ * @param uid_buffer Buffer for the device UID (can be NULL if not needed)
+ * @param uid_size Size of the uid buffer
  * @return 1 on success, 0 on error
  *
  * Example:
  * @code
- * char name[128], uuid[128];
- * parse_aio_device_fields(name, sizeof(name), uuid, sizeof(uuid));
+ * char name[128], uid[128];
+ * parse_device_fields(name, sizeof(name), uid, sizeof(uid));
  * @endcode
  */
-static int parse_aio_device_fields(char* name_buffer, size_t name_size, char* uuid_buffer, size_t uuid_size) {
+static int parse_device_fields(char* name_buffer, size_t name_size, char* uid_buffer, size_t uid_size) {
     // Initialize response buffer
     struct http_response response = {0};
     response.data = malloc(1);
@@ -341,17 +350,17 @@ static int parse_aio_device_fields(char* name_buffer, size_t name_size, char* uu
                             }
                         }
                     }
-                    // Extract uuid if requested
-                    if (uuid_buffer && uuid_size > 0) {
+                    // Extract uid if requested
+                    if (uid_buffer && uid_size > 0) {
                         char *uid_pos = strstr(device_section, "\"uid\":\"");
                         if (uid_pos) {
                             uid_pos += 7;
                             char *uid_end = strchr(uid_pos, '"');
                             if (uid_end) {
                                 size_t uid_length = uid_end - uid_pos;
-                                if (uid_length < uuid_size) {
-                                    strncpy(uuid_buffer, uid_pos, uid_length);
-                                    uuid_buffer[uid_length] = '\0';
+                                if (uid_length < uid_size) {
+                                    strncpy(uid_buffer, uid_pos, uid_length);
+                                    uid_buffer[uid_length] = '\0';
                                     found = 1;
                                 }
                             }
@@ -372,7 +381,7 @@ static int parse_aio_device_fields(char* name_buffer, size_t name_size, char* uu
 }
 
 /**
- * @brief Retrieves the full name of the AIO LCD device.
+ * @brief Retrieves the full name of the LCD device.
  *
  * Queries the CoolerControl API for the device name and writes it to the provided buffer.
  *
@@ -383,242 +392,69 @@ static int parse_aio_device_fields(char* name_buffer, size_t name_size, char* uu
  * Example:
  * @code
  * char name[128];
- * if (get_aio_device_name(name, sizeof(name))) {
+ * if (get_device_name(name, sizeof(name))) {
  *     // use name
  * }
  * @endcode
  */
-int get_aio_device_name(char* name_buffer, size_t buffer_size) {
+int get_device_name(char* name_buffer, size_t buffer_size) {
     if (!curl_handle || !name_buffer || buffer_size == 0 || !session_initialized) return 0;
-    return parse_aio_device_fields(name_buffer, buffer_size, NULL, 0);
+    return parse_device_fields(name_buffer, buffer_size, NULL, 0);
 }
 
 /**
- * @brief Retrieves the UUID of the first AIO LCD device found.
+ * @brief Retrieves the UID of the first LCD device found.
  *
- * Queries the CoolerControl API for the device UUID and writes it to the provided buffer.
+ * Queries the CoolerControl API for the device UID and writes it to the provided buffer.
  *
- * @param uuid_buffer Buffer for the device UUID
+ * @param uid_buffer Buffer for the device UID
  * @param buffer_size Size of the buffer
  * @return 1 on success, 0 on error
  *
  * Example:
  * @code
- * char uuid[128];
- * if (get_aio_device_uuid(uuid, sizeof(uuid))) {
- *     // use uuid
+ * char uid[128];
+ * if (get_device_uid(uid, sizeof(uid))) {
+ *     // use uid
  * }
  * @endcode
  */
-int get_aio_device_uuid(char* uuid_buffer, size_t buffer_size) {
-    if (!curl_handle || !uuid_buffer || buffer_size == 0 || !session_initialized) return 0;
-    return parse_aio_device_fields(NULL, 0, uuid_buffer, buffer_size);
+int get_device_uid(char* uid_buffer, size_t buffer_size) {
+    if (!curl_handle || !uid_buffer || buffer_size == 0 || !session_initialized) return 0;
+    return parse_device_fields(NULL, 0, uid_buffer, buffer_size);
 }
 
 /**
- * @brief Returns the cached AIO UUID (automatically detected at runtime).
+ * @brief Initialize and cache the device UID at program start.
  *
- * This function will attempt to detect the UUID on first call if not cached.
+ * This function must be called once after session initialization.
  *
- * @return Pointer to cached UUID string, or NULL on error
- *
- * Example:
- * @code
- * const char* uuid = get_cached_uuid();
- * if (uuid) {
- *     // use uuid
- * }
- * @endcode
- */
-const char* get_cached_uuid(void) {
-    // If already cached in memory, validate it first
-    if (cached_aio_uuid[0] != '\0') {
-        if (validate_cached_uuid(cached_aio_uuid)) {
-            return cached_aio_uuid;
-        } else {
-            // Invalid, clear it
-            cached_aio_uuid[0] = '\0';
-        }
-    }
-    
-    // Try to load from persistent cache
-    if (load_cached_uuid()) {
-        // Validate the loaded UUID
-        if (validate_cached_uuid(cached_aio_uuid)) {
-            return cached_aio_uuid;
-        } else {
-            // Invalid cached UUID, clear it
-            clear_uuid_cache();
-        }
-    }
-    
-    // No valid cache found, detect UUID from API
-    printf("No valid UUID cache found, detecting device...\n");
-    if (get_aio_device_uuid(cached_aio_uuid, sizeof(cached_aio_uuid))) {
-        // Save the newly detected UUID to cache
-        save_cached_uuid(cached_aio_uuid);
-        return cached_aio_uuid;
-    }
-    
-    return NULL;  // Detection failed
-}
-
-/**
- * @brief Loads cached UUID from persistent storage.
- *
- * @return 1 on success, 0 if no valid cache found
- *
- * Example:
- * @code
- * if (!load_cached_uuid()) {
- *     // no valid cache
- * }
- * @endcode
- */
-int load_cached_uuid(void) {
-    FILE *cache_file = fopen(UUID_CACHE_FILE, "r");
-    if (!cache_file) {
-        return 0;  // No cache file found
-    }
-    
-    char uuid_from_file[128] = {0};
-    if (fgets(uuid_from_file, sizeof(uuid_from_file), cache_file)) {
-        // Remove newline if present
-        size_t len = strlen(uuid_from_file);
-        if (len > 0 && uuid_from_file[len-1] == '\n') {
-            uuid_from_file[len-1] = '\0';
-        }
-        
-        // Validate UUID format (basic check)
-        if (len > 10 && len < 120) {  // Reasonable UUID length
-            strcpy(cached_aio_uuid, uuid_from_file);
-            fclose(cache_file);
-            printf("UUID loaded from cache: %s\n", cached_aio_uuid);
-            return 1;
-        }
-    }
-    
-    fclose(cache_file);
-    return 0;
-}
-
-/**
- * @brief Saves UUID to persistent cache file.
- *
- * @param uuid The UUID to cache
  * @return 1 on success, 0 on error
  *
  * Example:
  * @code
- * save_cached_uuid(uuid);
+ * if (!init_cached_device_uid()) { ... }
  * @endcode
  */
-int save_cached_uuid(const char* uuid) {
-    if (!uuid || strlen(uuid) == 0) {
+int init_cached_device_uid(void) {
+    if (!get_device_uid(cached_device_uid, sizeof(cached_device_uid)) || !cached_device_uid[0]) {
+        fprintf(stderr, "[CoolerDash] Error: Could not detect LCD device UID!\n");
         return 0;
     }
-    
-    // Create cache directory if it doesn't exist
-    struct stat st = {0};
-    if (stat(UUID_CACHE_DIR, &st) == -1) {
-        if (mkdir(UUID_CACHE_DIR, 0755) != 0) {
-            return 0;  // Cannot create directory
-        }
-    }
-    
-    FILE *cache_file = fopen(UUID_CACHE_FILE, "w");
-    if (!cache_file) {
-        return 0;  // Cannot create cache file
-    }
-    
-    if (fprintf(cache_file, "%s\n", uuid) > 0) {
-        fclose(cache_file);
-        printf("UUID saved to cache: %s\n", uuid);
-        return 1;
-    }
-    
-    fclose(cache_file);
-    return 0;
+    return 1;
 }
 
 /**
- * @brief Validates if a cached UUID is still valid by testing it with CoolerControl.
+ * @brief Get the cached device UID (read-only).
  *
- * @param uuid The UUID to validate
- * @return 1 if valid, 0 if invalid
- *
- * Example:
- * @code
- * if (!validate_cached_uuid(uuid)) {
- *     // uuid is invalid
- * }
- * @endcode
- */
-int validate_cached_uuid(const char* uuid) {
-    if (!uuid || !curl_handle || !session_initialized) {
-        return 0;
-    }
-    
-    // Test UUID by checking if it exists in the devices list
-    struct http_response response = {0};
-    response.data = malloc(1);
-    response.size = 0;
-    if (!response.data) return 0;
-    
-    curl_easy_setopt(curl_handle, CURLOPT_URL, DAEMON_ADDRESS "/devices");
-    curl_easy_setopt(curl_handle, CURLOPT_HTTPGET, 1L);
-    curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, write_callback);
-    curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, &response);
-    
-    CURLcode res = curl_easy_perform(curl_handle);
-    long response_code = 0;
-    curl_easy_getinfo(curl_handle, CURLINFO_RESPONSE_CODE, &response_code);
-    
-    // Reset cURL options
-    curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, NULL);
-    curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, NULL);
-    
-    int is_valid = 0;
-    if (res == CURLE_OK && response_code == 200 && response.data) {
-        // Check if UUID exists in the response
-        if (strstr(response.data, uuid) != NULL) {
-            is_valid = 1;
-        }
-    }
-    
-    if (response.data) {
-        free(response.data);
-        response.data = NULL;
-    }
-    
-    // Only log on error or UUID change
-    static char last_validated_uuid[128] = {0};
-    if (is_valid) {
-        if (strcmp(last_validated_uuid, uuid) != 0) {
-            printf("Cached UUID validated successfully: %s\n", uuid);
-            strncpy(last_validated_uuid, uuid, sizeof(last_validated_uuid) - 1);
-            last_validated_uuid[sizeof(last_validated_uuid) - 1] = '\0';
-        }
-        // No log output if UUID is valid and unchanged
-    } else {
-        printf("Cached UUID is invalid, will re-detect: %s\n", uuid);
-    }
-    
-    return is_valid;
-}
-
-/**
- * @brief Clears the UUID cache (both memory and file).
- *
- * @return void
+ * @return Pointer to cached UID string (empty string if not initialized)
  *
  * Example:
  * @code
- * clear_uuid_cache();
+ * const char* uid = get_cached_device_uid();
+ * if (uid[0]) { ... }
  * @endcode
  */
-void clear_uuid_cache(void) {
-    cached_aio_uuid[0] = '\0';
-    unlink(UUID_CACHE_FILE);
-    printf("UUID cache cleared\n");
+const char* get_cached_device_uid(void) {
+    return cached_device_uid;
 }
