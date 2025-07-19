@@ -51,13 +51,6 @@ Right: AI-generated image to demonstrate LCD output*
 
 ## 📦 Installation
 
-### Prerequisites
-
-1. **Install CoolerControl**: [Installation Guide](https://gitlab.com/coolercontrol/coolercontrol/-/blob/main/README.md)
-2. **Start CoolerControl daemon**: `sudo systemctl start coolercontrold`
-3. **Configure your LCD** in CoolerControl GUI
-4. **Set LCD mode**: In CoolerControl GUI, set your LCD display to **"NONE"** mode!
-
 ### System Requirements
 
 - **OS**: Linux (hwmon support required)
@@ -67,6 +60,13 @@ Right: AI-generated image to demonstrate LCD output*
 - **Resources**: < 4 MB RAM, < 1-2% CPU load
 
 **For older CPUs**: Use `CFLAGS=-march=x86-64 make` for compatibility
+
+### Prerequisites
+
+1. **Install CoolerControl**: [Installation Guide](https://gitlab.com/coolercontrol/coolercontrol/-/blob/main/README.md)
+2. **Start CoolerControl daemon**: `sudo systemctl start coolercontrold`
+3. **Configure your LCD** in CoolerControl GUI
+4. **Set LCD mode**: In CoolerControl GUI, set your LCD display to **"NONE"** mode!
 
 ### Install CoolerDash
 
