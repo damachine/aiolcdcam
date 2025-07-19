@@ -56,7 +56,7 @@
 #define FONT_SIZE_LABELS 28.0 // FONT_SIZE_LARGE * 0.25
 
 // LCD Display Settings
-#define LCD_BRIGHTNESS 80 // Default LCD brightness (0-100)
+#define LCD_BRIGHTNESS 100 // Default LCD brightness (0-100)
 #define LCD_ORIENTATION "0" // LCD orientation for image upload ("0"=default, "90"=rotated, "180"=flipped, "270"=rotated flipped)
 
 // Cache Settings

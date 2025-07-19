@@ -56,7 +56,7 @@ Right: AI-generated image to demonstrate LCD output*
 1. **Install CoolerControl**: [Installation Guide](https://gitlab.com/coolercontrol/coolercontrol/-/blob/main/README.md)
 2. **Start CoolerControl daemon**: `sudo systemctl start coolercontrold`
 3. **Configure your LCD** in CoolerControl GUI
-4. **Set LCD to Image mode**: In CoolerControl GUI, set your LCD display to "Image" mode
+4. **Set LCD mode**: In CoolerControl GUI, set your LCD display to **"NONE"** mode!
 
 ### System Requirements
 
@@ -98,8 +98,7 @@ journalctl -xeu coolerdash.service
 git clone https://github.com/damachine/coolerdash.git
 cd coolerdash
 
-# STEP 2: Start CoolerControl daemon
-# The LCD device UID is now automatically detected at runtime and cached!
+# STEP 2: Start CoolerControl daemon  if not already running
 sudo systemctl start coolercontrold
 
 # STEP 3: Build and install (auto-detects Linux distribution and installs dependencies)
@@ -196,12 +195,11 @@ curl http://localhost:11987/devices | jq
 
 ### Common Issues
 
-- **"Image send fails on first attempt"**: Occasionally, on launch, the CoolerControl daemon may return an error when sending the image to the device. This is usually a transient issue—on the next update cycle, the image will be sent successfully and appear on the LCD. No user action  is required.
 - **"Connection refused"**: CoolerControl daemon not running → `sudo systemctl start coolercontrold`
 - **"Device not found"**: LCD not configured in CoolerControl → Use CoolerControl GUI  
 - **"Empty JSON response"**: No devices found → Check CoolerControl configuration and LCD connection
 - **"UID not working"**: Wrong device UID → Verify with `curl http://localhost:11987/devices | jq` and copy exact UID
-- **"Segmentation fault or assertion error in coolercontrol-liqctld"**:  
+- **"Image send fails on attempt"** and **"Segmentation fault or assertion error in coolercontrol-liqctld"**:  
   If you see errors like  
   ```
   AssertionError: missing messages (attempts=12, missing=1)
@@ -209,8 +207,9 @@ curl http://localhost:11987/devices | jq
   or a segmentation fault in the `coolercontrol-liqctld` service.
   ```
 
-  **Solution:**  
-  - In most cases, this error can be ignored: CoolerDash will send the image again on the next update cycle and it will appear on the LCD automatically.
+  **Solution:** 
+  - In CoolerControl GUI, set your LCD display to **"NONE"** mode! 
+  - In most cases, this error can be ignored: CoolerDash will send the image again on the next update cycle and it will appear on the LCD automatically. 
 
 > If you encounter persistent segmentation faults or assertion errors in the CoolerControl backend, please report them upstream at [CoolerControl GitLab](https://gitlab.com/coolercontrol/coolercontrol/-/issues) with detailed logs.
 
