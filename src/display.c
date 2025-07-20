@@ -131,6 +131,7 @@ int render_display(const sensor_data_t *data) {
             const char* device_uid = get_cached_device_uid();
             if (device_uid[0]) {
                 send_image_to_lcd(IMAGE_PATH, device_uid);
+                send_image_to_lcd(IMAGE_PATH, device_uid);
             }
         }
     }

@@ -91,6 +91,7 @@ static void cleanup_and_exit(int sig) {
         fflush(stdout);
         if (device_uid[0]) {
             send_image_to_lcd(shutdown_image, device_uid);
+            send_image_to_lcd(shutdown_image, device_uid);
             printf("CoolerDash: Shutdown image sent successfully\n");
             shutdown_sent = 1; // set flag so it's only sent once
         } else {
@@ -405,6 +406,7 @@ int main(int argc, char *argv[]) {
         printf("CoolerDash: Sending final shutdown image...\n");
         fflush(stdout);
         if (device_uid[0]) {
+            send_image_to_lcd(shutdown_image, device_uid);
             send_image_to_lcd(shutdown_image, device_uid);
             printf("CoolerDash: Final shutdown image sent successfully\n");
         } else {
