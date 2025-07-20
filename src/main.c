@@ -252,7 +252,7 @@ static int run_daemon(void) {
     fflush(stdout);
     
     while (running) { // Main daemon loop
-        draw_combined_image(); // Draw combined image (default mode only)
+        draw_combined_image(); // Draw combined image
         struct timespec ts = {DISPLAY_REFRESH_INTERVAL_SEC, DISPLAY_REFRESH_INTERVAL_NSEC}; // Wait time for update
         nanosleep(&ts, NULL); // Wait for specified time
     }

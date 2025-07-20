@@ -61,8 +61,8 @@
 
 // Cache Settings
 #define GPU_CACHE_INTERVAL 2.5f // seconds (supports decimal values with millisecond precision)
-#define CHANGE_TOLERANCE_TEMP 0.1f // temperature change tolerance in degrees Celsius
-#define CHANGE_TOLERANCE_USAGE 0.5f // usage change tolerance in percent
+#define CHANGE_TOLERANCE_TEMP 1.0f // temperature change tolerance in degrees Celsius
+#define CHANGE_TOLERANCE_USAGE 1.0f // usage change tolerance in percent
 
 // Paths and Files
 #define HWMON_PATH "/sys/class/hwmon" // path to hardware monitors

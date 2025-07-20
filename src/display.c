@@ -340,7 +340,7 @@ static void draw_labels(cairo_t *cr) {
  * @endcode
  */
 static int should_update_display(const sensor_data_t *data) {
-    static sensor_data_t last_data = {.cpu_temp = 1.0f, .gpu_temp = 1.0f};
+    static sensor_data_t last_data = {.cpu_temp = -1.0f, .gpu_temp = -1.0f};
     static int first_run = 1;
     
     if (first_run) {
@@ -349,8 +349,9 @@ static int should_update_display(const sensor_data_t *data) {
         return 1;
     }
     // Check for significant changes (only CPU/GPU temperatures)
-    if (fabsf(data->cpu_temp - last_data.cpu_temp) > CHANGE_TOLERANCE_TEMP ||
-        fabsf(data->gpu_temp - last_data.gpu_temp) > CHANGE_TOLERANCE_TEMP) {
+    // Uses >= so that a change of exactly CHANGE_TOLERANCE_TEMP triggers an update
+    if (fabsf(data->cpu_temp - last_data.cpu_temp) >= CHANGE_TOLERANCE_TEMP ||
+        fabsf(data->gpu_temp - last_data.gpu_temp) >= CHANGE_TOLERANCE_TEMP) {
         last_data = *data;
         return 1;
     }

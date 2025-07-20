@@ -1,6 +1,14 @@
+[1m             .--.  (B[m
+[1m            |o_o | (B[m
+[1m            |:_/ | (B[m
+[1m           //   \ \ (B[m
+[1m          (|     | ) (B[m
+[1m         /'\_   _/'\ (B[m
+[1m          \___)=(___/ (B[m
+[1m     (B[m
 pkgbase = coolerdash
 	pkgdesc = CoolerDash a Wrapper for LCD Device Image Control in CoolerControl. To take full control of your liquid cooling system with integrated LCD display to monitor real-time sensor data in style.
-	pkgver = 0.25.07.18.2360
+	pkgver = 0.25.07.20.2
 	pkgrel = 1
 	url = https://github.com/damachine/coolerdash
 	install = coolerdash.install
@@ -9,14 +17,12 @@ pkgbase = coolerdash
 	makedepends = gcc
 	makedepends = make
 	makedepends = pkg-config
-	depends = ttf-roboto
+	makedepends = ttf-roboto
 	depends = cairo
 	depends = libcurl-gnutls
 	depends = coolercontrol
 	optdepends = nvidia-utils: for GPU temperature monitoring
 	optdepends = lm_sensors: for additional hardware monitoring
 	backup = opt/coolerdash/README.md
-	source = coolerdash-0.25.07.18.2360.tar.gz::https://github.com/damachine/coolerdash/releases/download/v0.25.07.19.2/coolerdash-0.25.07.19.2.tar.gz
-	sha256sums = 0019dfc4b32d63c1392aa264aed2253c1e0c2fb09216f8e2cc269bbfb8bb49b5
 
 pkgname = coolerdash
