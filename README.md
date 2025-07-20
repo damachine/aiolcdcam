@@ -140,6 +140,7 @@ Below are the most important values you can adjust in `include/config.h` before 
 | DISPLAY_WIDTH          | 240                   | LCD display width in pixels                                      |
 | DISPLAY_HEIGHT         | 240                   | LCD display height in pixels                                     |
 | DISPLAY_REFRESH_INTERVAL_SEC  | 2            | Display update interval (seconds)                                |
+| DISPLAY_REFRESH_INTERVAL_NSEC | 500000000             | Display update interval (nanoseconds, for sub-second refresh granularity) |
 | TEMP_THRESHOLD_GREEN   | 55.0f                 | Temperature for green color (°C)                                 |
 | TEMP_THRESHOLD_ORANGE  | 65.0f                 | Temperature for orange color (°C)                                |
 | TEMP_THRESHOLD_RED     | 75.0f                 | Temperature for red color (°C)                                   |
@@ -148,7 +149,7 @@ Below are the most important values you can adjust in `include/config.h` before 
 | FONT_SIZE_LARGE        | 98.0                  | Font size for temperature numbers                                |
 | FONT_SIZE_LABELS       | 28.0                  | Font size for labels ("CPU", "GPU")                             |
 | FONT_FACE              | "Roboto Black"        | Font used for all display text                                   |
-| LCD_BRIGHTNESS         | 80                    | LCD brightness (0-100)                                           |
+| LCD_BRIGHTNESS         | 100                   | LCD brightness (0-100)                                           |
 | LCD_ORIENTATION        | "0"                   | LCD orientation for image upload ("0"=default, "1"=rotated)      |
 | GPU_CACHE_INTERVAL     | 2.5f                  | GPU data cache interval (seconds)                                |
 | CHANGE_TOLERANCE_TEMP  | 0.1f                  | Minimum temperature change to trigger update (°C)                |
