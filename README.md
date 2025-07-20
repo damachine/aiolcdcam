@@ -140,7 +140,7 @@ Below are the most important values you can adjust in `include/config.h` before 
 | DISPLAY_WIDTH          | 240                   | LCD display width in pixels                                      |
 | DISPLAY_HEIGHT         | 240                   | LCD display height in pixels                                     |
 | DISPLAY_REFRESH_INTERVAL_SEC  | 2            | Display update interval (seconds)                                |
-| DISPLAY_REFRESH_INTERVAL_NSEC | 500000000             | Display update interval (nanoseconds, for sub-second refresh granularity) |
+| DISPLAY_REFRESH_INTERVAL_NSEC | 500000000             | Display update interval (nanoseconds, for sub-second refresh granularity, 500000000 ns = 0.5 seconds) |
 | TEMP_THRESHOLD_GREEN   | 55.0f                 | Temperature for green color (°C)                                 |
 | TEMP_THRESHOLD_ORANGE  | 65.0f                 | Temperature for orange color (°C)                                |
 | TEMP_THRESHOLD_RED     | 75.0f                 | Temperature for red color (°C)                                   |
