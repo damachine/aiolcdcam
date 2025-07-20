@@ -154,6 +154,7 @@ Below are the most important values you can adjust in `include/config.h` before 
 | GPU_CACHE_INTERVAL     | 2.5f                  | GPU data cache interval (seconds)                                |
 | CHANGE_TOLERANCE_TEMP  | 1.0f                  | Minimum temperature change to trigger update (°C)                |
 | IMAGE_PATH             | /dev/shm/coolerdash.png | Path to generated display image *(default; /dev/shm is a tmpfs in RAM for fast image access)*                |
+| SHUTDOWN_IMAGE_PATH    | /opt/coolerdash/images/shutdown.png | Path to shutdown image (displayed when service stops; you can change this path or imagee to use your own image) |
 
 > **Tip:** Edit these values in `include/config.h` before running `make` to change the look, update interval, thresholds, or LCD behavior to your needs.
 
