@@ -25,8 +25,8 @@
 # /usr/bin/coolerdash, /etc/systemd/system/coolerdash.service.
 # ================================
 
-# Version (Format: 0.year.month.day.commitcount)
-VERSION := 0.$(shell date +%y.%m.%d).$(shell git rev-list --count HEAD)
+# Version (read from VERSION file)
+VERSION := $(shell cat VERSION)
 
 CC = gcc
 CFLAGS = -Wall -Wextra -O2 -std=c99 -march=x86-64-v3 -Iinclude $(shell pkg-config --cflags cairo)
@@ -252,6 +252,7 @@ install: check-deps-for-install $(TARGET)
 	sudo chmod +x /opt/coolerdash/bin/$(TARGET)
 	sudo cp images/shutdown.png /opt/coolerdash/images/
 	sudo cp $(README) /opt/coolerdash/
+	sudo cp VERSION /opt/coolerdash/
 	@printf "  $(GREEN)→$(RESET) Program: /opt/coolerdash/bin/$(TARGET)\n"
 	@printf "  $(GREEN)→$(RESET) Shutdown image: /opt/coolerdash/images/shutdown.png\n"
 	@printf "  $(GREEN)→$(RESET) Sensor image: will be created at runtime as coolerdash.png\n"
@@ -313,6 +314,7 @@ uninstall:
 	sudo rm -rf /opt/coolerdash/
 	sudo rm -f /usr/bin/coolerdash 2>/dev/null || true
 	sudo rm -f /var/run/coolerdash.pid 2>/dev/null || true
+	sudo rm -f /opt/coolerdash/VERSION
 	# Remove any remaining files in /opt/coolerdash (catch-all, safe if dir already gone)
 	sudo rm -f /opt/coolerdash/* 2>/dev/null || true
 	@printf "  $(RED)✗$(RESET) Service: /etc/systemd/system/coolerdash.service\n"
@@ -337,36 +339,6 @@ debug: CFLAGS += -g -DDEBUG -fsanitize=address
 debug: LIBS += -fsanitize=address
 debug: $(TARGET)
 	@printf "$(ICON_SUCCESS) $(GREEN)Debug build created with AddressSanitizer: $(BINDIR)/$(TARGET)$(RESET)\n"
-
-# Service Management Targets
-start:
-	@printf "$(ICON_SERVICE) $(GREEN)Starting coolerdash service...$(RESET)\n"
-	sudo systemctl start coolerdash.service
-	@printf "$(ICON_SUCCESS) $(GREEN)Service started$(RESET)\n"
-
-stop:
-	@printf "$(ICON_SERVICE) $(YELLOW)Stopping coolerdash service...$(RESET)\n"
-	sudo systemctl stop coolerdash.service
-	@printf "$(ICON_SUCCESS) $(GREEN)Service stopped$(RESET)\n"
-
-restart:
-	@printf "$(ICON_SERVICE) $(CYAN)Restarting coolerdash service...$(RESET)\n"
-	sudo systemctl restart coolerdash.service
-	@printf "$(ICON_SUCCESS) $(GREEN)Service restarted$(RESET)\n"
-
-status:
-	@printf "$(ICON_INFO) $(CYAN)Service Status:$(RESET)\n"
-	sudo systemctl status coolerdash.service
-
-enable:
-	@printf "$(ICON_SERVICE) $(GREEN)Enabling autostart...$(RESET)\n"
-	sudo systemctl enable coolerdash.service
-	@printf "$(ICON_SUCCESS) $(GREEN)Service will start automatically at boot$(RESET)\n"
-
-disable:
-	@printf "$(ICON_SERVICE) $(YELLOW)Disabling autostart...$(RESET)\n"
-	sudo systemctl disable coolerdash.service
-	@printf "$(ICON_SUCCESS) $(GREEN)Boot autostart disabled$(RESET)\n"
 
 logs:
 	@printf "$(ICON_INFO) $(CYAN)Live logs (Ctrl+C to exit):$(RESET)\n"
@@ -396,7 +368,6 @@ help:
 	@printf "  $(GREEN)sudo systemctl enable coolerdash.service$(RESET)   - Enables autostart\n"
 	@printf "  $(GREEN)sudo systemctl disable coolerdash.service$(RESET)  - Disables autostart\n"
 	@printf "  $(GREEN)sudo journalctl -u coolerdash.service -f$(RESET)   - Shows live logs\n"
-	@printf "  $(BLUE)Note:$(RESET) Shortcuts available: make start/stop/restart/status/enable/disable/logs\n"
 	@printf "  $(BLUE)Shutdown:$(RESET) Service automatically displays shutdown.png when stopped (integrated in C code)\n"
 	@printf "\n"
 	@printf "$(YELLOW)📚 Documentation:$(RESET)\n"
@@ -410,4 +381,4 @@ help:
 	@printf "  $(GREEN)Program:$(RESET) /opt/coolerdash/bin/coolerdash [mode]\n"
 	@printf "\n"
 
-.PHONY: clean install uninstall debug start stop restart status enable disable logs help detect-distro install-deps check-deps-for-install
+.PHONY: clean install uninstall debug logs help detect-distro install-deps check-deps-for-install

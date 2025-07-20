@@ -21,7 +21,7 @@ plain '      \___)=(___/ '
 plain ' '
 
 pkgname=coolerdash
-pkgver=0.25.07.19.2
+pkgver=$(cat VERSION)
 pkgrel=1
 pkgdesc="CoolerDash a Wrapper for LCD Device Image Control in CoolerControl. To take full control of your liquid cooling system with integrated LCD display to monitor real-time sensor data in style."
 arch=('x86_64')
@@ -167,4 +167,6 @@ package() {
   install -Dm644 "$srcdir/CHANGELOG.md" "$pkgdir/opt/coolerdash/CHANGELOG.md"
   install -Dm644 "$srcdir/systemd/coolerdash.service" "$pkgdir/etc/systemd/system/coolerdash.service"
   install -Dm644 "$srcdir/man/coolerdash.1" "$pkgdir/usr/share/man/man1/coolerdash.1"
+  install -Dm644 "$srcdir/VERSION" "$pkgdir/opt/coolerdash/VERSION"
+  install -Dm644 "$srcdir/AUR-README.md" "$pkgdir/opt/coolerdash/AUR-README.md"
 }

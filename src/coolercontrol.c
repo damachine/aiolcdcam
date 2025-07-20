@@ -85,6 +85,19 @@ static char cookie_jar[256] = {0};
 static int session_initialized = 0;
 
 // Global cached UID for LCD device
+/**
+ * @brief Global buffer for the cached LCD device UID.
+ *
+ * This buffer is filled by init_cached_device_uid() and returned by get_cached_device_uid().
+ * It is guaranteed to be a valid, null-terminated string or an empty string if not initialized.
+ *
+ * Example:
+ * @code
+ * if (!init_cached_device_uid()) { ... }
+ * const char* uid = get_cached_device_uid();
+ * if (uid[0]) { ... }
+ * @endcode
+ */
 static char cached_device_uid[128] = {0};
 
 /**

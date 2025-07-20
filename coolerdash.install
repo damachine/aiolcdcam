@@ -19,6 +19,13 @@ pre_remove() {
         echo "Disabling coolerdash service..."
         systemctl disable coolerdash.service
     fi
+    
+    # Remove all installed files and directories (safety, in case pacman leaves anything)
+    rm -rf /opt/coolerdash 2>/dev/null || true
+    rm -f /etc/systemd/system/coolerdash.service 2>/dev/null || true
+    rm -f /usr/share/man/man1/coolerdash.1 2>/dev/null || true
+    rm -f /usr/bin/coolerdash 2>/dev/null || true
+    rm -f /var/run/coolerdash.pid 2>/dev/null || true
 }
 
 post_remove() {
