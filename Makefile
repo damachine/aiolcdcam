@@ -233,12 +233,14 @@ install: check-deps-for-install $(TARGET)
 	@printf "$(ICON_INFO) $(CYAN)Copying files...$(RESET)\n"
 	sudo cp $(BINDIR)/$(TARGET) /opt/coolerdash/bin/ 2>/dev/null || true
 	sudo chmod +x /opt/coolerdash/bin/$(TARGET) 2>/dev/null || true
+	sudo ln -sf /opt/coolerdash/bin/$(TARGET) /usr/bin/coolerdash 2>/dev/null || true
 	sudo cp images/shutdown.png /opt/coolerdash/images/ 2>/dev/null || true
 	sudo cp $(README) /opt/coolerdash/ 2>/dev/null || true
 	sudo cp LICENSE /opt/coolerdash/ 2>/dev/null || true
 	sudo cp CHANGELOG.md /opt/coolerdash/ 2>/dev/null || true
 	sudo cp VERSION /opt/coolerdash/ 2>/dev/null || true
 	@printf "  $(GREEN)→$(RESET) Program: /opt/coolerdash/bin/$(TARGET)\n"
+	@printf "  $(GREEN)→$(RESET) Symlink: /usr/bin/coolerdash → /opt/coolerdash/bin/$(TARGET)\n"
 	@printf "  $(GREEN)→$(RESET) Shutdown image: /opt/coolerdash/images/shutdown.png\n"
 	@printf "  $(GREEN)→$(RESET) Sensor image: will be created at runtime as coolerdash.png in RAM (/dev/shm)\n"
 	@printf "  $(GREEN)→$(RESET) README: /opt/coolerdash/README.md\n"

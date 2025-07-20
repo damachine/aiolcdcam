@@ -1,18 +1,6 @@
 /**
  * @file main.c
  * @brief Main entry point for CoolerDash daemon.
- *
- * Coding Standards (C99, ISO/IEC 9899:1999):
- * - All code comments in English.
- * - Doxygen-style comments for all functions (description, @brief, @param, @return, examples).
- * - Opening braces on the same line (K&R style).
- * - Always check return values of malloc(), calloc(), realloc().
- * - Free all dynamically allocated memory and set pointers to NULL after freeing.
- * - Use include guards in all headers.
- * - Include only necessary headers, system headers before local headers.
- * - Function names are verbs, use snake_case for functions/variables, UPPER_CASE for macros, PascalCase for typedef structs.
- * - Use descriptive names, avoid abbreviations.
- * - Document complex algorithms and data structures.
  */
 #define _POSIX_C_SOURCE 200112L
 #define _XOPEN_SOURCE 600

@@ -1,30 +1,9 @@
 /**
  * @file config.h
  * @brief Central configuration header for CoolerDash.
- *
- * Coding Standards (C99, ISO/IEC 9899:1999):
- * - Use english language for all code comments.
- * - Use Doxygen-style comments for functions. Include a description, @brief, @param, @return values and examples if useful.
- * - Opening braces on the same line for functions and control structures (K&R style).
- * - Add comments for non-obvious code sections.
- * - Always check return values of malloc(), calloc(), realloc().
- * - Free all dynamically allocated memory and set pointers to NULL after freeing.
- * - Use include guards: #ifndef HEADER_H / #define HEADER_H / #endif in all headers.
- * - Include only necessary headers. Separate system headers from local headers.
- * - Function names should be verbs: calculate_sum(), parse_input().
- * - Use snake_case for function names and variables: my_function(), user_count.
- * - Use UPPER_CASE for constants and macros: MAX_SIZE, PI.
- * - Use PascalCase for typedef structs: MyStruct.
- * - Use forward declarations when possible.
- * - Use descriptive names, avoid abbreviations.
- * - Document complex algorithms and data structures.
  */
 #ifndef CONFIG_H
 #define CONFIG_H
-
-// =============================================================================
-// LCD CONFIGURATION
-// =============================================================================
 
 // Display Settings
 #define DISPLAY_WIDTH 240 // 240 pixel width

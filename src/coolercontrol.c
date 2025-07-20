@@ -1,18 +1,6 @@
 /**
  * @file coolercontrol.c
  * @brief CoolerControl API implementation for LCD device communication.
- *
- * Coding Standards (C99, ISO/IEC 9899:1999):
- * - All code comments in English.
- * - Doxygen-style comments for all functions (description, @brief, @param, @return, examples).
- * - Opening braces on the same line (K&R style).
- * - Always check return values of malloc(), calloc(), realloc().
- * - Free all dynamically allocated memory and set pointers to NULL after freeing.
- * - Use include guards in all headers.
- * - Include only necessary headers, system headers before local headers.
- * - Function names are verbs, use snake_case for functions/variables, UPPER_CASE for macros, PascalCase for typedef structs.
- * - Use descriptive names, avoid abbreviations.
- * - Document complex algorithms and data structures.
  */
 #include "../include/coolercontrol.h"
 #include "../include/config.h"
@@ -28,22 +16,6 @@ struct http_response {
     char *data;
     size_t size;
 };
-
-// =====================
-// API-FUNKTIONEN
-// =====================
-
-int init_coolercontrol_session(void);
-int send_image_to_lcd(const char* image_path, const char* device_uid);
-int upload_image_to_device(const char* image_path, const char* device_uid);
-void cleanup_coolercontrol_session(void);
-int is_session_initialized(void);
-int get_device_name(char* name_buffer, size_t buffer_size);
-int get_device_uid(char* uid_buffer, size_t buffer_size);
-
-// =====================
-// INTERNE HILFSFUNKTIONEN
-// =====================
 
 /**
  * @brief Callback function to write HTTP response data.
@@ -66,6 +38,14 @@ int get_device_uid(char* uid_buffer, size_t buffer_size);
  * curl_easy_setopt(curl, CURLOPT_WRITEDATA, &resp);
  * @endcode
  */
+int init_coolercontrol_session(void);
+int send_image_to_lcd(const char* image_path, const char* device_uid);
+int upload_image_to_device(const char* image_path, const char* device_uid);
+void cleanup_coolercontrol_session(void);
+int is_session_initialized(void);
+int get_device_name(char* name_buffer, size_t buffer_size);
+int get_device_uid(char* uid_buffer, size_t buffer_size);
+
 static size_t write_callback(void *contents, size_t size, size_t nmemb, struct http_response *response) {
     size_t realsize = size * nmemb;
     char *ptr = realloc(response->data, response->size + realsize + 1);
@@ -166,12 +146,7 @@ int init_coolercontrol_session(void) {
  */
 int send_image_to_lcd(const char* image_path, const char* device_uid) {
     if (!curl_handle || !image_path || !device_uid || !session_initialized) return 0;
-    
-    // Check if file exists
-    FILE *test_file = fopen(image_path, "rb");
-    if (!test_file) return 0;
-    fclose(test_file);
-    
+
     // URL for LCD image upload
     char upload_url[256];
     snprintf(upload_url, sizeof(upload_url), 
@@ -179,12 +154,7 @@ int send_image_to_lcd(const char* image_path, const char* device_uid) {
     
     // Determine MIME type
     const char* mime_type = "image/png";
-    if (strstr(image_path, ".jpg") || strstr(image_path, ".jpeg")) {
-        mime_type = "image/jpeg";
-    } else if (strstr(image_path, ".gif")) {
-        mime_type = "image/gif";
-    }
-    
+
     // Create multipart form
     curl_mime *form = curl_mime_init(curl_handle);
     curl_mimepart *field;

@@ -1,23 +1,25 @@
 post_install() {
+    # Stop service before install or update
+    if systemctl is-active --quiet coolerdash.service; then
+        echo "Stopping coolerdash service..."
+        systemctl stop coolerdash.service 2>/dev/null || true
+    fi
     echo "CoolerDash has been installed successfully!"
-}
-
-post_upgrade() {
-    echo "CoolerDash has been upgraded to version $1"
-    echo "Restart the service to apply changes:"
-    echo "   sudo systemctl restart coolerdash.service"
+    echo "Start the service..."
+    systemctl daemon-reload 2>/dev/null || true
+    systemctl enable --now coolerdash.service 2>/dev/null || true
 }
 
 pre_remove() {
     # Stop service before removal
     if systemctl is-active --quiet coolerdash.service; then
         echo "Stopping coolerdash service..."
-        systemctl stop coolerdash.service
+        systemctl stop coolerdash.service 2>/dev/null || true
     fi
     
     if systemctl is-enabled --quiet coolerdash.service; then
         echo "Disabling coolerdash service..."
-        systemctl disable coolerdash.service
+        systemctl disable coolerdash.service 2>/dev/null || true
     fi
     
     # Remove all installed files and directories (safety, in case pacman leaves anything)
