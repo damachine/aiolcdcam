@@ -26,6 +26,8 @@ pre_remove() {
     rm -f /usr/share/man/man1/coolerdash.1 2>/dev/null || true
     rm -f /usr/bin/coolerdash 2>/dev/null || true
     rm -f /var/run/coolerdash.pid 2>/dev/null || true
+    rm -f /opt/coolerdash/CHANGELOG.md 2>/dev/null || true
+    rm -f /opt/coolerdash/LICENSE 2>/dev/null || true
 }
 
 post_remove() {

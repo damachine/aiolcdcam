@@ -86,15 +86,17 @@ prepare() {
                 # Complete manual cleanup if make uninstall fails
                 sudo systemctl stop coolerdash.service 2>/dev/null || true
                 sudo systemctl disable coolerdash.service 2>/dev/null || true
-                sudo rm -f /etc/systemd/system/coolerdash.service
-                sudo rm -f /usr/share/man/man1/coolerdash.1
-                sudo rm -f /opt/coolerdash/bin/coolerdash
-                sudo rm -f /opt/coolerdash/README.md
-                sudo rm -f /opt/coolerdash/LICENSE
-                sudo rm -f /opt/coolerdash/CHANGELOG.md
-                sudo rm -rf /opt/coolerdash/images/
-                sudo rm -rf /opt/coolerdash/
-                # All files and images are removed above; no need for extra image cleanup
+                sudo rm -f /etc/systemd/system/coolerdash.service 2>/dev/null || true
+                sudo rm -f /usr/share/man/man1/coolerdash.1 2>/dev/null || true
+                sudo rm -f /opt/coolerdash/bin/coolerdash 2>/dev/null || true
+                sudo rm -f /opt/coolerdash/README.md 2>/dev/null || true
+                sudo rm -f /opt/coolerdash/LICENSE 2>/dev/null || true
+                sudo rm -f /opt/coolerdash/CHANGELOG.md 2>/dev/null || true
+                sudo rm -rf /opt/coolerdash/images/ 2>/dev/null || true
+                sudo rm -rf /opt/coolerdash/ 2>/dev/null || true
+                sudo rm -f /usr/bin/coolerdash 2>/dev/null || true
+                sudo systemctl daemon-reload 2>/dev/null || true
+                
                 echo "✅ Complete manual cleanup completed"
             fi
         else
@@ -103,16 +105,16 @@ prepare() {
             # Complete manual cleanup
             sudo systemctl stop coolerdash.service 2>/dev/null || true
             sudo systemctl disable coolerdash.service 2>/dev/null || true
-            sudo rm -f /etc/systemd/system/coolerdash.service
-            sudo rm -f /usr/share/man/man1/coolerdash.1
-            sudo rm -f /opt/coolerdash/bin/coolerdash
-            sudo rm -f /opt/coolerdash/README.md
-            sudo rm -f /opt/coolerdash/LICENSE
-            sudo rm -f /opt/coolerdash/CHANGELOG.md
-            sudo rm -rf /opt/coolerdash/images/
-            sudo rm -rf /opt/coolerdash/
+            sudo rm -f /etc/systemd/system/coolerdash.service 2>/dev/null || true
+            sudo rm -f /usr/share/man/man1/coolerdash.1 2>/dev/null || true
+            sudo rm -f /opt/coolerdash/bin/coolerdash 2>/dev/null || true
+            sudo rm -f /opt/coolerdash/README.md 2>/dev/null || true
+            sudo rm -f /opt/coolerdash/LICENSE 2>/dev/null || true
+            sudo rm -f /opt/coolerdash/CHANGELOG.md 2>/dev/null || true
+            sudo rm -rf /opt/coolerdash/images/ 2>/dev/null || true
+            sudo rm -rf /opt/coolerdash/ 2>/dev/null || true
             sudo rm -f /usr/bin/coolerdash 2>/dev/null || true
-            sudo systemctl daemon-reload
+            sudo systemctl daemon-reload 2>/dev/null || true
             
             echo "✅ Complete manual cleanup completed"
         fi
@@ -133,7 +135,7 @@ build() {
     cd "$startdir"
 
     # Remove all previous tarball builds
-    rm -f *.pkg.tar.*
+    rm -rf coolerdash-*.pkg.tar.* || true
 
     # Clean any previous builds
     make clean || true
@@ -141,9 +143,29 @@ build() {
     # Build with Arch Linux specific optimizations and C99 compliance
     make CC=gcc CFLAGS="-Wall -Wextra -O2 -std=c99 -march=x86-64-v3 -Iinclude $(pkg-config --cflags cairo)" \
          LIBS="$(pkg-config --libs cairo) -lcurl -lm"
+
+    # Copy binary to $srcdir/bin for packaging
+    mkdir -p "$srcdir/bin"
+    cp -a bin/coolerdash "$srcdir/bin/coolerdash"
+
+    # Copy images directory to $srcdir for packaging
+    mkdir -p "$srcdir/images"
+    cp -a images/. "$srcdir/images/"
+
+    # Copy all required files for packaging to $srcdir
+    cp -a README.md "$srcdir/README.md"
+    cp -a LICENSE "$srcdir/LICENSE"
+    cp -a CHANGELOG.md "$srcdir/CHANGELOG.md"
+    cp -a VERSION "$srcdir/VERSION"
+    cp -a AUR-README.md "$srcdir/AUR-README.md"
+    mkdir -p "$srcdir/systemd"
+    cp -a systemd/coolerdash.service "$srcdir/systemd/coolerdash.service"
+    mkdir -p "$srcdir/man"
+    cp -a man/coolerdash.1 "$srcdir/man/coolerdash.1"
 }
 
 check() {
+    # For local build: use current directory directly
     cd "$startdir"
     
     # Basic functionality test
