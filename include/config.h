@@ -67,15 +67,15 @@
 // Paths and Files
 #define HWMON_PATH "/sys/class/hwmon" // path to hardware monitors
 #define IMAGE_DIR "/opt/coolerdash/images" // directory for images
-#define IMAGE_PATH "/opt/coolerdash/images/coolerdash.png" // path to CPU/GPU temperature display image
+#define IMAGE_PATH "/dev/shm/coolerdash.png" // path to CPU/GPU temperature display image
 #define SHUTDOWN_IMAGE_PATH "/opt/coolerdash/images/shutdown.png" // path to shutdown image
 #define PID_FILE "/var/run/coolerdash.pid" // PID file for daemon
 
 // CoolerControl Settings
 // Make sure CoolerControl is running: sudo systemctl start coolercontrold
-// Test the API: curl http://localhost:11987/devices
+// Test the API: curl http://localhost:11987/devices | jq
 #define DAEMON_ADDRESS "http://localhost:11987" // CoolerControl daemon address
-#define DAEMON_PASSWORD "coolAdmin" // CoolerControl daemon passwor
+#define DAEMON_PASSWORD "coolAdmin" // CoolerControl daemon password
 
 // Colors (RGB 0-255)
 #define COLOR_GREEN_R 0
@@ -130,8 +130,8 @@
 #define COLOR_TEMP_B 1.0
 
 // Foreground/Text Color (for all labels)
-#define COLOR_LABEL_R 0.90
-#define COLOR_LABEL_G 0.90
-#define COLOR_LABEL_B 0.90
+#define COLOR_LABEL_R 0.75
+#define COLOR_LABEL_G 0.75
+#define COLOR_LABEL_B 0.75
 
 #endif // CONFIG_H

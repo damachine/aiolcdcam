@@ -19,7 +19,6 @@
 #include "../include/coolercontrol.h"
 #include "../include/cpu_monitor.h"
 #include "../include/gpu_monitor.h"
-#include "../include/coolant_monitor.h"
 #include <cairo/cairo.h>
 #include <sys/stat.h>
 #include <math.h>
@@ -131,7 +130,6 @@ int render_display(const sensor_data_t *data) {
         if (is_session_initialized()) {
             const char* device_uid = get_cached_device_uid();
             if (device_uid[0]) {
-                send_image_to_lcd(IMAGE_PATH, device_uid);
                 send_image_to_lcd(IMAGE_PATH, device_uid);
             }
         }
