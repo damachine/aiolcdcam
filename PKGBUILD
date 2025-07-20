@@ -183,7 +183,6 @@ package() {
   install -Dm755 "$srcdir/bin/coolerdash" "$pkgdir/opt/coolerdash/bin/coolerdash"
   install -dm755 "$pkgdir/opt/coolerdash/images"
   install -Dm644 "$srcdir/images/shutdown.png" "$pkgdir/opt/coolerdash/images/shutdown.png"
-  install -Dm644 "$srcdir/images/coolerdash.png" "$pkgdir/opt/coolerdash/images/coolerdash.png"
   install -Dm644 "$srcdir/README.md" "$pkgdir/opt/coolerdash/README.md"
   install -Dm644 "$srcdir/LICENSE" "$pkgdir/opt/coolerdash/LICENSE"
   install -Dm644 "$srcdir/CHANGELOG.md" "$pkgdir/opt/coolerdash/CHANGELOG.md"
