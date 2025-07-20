@@ -1,31 +1,14 @@
-# Project coding standards and packaging notes (see README and AUR-README for details)
+# Project coding standards and packaging notes (see README for details)
 #
-# - All code must be C99 compliant (ISO/IEC 9899:1999)
-# - Versioning: custom scheme "0.year.month.day.hourminute" (see VERSION file)
-# - Always update both VERSION (here) and pkgver (in PKGBUILD) before every commit/release
-# - All code comments, documentation, and commit messages must be in English
-# - All user questions are answered in German (see .github/copilot-instructions.md)
-# - All dependencies must be clearly listed and documented here, in PKGBUILD, and in README
-# - Build flags must enforce C99 and recommended optimizations
-# - See README and AUR-README for further details
+# Maintainer: DAMACHINE <christkue79@gmail.com>
 #
-# Example version: 0.2025.07.16.1234 (Year 2025, July 16th, 12:34)
-#
-# Before every commit: ensure VERSION and pkgver match the current release!
-#
+# --- Dependency notes ---
+# - 'cairo', 'libcurl-gnutls', 'coolercontrol' are required for core functionality
+# - 'nvidia-utils' and 'lm_sensors' are optional for extended hardware monitoring
+# - 'ttf-roboto' is required for proper font rendering on the LCD
+# - All dependencies are documented in README and AUR-README
+# ------------------------
 
-# Makefile for CoolerDash (Standard C Project Structure)
-# CoolerDash - Modular C daemon for Liquid Cooler LCD Dashboard via CoolerControl
-
-# ================================
-# Manual Installation Check
-# ================================
-# If you see errors about "conflicting files" or manual installation,
-# run 'sudo make uninstall' and remove leftover files in /opt/coolerdash,
-# /usr/bin/coolerdash, /etc/systemd/system/coolerdash.service.
-# ================================
-
-# Version (read from VERSION file)
 VERSION := $(shell cat VERSION)
 
 CC = gcc

@@ -1,7 +1,5 @@
 # Project coding standards and packaging notes (see README for details)
 #
-# Example version: 0.2025.07.16.1234 (Year 2025, July 16th, 12:34)
-#
 # Maintainer: DAMACHINE <christkue79@gmail.com>
 #
 # --- Dependency notes ---
