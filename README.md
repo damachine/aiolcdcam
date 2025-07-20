@@ -153,7 +153,7 @@ Below are the most important values you can adjust in `include/config.h` before 
 | LCD_ORIENTATION        | "0"                   | LCD orientation for image upload ("0"=default, "1"=rotated)      |
 | GPU_CACHE_INTERVAL     | 2.5f                  | GPU data cache interval (seconds)                                |
 | CHANGE_TOLERANCE_TEMP  | 1.0f                  | Minimum temperature change to trigger update (°C)                |
-| IMAGE_PATH             | /dev/shm/coolerdash.png *(default; /dev/shm is a tmpfs in RAM for fast image access)* | Path to generated display image                |
+| IMAGE_PATH             | /dev/shm/coolerdash.png | Path to generated display image *(default; /dev/shm is a tmpfs in RAM for fast image access)*                |
 
 > **Tip:** Edit these values in `include/config.h` before running `make` to change the look, update interval, thresholds, or LCD behavior to your needs.
 
