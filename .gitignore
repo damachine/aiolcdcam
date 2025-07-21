@@ -1,33 +1,38 @@
 # Build artifacts
 build/
 bin/
+*.a
 *.o
+*.so
 
-# Release tarballs (created by release.sh)
-release.sh
-coolerdash-*.tar.gz
-
-# Arch package files (created by makepkg)
-*.pkg.tar.zst
-*.pkg.tar.xz
+# Temporary files
 pkg/
-
-# Editor files
-*.code-workspace
-*.swp
-*.swo
+temp/
 *~
-.vscode/
-.idea/
+*.tmp
+*.log
+*.bak
+.cache/
+.makepkg/
 
 # OS files
 .DS_Store
 Thumbs.db
 
-# Temporary files
-*.tmp
-*.log
-.makepkg/
+# Editor files
+*.code-workspace
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# Compressed archives
+*.tar.xz
+*.tar.gz
+*.zip
+
+# Release tarballs
+coolerdash-*.pkg.*
 
 # Local test files
 PKGBUILD-test
