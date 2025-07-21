@@ -14,10 +14,10 @@ Requires=coolercontrold.service
 
 [Service]
 Type=simple
-ExecStart=/opt/coolerdash/bin/coolerdash
+ExecStart=/bin/coolerdash
 Restart=always
-RestartSec=1
-TimeoutStopSec=5
+RestartSec=3
+TimeoutStopSec=3
 
 [Install]
 WantedBy=multi-user.target
