@@ -39,7 +39,7 @@
 #define LCD_ORIENTATION "0" // LCD orientation for image upload ("0"=default, "90"=rotated, "180"=flipped, "270"=rotated flipped)
 
 // Cache Settings
-#define GPU_CACHE_INTERVAL 2.5f // seconds (supports decimal values with millisecond precision)
+#define GPU_CACHE_INTERVAL 3.0f // seconds (supports decimal values with millisecond precision)
 #define CHANGE_TOLERANCE_TEMP 1.0f // temperature change tolerance in degrees Celsius
 #define CHANGE_TOLERANCE_USAGE 1.0f // usage change tolerance in percent
 
