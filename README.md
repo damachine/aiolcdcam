@@ -139,8 +139,8 @@ Below are the most important values you can adjust in `include/config.h` before 
 |------------------------|-----------------------|------------------------------------------------------------------|
 | DISPLAY_WIDTH          | 240                   | LCD display width in pixels (adjust to your LCD device)          |
 | DISPLAY_HEIGHT         | 240                   | LCD display height in pixels (adjust to your LCD device)         |
-| DISPLAY_REFRESH_INTERVAL_SEC  | 2            | Display update interval (seconds)                                |
-| DISPLAY_REFRESH_INTERVAL_NSEC | 500000000             | Display update interval (nanoseconds, for sub-second refresh granularity, 500000000 ns = 0.5 seconds) |
+| DISPLAY_REFRESH_INTERVAL_SEC  | 3            | Display update interval (seconds)                                |
+| DISPLAY_REFRESH_INTERVAL_NSEC | 000000000             | Display update interval (nanoseconds, for sub-second refresh granularity, 500000000 ns = 0.5 seconds) |
 | TEMP_THRESHOLD_GREEN   | 55.0f                 | Temperature for green color (°C)                                 |
 | TEMP_THRESHOLD_ORANGE  | 65.0f                 | Temperature for orange color (°C)                                |
 | TEMP_THRESHOLD_RED     | 75.0f                 | Temperature for red color (°C)                                   |
@@ -151,9 +151,9 @@ Below are the most important values you can adjust in `include/config.h` before 
 | FONT_FACE              | "Roboto Black"        | Font used for all display text                                   |
 | LCD_BRIGHTNESS         | 100                   | LCD brightness (0-100)                                           |
 | LCD_ORIENTATION        | "0"                   | LCD orientation for image upload ("0"=default, "1"=rotated)      |
-| GPU_CACHE_INTERVAL     | 2.5f                  | GPU data cache interval (seconds)                                |
+| GPU_CACHE_INTERVAL     | 3.0f                  | GPU data cache interval (seconds)                                |
 | CHANGE_TOLERANCE_TEMP  | 1.0f                  | Minimum temperature change to trigger update (°C)                |
-| IMAGE_PATH             | /dev/shm/coolerdash.png | Path to generated display image *(default; /dev/shm is a tmpfs in RAM for fast image access)*                |
+| IMAGE_PATH             | /dev/shm/coolerdash.png | Path to generated display image *(default; /dev/shm is a tmpfs in RAM for fast image access <10KiB>)*                |
 | SHUTDOWN_IMAGE_PATH    | /opt/coolerdash/images/shutdown.png | Path to shutdown image (displayed when service stops; you can change this path or imagee to use your own image) |
 
 > **Tip:** Edit these values in `include/config.h` before running `make` to change the look, update interval, thresholds, or LCD behavior to your needs.
@@ -190,7 +190,7 @@ curl http://localhost:11987/devices | jq
 ### Performance Notes
 
 - **Mode** - Only temperature sensors, minimal I/O (~3.4MB RAM, <1% CPU)
-- **Sensor caching**: hwmon paths cached at startup, GPU data cached for 2 seconds
+- **Sensor caching**: hwmon paths cached at startup, GPU data cached for 3 seconds
 - **Change detection**: PNG only updated when significant changes occur
 
 ## 🔍 Troubleshooting
