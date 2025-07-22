@@ -9,7 +9,7 @@
 #define DISPLAY_WIDTH 240 // 240 pixel width
 #define DISPLAY_HEIGHT 240 // 240 pixel height
 #define DISPLAY_REFRESH_INTERVAL_SEC 3 //  seconds
-#define DISPLAY_REFRESH_INTERVAL_NSEC 000000000  // 0.5 seconds
+#define DISPLAY_REFRESH_INTERVAL_NSEC 000000000  // 0. seconds
 
 // Temperature Thresholds (4-stage color gradient: green → orange → hot orange → red)
 // Stage 1: Green (≤55°C) - Cool operating temperature
