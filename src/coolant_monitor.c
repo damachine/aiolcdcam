@@ -2,12 +2,16 @@
  * @file coolant_monitor.c
  * @brief Coolant temperature monitoring implementation for CoolerDash.
  */
-#include "../include/coolant_monitor.h"
-#include "../include/config.h"
+
+// Include necessary headers
 #include <stdio.h>
 #include <string.h>
 #include <dirent.h>
 #include <stdlib.h>
+
+// Include project headers
+#include "../include/coolant_monitor.h"
+#include "../include/config.h"
 
 // Global variable for cached coolant temperature path
 char coolant_temp_path[512] = {0};

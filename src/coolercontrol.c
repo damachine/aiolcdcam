@@ -2,14 +2,18 @@
  * @file coolercontrol.c
  * @brief CoolerControl API implementation for LCD device communication.
  */
-#include "../include/coolercontrol.h"
-#include "../include/config.h"
+
+// Include necessary headers
 #include <curl/curl.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/stat.h>
+
+// Include project headers
+#include "../include/coolercontrol.h"
+#include "../include/config.h"
 
 // Response buffer structure for HTTP responses
 struct http_response {

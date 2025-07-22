@@ -2,17 +2,22 @@
  * @file display.c
  * @brief LCD rendering and image upload for CoolerDash.
  */
-#include "../include/display.h"
-#include "../include/config.h"
-#include "../include/coolercontrol.h"
-#include "../include/cpu_monitor.h"
-#include "../include/gpu_monitor.h"
+
+ // Include necessary headers
 #include <cairo/cairo.h>
 #include <sys/stat.h>
 #include <math.h>
 #include <stdio.h>
 #include <unistd.h>
 
+// Include project headers
+#include "../include/display.h"
+#include "../include/config.h"
+#include "../include/coolercontrol.h"
+#include "../include/cpu_monitor.h"
+#include "../include/gpu_monitor.h"
+
+// Constants for display layout
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
@@ -118,6 +123,7 @@ int render_display(const sensor_data_t *data) {
         if (is_session_initialized()) {
             const char* device_uid = get_cached_device_uid();
             if (device_uid[0]) {
+                // Send image to LCD
                 send_image_to_lcd(IMAGE_PATH, device_uid);
                 send_image_to_lcd(IMAGE_PATH, device_uid);
             }
@@ -125,8 +131,14 @@ int render_display(const sensor_data_t *data) {
     }
 
 cleanup:
-    if (cr) cairo_destroy(cr);
-    if (surface) cairo_surface_destroy(surface);
+    if (cr) {
+        cairo_destroy(cr);
+        cr = NULL;
+    }
+    if (surface) {
+        cairo_surface_destroy(surface);
+        surface = NULL;
+    }
 
     return success;
 }

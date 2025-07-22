@@ -2,11 +2,13 @@
  * @file gpu_monitor.c
  * @brief GPU temperature and usage monitoring implementation for CoolerDash.
  */
-#include "../include/gpu_monitor.h"
-#include "../include/config.h"
 #include <stdio.h>
 #include <time.h>
 #include <sys/time.h>
+
+// Include project headers
+#include "../include/gpu_monitor.h"
+#include "../include/config.h"
 
 // Global variable for GPU availability
 static int gpu_available = -1;  // -1 = unknown, 0 = not available, 1 = available

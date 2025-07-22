@@ -2,12 +2,16 @@
  * @file cpu_monitor.c
  * @brief CPU temperature and usage monitoring implementation for CoolerDash.
  */
-#include "../include/cpu_monitor.h"
-#include "../include/config.h"
+
+// Include necessary headers
 #include <stdio.h>
 #include <string.h>
 #include <dirent.h>
 #include <stdlib.h>
+
+// Include project headers
+#include "../include/cpu_monitor.h"
+#include "../include/config.h"
 
 // Global variable for cached CPU temperature path
 char cpu_temp_path[512] = {0};

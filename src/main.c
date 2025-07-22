@@ -2,8 +2,12 @@
  * @file main.c
  * @brief Main entry point for CoolerDash daemon.
  */
+
+// Function prototypes
 #define _POSIX_C_SOURCE 200112L
 #define _XOPEN_SOURCE 600
+
+// Include necessary headers
 #include <unistd.h>
 #include <signal.h>
 #include <sys/types.h>
@@ -14,37 +18,7 @@
 #include <time.h>
 #include <errno.h>
 
-/**
- * CoolerDash - Main Program
- * =========================
- *
- * Modular C daemon for LCD Temperature Monitor.
- * Displays CPU and GPU temperatures on an LCD display (two-box layout).
- *
- * Compile with: make
- * Or manually: gcc -Wall -Wextra -O2 -std=c99 main.c cpu_monitor.c gpu_monitor.c \
- *               display.c coolercontrol.c -o coolerdash -lcairo -lcurl -lm
- *
- * Features:
- *   - Displays CPU and GPU temperatures (no coolant, no load bars)
- *   - Resource-efficient, optimized for continuous background operation
- *   - Two-box layout: CPU (top), GPU (bottom)
- *   - Configurable colors and update interval (see config.h)
- *   - Single-Instance Enforcement: Only one coolerdash instance can run simultaneously
- *   - systemd start: Terminates previous manual instances
- *   - Manual start: Error if systemd service is running
- *   - PID file coordinates instance management
- *
- * Future:
- *   - Support for multiple display modes and GUI planned
- *
- * Usage:
- *   - Start via systemd service (recommended)
- *   - Manual start possible, but not parallel zum Service
- *   - See README.md for configuration and details
- */
-
-// Include modules
+// Include project headers
 #include "../include/config.h"
 #include "../include/cpu_monitor.h"
 #include "../include/gpu_monitor.h"
@@ -289,6 +263,30 @@ static int is_started_by_systemd(void) {
 }
 
 /**
+ * @brief Register signal handlers for clean daemon termination.
+ *
+ * Uses sigaction for robust signal handling.
+ *
+ * @return void
+ *
+ * Example:
+ * @code
+ * register_signal_handlers();
+ * @endcode
+ */
+static void register_signal_handlers(void)
+{
+    struct sigaction sa;
+    memset(&sa, 0, sizeof(sa));
+    sa.sa_handler = cleanup_and_exit;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
+
+    sigaction(SIGTERM, &sa, NULL); // For systemd stop
+    sigaction(SIGINT, &sa, NULL); // For Ctrl+C
+}
+
+/**
  * @brief Main function for CoolerDash daemon.
  *
  * Initializes modules, enforces single-instance, manages daemon lifecycle, and handles clean shutdown.
@@ -324,8 +322,7 @@ int main(int argc, char *argv[]) {
     write_pid_file(pid_file);
     
     // Register signal handlers
-    signal(SIGTERM, cleanup_and_exit); // For systemd stop
-    signal(SIGINT, cleanup_and_exit); // For Ctrl+C
+    register_signal_handlers();
     
     // Create image directory
     mkdir(IMAGE_DIR, 0755); // Create directory for images if not present
