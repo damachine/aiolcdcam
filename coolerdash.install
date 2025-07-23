@@ -8,7 +8,7 @@ post_install() {
     chown coolerdash:coolerdash /run/coolerdash || true
 
     # Create tmp directory for PNG file
-    install -d -m 0755 /tmp/coolerdash
+    install -d -m 0777 /tmp/coolerdash
     chown coolerdash:coolerdash /tmp/coolerdash
     
     # Stop service before install or update
