@@ -29,7 +29,7 @@ HEADERS = $(INCDIR)/config.h $(INCDIR)/cpu_monitor.h $(INCDIR)/gpu_monitor.h $(I
 OBJECTS = $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(SRC_MODULES))
 ALL_SOURCES = $(MAIN_SOURCE) $(SRC_MODULES)
 
-SERVICE = systemd/coolerdash.service
+SERVICE = etc/systemd/coolerdash.service
 MANPAGE = man/coolerdash.1
 README = README.md
 

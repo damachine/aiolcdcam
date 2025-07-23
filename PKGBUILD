@@ -62,7 +62,7 @@ build() {
     mkdir -p "$srcdir/images"
     cp -a images/shutdown.png "$srcdir/images/shutdown.png"
     mkdir -p "$srcdir/systemd"
-    cp -a systemd/coolerdash.service "$srcdir/systemd/coolerdash.service"
+    cp -a etc/systemd/coolerdash.service "$srcdir/systemd/coolerdash.service"
     mkdir -p "$srcdir/man"
     cp -a man/coolerdash.1 "$srcdir/man/coolerdash.1"
     mkdir -p "$srcdir/etc/coolerdash"
