@@ -43,6 +43,21 @@
 #include <ini.h>
 
 /**
+ * @brief Color struct for RGB values (0-255).
+ *
+ * @details Used for all color configuration values in CoolerDash.
+ * @author damachine
+ * @since 0.25.07.23.5-1
+ * @copyright (c) 2025 damachine
+ * @license MIT
+ */
+typedef struct {
+    int r; /**< Red value (0-255) */
+    int g; /**< Green value (0-255) */
+    int b; /**< Blue value (0-255) */
+} Color;
+
+/**
  * @brief Structure for runtime configuration loaded from INI file.
  *
  * All fields are loaded from the INI file. No static defaults are defined here.
@@ -81,14 +96,14 @@ typedef struct Config {
     char pid_file[128];          /**< Path for PID file */
     char daemon_address[128];    /**< Daemon address */
     char daemon_password[64];    /**< Daemon password */
-    struct { int r, g, b; } color_green;        /**< RGB for green bar */
-    struct { int r, g, b; } color_orange;       /**< RGB for orange bar */
-    struct { int r, g, b; } color_hot_orange;   /**< RGB for hot orange bar */
-    struct { int r, g, b; } color_red;          /**< RGB for red bar */
-    struct { int r, g, b; } color_temp;         /**< RGB for temperature text */
-    struct { int r, g, b; } color_label;        /**< RGB for label text */
-    struct { int r, g, b; } color_bg;           /**< RGB for background */
-    struct { int r, g, b; } color_border;       /**< RGB for border */
+    Color color_green;        /**< RGB for green bar */
+    Color color_orange;       /**< RGB for orange bar */
+    Color color_hot_orange;   /**< RGB for hot orange bar */
+    Color color_red;          /**< RGB for red bar */
+    Color color_temp;         /**< RGB for temperature text */
+    Color color_label;        /**< RGB for label text */
+    Color color_bg;           /**< RGB for background */
+    Color color_border;       /**< RGB for border */
 } Config;
 
 /**

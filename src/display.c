@@ -209,8 +209,8 @@ static void draw_temperature_displays(cairo_t *cr, const sensor_data_t *data, co
     
     // Set font and size
     cairo_select_font_face(cr, config->font_face, CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-    cairo_set_source_rgb(cr, config->color_temp.r, config->color_temp.g, config->color_temp.b);
-    
+    cairo_set_source_rgb(cr, config->color_temp.r / 255.0, config->color_temp.g / 255.0, config->color_temp.b / 255.0);
+
     char temp_str[8];
     cairo_text_extents_t ext;
 
@@ -301,7 +301,7 @@ static void draw_temperature_bars(cairo_t *cr, const sensor_data_t *data, const 
     cairo_fill(cr);
     // Draw CPU bar border (rounded)
     cairo_set_line_width(cr, config->border_line_width);
-    cairo_set_source_rgb(cr, config->color_border.r, config->color_border.g, config->color_border.b);
+    cairo_set_source_rgb(cr, config->color_border.r / 255.0, config->color_border.g / 255.0, config->color_border.b / 255.0);
     cairo_new_sub_path(cr);
     cairo_arc(cr, bar_x + config->bar_width - radius, cpu_bar_y + radius, radius, -M_PI_2, 0);
     cairo_arc(cr, bar_x + config->bar_width - radius, cpu_bar_y + config->bar_height - radius, radius, 0, M_PI_2);
@@ -341,7 +341,7 @@ static void draw_temperature_bars(cairo_t *cr, const sensor_data_t *data, const 
     cairo_fill(cr);
     // Draw GPU bar border (rounded)
     cairo_set_line_width(cr, config->border_line_width);
-    cairo_set_source_rgb(cr, config->color_border.r, config->color_border.g, config->color_border.b);
+    cairo_set_source_rgb(cr, config->color_border.r / 255.0, config->color_border.g / 255.0, config->color_border.b / 255.0);
     cairo_new_sub_path(cr);
     cairo_arc(cr, bar_x + config->bar_width - radius, gpu_bar_y + radius, radius, -M_PI_2, 0);
     cairo_arc(cr, bar_x + config->bar_width - radius, gpu_bar_y + config->bar_height - radius, radius, 0, M_PI_2);
@@ -369,7 +369,7 @@ static void draw_labels(cairo_t *cr, const Config *config) {
     // Set font and size
     cairo_select_font_face(cr, config->font_face, CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
     cairo_set_font_size(cr, config->font_size_labels);
-    cairo_set_source_rgb(cr, config->color_label.r, config->color_label.g, config->color_label.b);
+    cairo_set_source_rgb(cr, config->color_label.r / 255.0, config->color_label.g / 255.0, config->color_label.b / 255.0);
     // CPU label: left in top box
     cairo_move_to(cr, + 0, config->box_height / 2 + config->font_size_labels / 2 - 12);
     cairo_show_text(cr, "CPU");
