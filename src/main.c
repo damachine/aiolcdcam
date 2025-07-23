@@ -1,3 +1,10 @@
+/*
+ * @note Main entry point for CoolerDash daemon. Must be initialized before starting daemon loop.
+ * @author damachine
+ * @copyright (c) 2025 damachine
+ * @license MIT
+ * @version 1.0
+ */
 /**
  * @file main.c
  * @brief Main entry point for CoolerDash daemon.
@@ -5,13 +12,7 @@
  * @details
  * Implements the main daemon logic, including initialization, single-instance enforcement, signal handling, and main loop.
  *
- * @author damachine
- * @copyright Copyright (c) 2025 damachine
- * @license MIT
- * @version 0.25.07.23.2
- * @since 0.25.07.23.2
- *
- * @note
+ * Coding and Documentation Standards for CoolerDash:
  * - All code comments are written in English.
  * - Doxygen style is used for all function comments.
  * - See coding standards in project documentation and config.h for details.
@@ -26,17 +27,35 @@
  * - All malloc/calloc/realloc return values are checked.
  * - Single instance enforcement is handled via systemctl and pgrep.
  *
- * @warning
- * - This file must comply with ISO/IEC 9899:1999 (C99).
- * - Do not add obsolete or unused code.
+ * C99 Coding Guidelines:
+ * - Follow ISO/IEC 9899:1999 (C99)
+ * - Check return values of malloc(), calloc(), realloc()
+ * - Free dynamic memory and set pointers to NULL
+ * - Use include guards: #ifndef HEADER_H / #define HEADER_H / #endif
+ * - Only include necessary headers; separate system and local headers
+ * - Use 4 spaces for indentation, no tabs
+ * - Use const for immutable variables and parameters
+ * - Use static for file-local functions/variables
+ * - Use inline for small, frequently used functions
  *
+ * Naming Conventions:
+ * - Functions: snake_case verbs (e.g. calculate_sum())
+ * - Variables: snake_case (e.g. user_count)
+ * - Constants/Macros: UPPER_CASE (e.g. MAX_SIZE)
+ * - Structs via typedef: PascalCase (e.g. MyStruct)
+ * - Use descriptive names, avoid abbreviations
+ * - Use enum for status/error codes
+ * - Use typedef for complex types
+ * - Consistent naming throughout the project
+ *
+ * @warning This file must comply with ISO/IEC 9899:1999 (C99).
  * @see config.h, display.h
- *
- * @todo
- * - Add support for additional command line options if required.
- *
- * @example
- * See function documentation for usage examples.
+ * @todo Add support for additional command line options if required.
+ * @example See function documentation for usage examples.
+ * @author damachine
+ * @copyright (c) 2025 damachine
+ * @license MIT
+ * @version 1.0
  */
 
 // Function prototypes
@@ -72,15 +91,23 @@ static const Config *g_config_ptr = NULL;
 /**
  * @brief Signal handler for clean daemon termination with shutdown image.
  *
+ * @details
  * Sends a shutdown image to the LCD (if not already sent), removes the PID file, and sets the running flag to 0 for clean termination.
+ * Ensures that the shutdown image is only sent once per session.
  *
- * @param sig Signal number (unused)
+ * @param[in] sig Signal number (unused)
+ * @pre g_config_ptr must be initialized and point to a valid Config struct.
+ * @post Daemon is terminated, shutdown image sent, PID file removed.
  * @return void
- *
- * Example:
- * @code
- * signal(SIGTERM, cleanup_and_exit);
- * @endcode
+ * @note This function is registered as a signal handler for SIGTERM and SIGINT.
+ * @warning If device UID is not detected, shutdown image will not be sent.
+ * @see send_image_to_lcd, unlink
+ * @author damachine
+ * @copyright (c) 2025 damachine
+ * @license MIT
+ * @version 1.0
+ * @example
+ *     signal(SIGTERM, cleanup_and_exit);
  */
 static void cleanup_and_exit(int sig) {
     (void)sig; // parameter is not used

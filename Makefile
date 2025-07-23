@@ -284,6 +284,7 @@ install: check-deps-for-install $(TARGET)
 	@if [ ! -f /etc/coolerdash/config.ini ]; then \
 		sudo mkdir -p /etc/coolerdash/; \
 		sudo cp etc/coolerdash/config.ini /etc/coolerdash/config.ini; \
+		sudo cp etc/coolerdash/config.ini /opt/coolerdash/config.ini; \
 		printf "  $(GREEN)→$(RESET) Default config installed: /etc/coolerdash/config.ini\n"; \
 	else \
 		printf "  $(YELLOW)→$(RESET) Config already exists: /etc/coolerdash/config.ini\n"; \

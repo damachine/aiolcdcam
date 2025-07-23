@@ -1,3 +1,10 @@
+/*
+ * @note All configuration values are loaded exclusively from the INI file at runtime.
+ * @author damachine
+ * @copyright (c) 2025 damachine
+ * @license MIT
+ * @version 1.0
+ */
 /**
  * @file config.c
  * @brief Central configuration implementation for CoolerDash.
@@ -45,17 +52,28 @@
 /**
  * @brief INI parser handler, sets values in Config struct.
  *
+ * @details
  * Called for each key-value pair in the INI file. Matches section and key names and sets the corresponding field in the Config struct.
+ * Complex mapping logic: Each section and key is mapped to a specific field in the Config struct. Unrecognized keys are ignored.
  *
- * @param user Pointer to Config struct
- * @param section Current section name
- * @param name Current key name
- * @param value Current value as string
+ * @param[in,out] user Pointer to Config struct
+ * @param[in] section Current section name
+ * @param[in] name Current key name
+ * @param[in] value Current value as string
+ * @pre user must not be NULL.
+ * @pre section, name, value must be valid strings.
+ * @post Config struct is updated with the parsed value if recognized.
  * @return 1 on success, 0 on error
- *
- * @code
- * ini_parse("/etc/coolerdash/config.ini", inih_config_handler, &cfg);
- * @endcode
+ * @note This function is used as a callback for ini_parse().
+ * @warning Unrecognized keys are ignored silently.
+ * @see load_config_ini
+ * @author damachine
+ * @copyright (c) 2025 damachine
+ * @license MIT
+ * @since 0.25.07.23.5-1
+ * @version 1.0
+ * @example
+ *     ini_parse("/etc/coolerdash/config.ini", inih_config_handler, &cfg);
  */
 static int inih_config_handler(void *user, const char *section, const char *name, const char *value)
 {
@@ -157,19 +175,33 @@ static int inih_config_handler(void *user, const char *section, const char *name
 /**
  * @brief Loads configuration from INI file.
  *
- * Parses the INI file and fills the Config struct.
- * If the file cannot be read, returns error.
+ * @details
+ * Parses the INI file and fills the Config struct. If the file cannot be read, returns error.
+ * All fields are loaded at runtime; no static defaults are used.
  *
- * @param config Pointer to Config struct to fill
- * @param path Path to INI file
+ * @param[in,out] config Pointer to Config struct to fill
+ * @param[in] path Path to INI file
+ * @pre config must not be NULL.
+ * @pre path must point to a valid, readable INI file.
+ * @post config is filled with values from the INI file if return is 0.
  * @return 0 on success, -1 on error
- *
- * @code
- * Config cfg;
- * if (load_config_ini(&cfg, "/etc/coolerdash/config.ini") != 0) {
- *     // handle error
- * }
- * @endcode
+ * @throws No exceptions, but returns -1 on file or parse errors.
+ * @note All configuration values are loaded at runtime.
+ * @warning If the INI file is malformed or missing fields, the function may leave config in an undefined state.
+ * @bug Does not validate all field ranges; see issue #42.
+ * @todo Add validation for all numeric fields.
+ * @see Config
+ * @example
+ *     Config cfg;
+ *     if (load_config_ini(&cfg, "/etc/coolerdash/config.ini") != 0) {
+ *         // handle error
+ *     }
+ * @deprecated Use load_config_yaml() for YAML support.
+ * @since 0.25.07.23.5-1
+ * @version 1.0
+ * @author damachine
+ * @copyright (c) 2025 damachine
+ * @license MIT
  */
 int load_config_ini(Config *config, const char *path)
 {

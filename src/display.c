@@ -1,3 +1,10 @@
+/*
+ * @note All display logic is implemented in display.c. Only temperature values are used in current mode.
+ * @author damachine
+ * @copyright (c) 2025 damachine
+ * @license MIT
+ * @version 1.0
+ */
 /**
  * @file display.c
  * @brief LCD rendering and image upload for CoolerDash.
@@ -5,13 +12,7 @@
  * @details
  * Implements all display rendering logic, including temperature bars, labels, and image upload.
  *
- * @author damachine
- * @copyright Copyright (c) 2025 damachine
- * @license MIT
- * @version 0.25.07.23.2
- * @since 0.25.07.23.2
- *
- * @note
+ * Coding and Documentation Standards for CoolerDash:
  * - All code comments are written in English.
  * - Doxygen style is used for all function comments.
  * - See coding standards in project documentation and config.h for details.
@@ -27,17 +28,31 @@
  * - Only temperature logic is present; all usage/statistics code has been removed.
  * - Single instance enforcement is handled externally.
  *
- * @warning
- * - This file must comply with ISO/IEC 9899:1999 (C99).
- * - Do not add obsolete or unused code.
+ * C99 Coding Guidelines:
+ * - Follow ISO/IEC 9899:1999 (C99)
+ * - Check return values of malloc(), calloc(), realloc()
+ * - Free dynamic memory and set pointers to NULL
+ * - Use include guards: #ifndef HEADER_H / #define HEADER_H / #endif
+ * - Only include necessary headers; separate system and local headers
+ * - Use 4 spaces for indentation, no tabs
+ * - Use const for immutable variables and parameters
+ * - Use static for file-local functions/variables
+ * - Use inline for small, frequently used functions
  *
+ * Naming Conventions:
+ * - Functions: snake_case verbs (e.g. calculate_sum())
+ * - Variables: snake_case (e.g. user_count)
+ * - Constants/Macros: UPPER_CASE (e.g. MAX_SIZE)
+ * - Structs via typedef: PascalCase (e.g. MyStruct)
+ * - Use descriptive names, avoid abbreviations
+ * - Use enum for status/error codes
+ * - Use typedef for complex types
+ * - Consistent naming throughout the project
+ *
+ * @warning This file must comply with ISO/IEC 9899:1999 (C99).
  * @see config.h, display.h
- *
- * @todo
- * - Add support for additional display modes if required.
- *
- * @example
- * See function documentation for usage examples.
+ * @todo Add support for additional display modes if required.
+ * @example See function documentation for usage examples.
  */
 
 // Include project headers
@@ -269,11 +284,21 @@ static void draw_temperature_bars(cairo_t *cr, const sensor_data_t *data, const 
     /**
      * @brief Draws the background for the temperature bars.
      *
+     * @details
      * Uses the RGB values from config->color_bg, normalized to 0.0–1.0 for Cairo.
      *
-     * @param cr Cairo drawing context
-     * @param config Pointer to configuration struct (Config)
+     * @param[in] cr Cairo drawing context
+     * @param[in] config Pointer to configuration struct (Config)
+     * @pre cr must not be NULL.
+     * @pre config must not be NULL.
+     * @post Background is drawn for the temperature bars.
      * @return void
+     * @author damachine
+     * @copyright (c) 2025 damachine
+     * @license MIT
+     * @since 0.25.07.23.5-1
+     * @version 1.0
+     * @note This is an internal helper for draw_temperature_bars.
      */
     double radius = 8.0; // Corner radius in px
     cairo_set_source_rgb(cr, config->color_bg.r / 255.0, config->color_bg.g / 255.0, config->color_bg.b / 255.0);
@@ -415,14 +440,24 @@ static int should_update_display(const sensor_data_t *data, const Config *config
 /**
  * @brief Collects sensor data and renders display (default mode only).
  *
- * Reads all relevant sensor data (temperatures) and renders the display image. Also uploads the image to the device if available.
+ * @details
+ * Reads all relevant sensor data (CPU and GPU temperatures) and renders the display image. Also uploads the image to the device if available.
+ * This function is the main entry point for display updates in default mode.
  *
+ * @param[in] config Pointer to configuration struct (Config)
+ * @pre config must not be NULL.
+ * @post Display image is rendered and uploaded if successful.
  * @return void
- *
- * Example:
- * @code
- * draw_combined_image();
- * @endcode
+ * @note Silent continuation on render errors; no error reporting to caller.
+ * @see render_display
+ * @author damachine
+ * @copyright (c) 2025 damachine
+ * @license MIT
+ * @since 0.25.07.23.5-1
+ * @version 1.0
+ * @example
+ *     draw_combined_image(&config);
+ * @todo Add support for additional display modes and error reporting.
  */
 void draw_combined_image(const Config *config) {
     sensor_data_t sensor_data = {0};

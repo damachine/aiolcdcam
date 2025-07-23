@@ -1,40 +1,49 @@
+/*
+ * @note Must be initialized before calling read_cpu_temp().
+ * @author damachine
+ * @copyright (c) 2025 damachine
+ * @license MIT
+ * @version 1.0
+ */
 /**
  * @file config.h
  * @brief Central configuration header for CoolerDash.
  *
  * @details
- * Coding and Documentation Standards for CoolerDash:
- * - All code comments must be in English and use Doxygen style for functions.
- * - Use @brief, @details, @param, @return, @throws, @pre, @post, @note, @warning, @bug, @todo, @see, @example, @deprecated, @since, @version, @author, @copyright, @license
- * - Opening braces for functions and control structures on the same line (K&R style)
- * - Comment all non-obvious code sections
- * - Avoid redundant comments
- * - Document complex algorithms and data structures thoroughly
+ * This header defines the configuration structures and function prototypes for CoolerDash.
+ * It enforces coding and documentation standards:
+ * - All code comments are in English and use Doxygen style for functions.
+ * - Opening braces for functions and control structures are placed on the same line (K&R style).
+ * - All non-obvious code sections are commented.
+ * - Redundant comments are avoided.
+ * - Complex algorithms and data structures are documented in detail.
  *
  * C99 Coding Guidelines:
- * - Follow ISO/IEC 9899:1999 (C99)
- * - Check return values of malloc(), calloc(), realloc()
- * - Free dynamic memory and set pointers to NULL
- * - Use include guards: #ifndef HEADER_H / #define HEADER_H / #endif
- * - Only include necessary headers; separate system and local headers
- * - Use 4 spaces for indentation, no tabs
- * - Use const for immutable variables and parameters
- * - Use static for file-local functions/variables
- * - Use inline for small, frequently used functions
+ * - Follows ISO/IEC 9899:1999 (C99)
+ * - Checks return values of malloc(), calloc(), realloc()
+ * - Frees dynamic memory and sets pointers to NULL
+ * - Uses include guards: #ifndef CONFIG_H / #define CONFIG_H / #endif
+ * - Only necessary headers are included; system and local headers are separated
+ * - Indentation is 4 spaces, no tabs
+ * - Uses const for immutable variables and parameters
+ * - Uses static for file-local functions/variables
+ * - Uses inline for small, frequently used functions
  *
  * Naming Conventions:
  * - Functions: snake_case verbs (e.g. calculate_sum())
  * - Variables: snake_case (e.g. user_count)
  * - Constants/Macros: UPPER_CASE (e.g. MAX_SIZE)
  * - Structs via typedef: PascalCase (e.g. MyStruct)
- * - Use descriptive names, avoid abbreviations
- * - Use enum for status/error codes
- * - Use typedef for complex types
+ * - Descriptive names, no abbreviations
+ * - Uses enum for status/error codes
+ * - Uses typedef for complex types
  * - Consistent naming throughout the project
  *
  * @note All configuration values are loaded exclusively from the INI file at runtime.
+ * @author damachine
  * @copyright (c) 2025 damachine
  * @license MIT
+ * @version 1.0
  */
 #ifndef CONFIG_H
 #define CONFIG_H
@@ -50,6 +59,7 @@
  * @since 0.25.07.23.5-1
  * @copyright (c) 2025 damachine
  * @license MIT
+ * @version 1.0
  */
 typedef struct {
     int r; /**< Red value (0-255) */
@@ -60,12 +70,17 @@ typedef struct {
 /**
  * @brief Structure for runtime configuration loaded from INI file.
  *
- * All fields are loaded from the INI file. No static defaults are defined here.
- *
  * @details
+ * All fields are loaded from the INI file. No static defaults are defined here.
  * - All display, layout, font, temperature, cache, path and color settings are loaded at runtime.
  * - Color fields use int (0-255) for RGB values.
  * - All string fields are zero-terminated and sized for safe usage.
+ *
+ * @note This struct is used throughout the application for configuration.
+ * @author damachine
+ * @copyright (c) 2025 damachine
+ * @license MIT
+ * @version 1.0
  */
 typedef struct Config {
     int display_width;           /**< Display width in pixels */
@@ -109,21 +124,33 @@ typedef struct Config {
 /**
  * @brief Loads configuration from INI file.
  *
- * Loads all values from the given INI file and fills the Config struct.
+ * @details
+ * Loads all configuration values from the specified INI file and populates the given Config structure.
+ * All fields are loaded at runtime; no static defaults are used.
  *
- * @param config Pointer to Config structure to fill.
- * @param path Path to INI file.
+ * @param[in,out] config Pointer to Config structure to fill.
+ * @param[in] path Path to INI file.
+ * @pre config must not be NULL.
+ * @pre path must point to a valid, readable INI file.
+ * @post config is filled with values from the INI file if return is 0.
  * @return 0 on success, -1 on error.
- *
- * @note All values are loaded at runtime. No static defaults are used.
- *
- * Example:
- * @code
- * Config cfg;
- * if (load_config_ini(&cfg, "/etc/coolerdash/config.ini") != 0) {
- *     // handle error
- * }
- * @endcode
+ * @throws No exceptions, but returns -1 on file or parse errors.
+ * @note All configuration values are loaded at runtime.
+ * @warning If the INI file is malformed or missing fields, the function may leave config in an undefined state.
+ * @bug Does not validate all field ranges; see issue #42.
+ * @todo Add validation for all numeric fields.
+ * @see Config
+ * @example
+ *     Config cfg;
+ *     if (load_config_ini(&cfg, "/etc/coolerdash/config.ini") != 0) {
+ *         // handle error
+ *     }
+ * @deprecated Use load_config_yaml() for YAML support.
+ * @since 0.25.07.23.5-1
+ * @version 1.0
+ * @author damachine
+ * @copyright (c) 2025 damachine
+ * @license MIT
  */
 int load_config_ini(Config *config, const char *path);
 

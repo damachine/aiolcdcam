@@ -1,3 +1,10 @@
+/*
+ * @note Must be initialized before calling read_cpu_temp().
+ * @author damachine
+ * @copyright (c) 2025 damachine
+ * @license MIT
+ * @version 1.0
+ */
 /**
  * @file gpu_monitor.c
  * @brief GPU temperature monitoring implementation for CoolerDash.
@@ -5,13 +12,7 @@
  * @details
  * Implements functions for reading GPU temperature from system sensors and handling GPU availability.
  *
- * @author damachine
- * @copyright Copyright (c) 2025 damachine
- * @license MIT
- * @version 0.25.07.23.2
- * @since 0.25.07.23.2
- *
- * @note
+ * Coding and Documentation Standards for CoolerDash:
  * - All code comments are written in English.
  * - Doxygen style is used for all function comments.
  * - See coding standards in project documentation and config.h for details.
@@ -24,17 +25,35 @@
  * - All dynamically allocated memory is freed and pointers set to NULL.
  * - All malloc/calloc/realloc return values are checked.
  *
- * @warning
- * - This file must comply with ISO/IEC 9899:1999 (C99).
- * - Do not add obsolete or unused code.
+ * C99 Coding Guidelines:
+ * - Follow ISO/IEC 9899:1999 (C99)
+ * - Check return values of malloc(), calloc(), realloc()
+ * - Free dynamic memory and set pointers to NULL
+ * - Use include guards: #ifndef HEADER_H / #define HEADER_H / #endif
+ * - Only include necessary headers; separate system and local headers
+ * - Use 4 spaces for indentation, no tabs
+ * - Use const for immutable variables and parameters
+ * - Use static for file-local functions/variables
+ * - Use inline for small, frequently used functions
  *
+ * Naming Conventions:
+ * - Functions: snake_case verbs (e.g. calculate_sum())
+ * - Variables: snake_case (e.g. user_count)
+ * - Constants/Macros: UPPER_CASE (e.g. MAX_SIZE)
+ * - Structs via typedef: PascalCase (e.g. MyStruct)
+ * - Use descriptive names, avoid abbreviations
+ * - Use enum for status/error codes
+ * - Use typedef for complex types
+ * - Consistent naming throughout the project
+ *
+ * @warning This file must comply with ISO/IEC 9899:1999 (C99).
  * @see gpu_monitor.h, config.h
- *
- * @todo
- * - Add support for additional GPU sensor types if required.
- *
- * @example
- * See function documentation for usage examples.
+ * @todo Add support for additional GPU sensor types if required.
+ * @example See function documentation for usage examples.
+ * @author damachine
+ * @copyright (c) 2025 damachine
+ * @license MIT
+ * @version 1.0
  */
 
 // Include project headers

@@ -124,5 +124,6 @@ package() {
     install -dm755 "$pkgdir/usr/bin"
     ln -sf /opt/coolerdash/bin/coolerdash "$pkgdir/usr/bin/coolerdash"
     install -Dm644 etc/coolerdash/config.ini "$pkgdir/etc/coolerdash/config.ini"
+    install -Dm644 etc/coolerdash/config.ini "$pkgdir/opt/coolerdash/config.ini"
     install -dm755 "$pkgdir/run/coolerdash"
 }
