@@ -32,7 +32,7 @@ Right: AI-generated image to demonstrate LCD output*
 
 ## ✨ Features
 
-- **🏗️ Modular Architecture**: Separation of CPU, GPU, coolant, and display logic into separate modules
+- **🏗️ Modular Architecture**: Separation of CPU, GPU, and display logic into separate modules
 - **⚡ Performance-Optimized**: Caching, change detection, minimal I/O operations
 - **🔧 Automatic Device Detection**: Runtime UID detection.
 - **🎨 Display Modes (legacy)**: The program currently always runs in a fixed two-box layout (CPU/GPU temperature only). Mode selection is not available in this version. Support for selectable display modes (e.g. load bars, circular diagrams) may be reintroduced in a future version if there is sufficient demand.
@@ -43,11 +43,11 @@ Right: AI-generated image to demonstrate LCD output*
 - **🔧 Built with strict C99 compliance** for maximum portability and standards conformance.
 
 **Supported Distributions (Auto-Detected):**
-- **Arch Linux / Manjaro**: `pacman -S cairo libcurl-gnutls coolercontrol gcc make pkg-config`
-- **Ubuntu / Debian**: `apt install libcairo2-dev libcurl4-openssl-dev gcc make pkg-config`
-- **Fedora**: `dnf install cairo-devel libcurl-devel gcc make pkg-config`
-- **RHEL / CentOS**: `yum install cairo-devel libcurl-devel gcc make pkg-config`
-- **openSUSE**: `zypper install cairo-devel libcurl-devel gcc make pkg-config`
+- **Arch Linux / Manjaro**: `pacman -S cairo libcurl-gnutls coolercontrol libini gcc make pkg-config`
+- **Ubuntu / Debian**: `apt install libcairo2-dev libcurl4-openssl-dev coolercontrol libini-dev gcc make pkg-config`
+- **Fedora**: `dnf install cairo-devel libcurl-devel coolercontrol libini-devel gcc make pkg-config`
+- **RHEL / CentOS**: `yum install cairo-devel libcurl-devel coolercontrol libini-devel gcc make pkg-config`
+- **openSUSE**: `zypper install cairo-devel libcurl-devel coolercontrol libini-devel gcc make pkg-config`
 
 ## 📦 Installation
 
@@ -65,8 +65,7 @@ Right: AI-generated image to demonstrate LCD output*
 
 1. **Install CoolerControl**: [Installation Guide](https://gitlab.com/coolercontrol/coolercontrol/-/blob/main/README.md)
 2. **Start CoolerControl daemon**: `sudo systemctl start coolercontrold`
-3. **Configure your LCD** in CoolerControl GUI
-4. **Set LCD mode**: In CoolerControl GUI, set your LCD display to **"Image/gif"** mode!
+3. **Set LCD mode**: In CoolerControl GUI, set your LCD display to **"Image/gif"** mode!
 
 ### Install CoolerDash
 
@@ -86,7 +85,7 @@ makepkg -si
 # STEP 4: Enable autostart and start CoolerDash
 sudo systemctl enable --now coolerdash.service
 
-# STEP 5: Status CoolerDash service
+# STEP 5: (optional) Status CoolerDash service
 sudo systemctl status coolerdash.service
 journalctl -xeu coolerdash.service
 ```
@@ -107,7 +106,7 @@ sudo make install
 # STEP 4: Enable autostart
 sudo systemctl enable --now coolerdash.service
 
-# STEP 5: Status CoolerDash service
+# STEP 5: (optional) Status CoolerDash service
 sudo systemctl status coolerdash.service
 journalctl -xeu coolerdash.service
 ```
@@ -159,11 +158,6 @@ Below are the most important values you can adjust in `include/config.h` before 
 | SHUTDOWN_IMAGE_PATH    | /opt/coolerdash/images/shutdown.png | Path to shutdown image (displayed when service stops; you can change this path or imagee to use your own image) |
 
 > **Tip:** Edit these values in `include/config.h` before running `make` to change the look, update interval, thresholds, or LCD behavior to your needs.
-
-The daemon will:
-1. **Connect to CoolerControl** daemon at startup
-4. **Auto-detect new UID** if cache is invalid or missing
-6. **Display the active device** in the startup logs
 
 **For troubleshooting**, you can manually check devices:
 ```bash
