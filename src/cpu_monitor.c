@@ -1,6 +1,40 @@
 /**
  * @file cpu_monitor.c
- * @brief CPU temperature and usage monitoring implementation for CoolerDash.
+ * @brief CPU temperature monitoring implementation for CoolerDash.
+ *
+ * @details
+ * Implements functions for reading CPU temperature from system sensors.
+ *
+ * @author damachine
+ * @copyright Copyright (c) 2025 damachine
+ * @license MIT
+ * @version 0.25.07.23.2
+ * @since 0.25.07.23.2
+ *
+ * @note
+ * - All code comments are written in English.
+ * - Doxygen style is used for all function comments.
+ * - See coding standards in project documentation and config.h for details.
+ * - Opening braces for functions and control structures are placed on the same line (K&R style).
+ * - Only necessary headers are included; system and local headers are separated.
+ * - Code is indented with 4 spaces, no tabs.
+ * - All functions, variables, and types follow project naming conventions (snake_case, PascalCase, UPPER_CASE).
+ * - Inline comments are used sparingly and only when necessary.
+ * - Redundant comments are avoided.
+ * - All dynamically allocated memory is freed and pointers set to NULL.
+ * - All malloc/calloc/realloc return values are checked.
+ *
+ * @warning
+ * - This file must comply with ISO/IEC 9899:1999 (C99).
+ * - Do not add obsolete or unused code.
+ *
+ * @see cpu_monitor.h, config.h
+ *
+ * @todo
+ * - Add support for additional sensor types if required.
+ *
+ * @example
+ * See function documentation for usage examples.
  */
 
 // Include project headers
@@ -94,83 +128,17 @@ float read_cpu_temp(void) {
 }
 
 /**
- * @brief Read CPU statistics for usage calculation.
- *
- * Reads the current CPU statistics from /proc/stat and fills the provided structure.
- *
- * @param[out] stat CPU statistics structure
- * @return 1 on success, 0 on error
- *
- * Example:
- * @code
- * cpu_stat_t stat;
- * if (get_cpu_stat(&stat)) {
- *     // use stat
- * }
- * @endcode
- */
-int get_cpu_stat(cpu_stat_t *stat) {
-    FILE *fstat = fopen("/proc/stat", "r");
-    if (!fstat) { 
-        stat->total = 0; 
-        stat->idle = 0; 
-        return 0; 
-    }
-    
-    long user, nice, system, idle_val, iowait, irq, softirq, steal;
-    const int result = fscanf(fstat, "cpu %ld %ld %ld %ld %ld %ld %ld %ld", 
-                       &user, &nice, &system, &idle_val, &iowait, &irq, &softirq, &steal);
-    fclose(fstat);
-    
-    if (result == 8) {
-        // Calculate total and idle time for CPU
-        stat->idle = idle_val + iowait;
-        stat->total = stat->idle + user + nice + system + irq + softirq + steal;
-        return 1;
-    }
-    
-    stat->total = 0;
-    stat->idle = 0;
-    return 0;
-}
-
-/**
- * @brief Calculate CPU usage between two time points.
- *
- * Calculates the CPU usage as a percentage between two cpu_stat_t samples.
- *
- * @param last_stat Previous CPU statistics
- * @param curr_stat Current CPU statistics
- * @return CPU usage in percent (float), -1.0f on error
- *
- * Example:
- * @code
- * float usage = calculate_cpu_usage(&last, &curr);
- * @endcode
- */
-float calculate_cpu_usage(const cpu_stat_t *last_stat, const cpu_stat_t *curr_stat) {
-    if (!last_stat || !curr_stat) return -1.0f;
-    
-    const long totald = curr_stat->total - last_stat->total;
-    const long idled = curr_stat->idle - last_stat->idle;
-    
-    if (totald <= 0) return -1.0f;  // Error indicator
-    
-    const float usage = 100.0f * (float)(totald - idled) / (float)totald;
-    return (usage >= 0.0f && usage <= 100.0f) ? usage : 0.0f;
-}
-
-/**
  * @brief Read RAM usage from /proc/meminfo.
- *
- * Reads the current RAM usage from /proc/meminfo and returns the usage as a percentage.
- *
+ * @deprecated RAM usage is no longer used in CoolerDash. This function will be removed in future versions.
+ * @author damachine
+ * @since 0.25.07.23.2
+ * @version 0.25.07.23.2
  * @return RAM usage in percent (float), -1.0f on error
- *
- * Example:
- * @code
+ * @throws None
+ * @note This function is kept for legacy reasons only.
+ * @see cpu_monitor.h
+ * @example
  * float ram = get_ram_usage();
- * @endcode
  */
 float get_ram_usage(void) {
     FILE *fmem = fopen("/proc/meminfo", "r");

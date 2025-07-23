@@ -1,4 +1,16 @@
 post_install() {
+    # Create runtime directory for PID file
+    install -d -m 0755 /run/coolerdash || true
+    # Create user for service
+    if ! id -u coolerdash &>/dev/null; then
+        useradd --system --no-create-home coolerdash || true
+    fi
+    chown coolerdash:coolerdash /run/coolerdash || true
+
+    # Create tmp directory for PNG file
+    install -d -m 0755 /tmp/coolerdash
+    chown coolerdash:coolerdash /tmp/coolerdash
+    
     # Stop service before install or update
     if systemctl is-active --quiet coolerdash.service; then
         echo "Stopping coolerdash service..."
@@ -26,9 +38,13 @@ pre_remove() {
     rm -f /etc/systemd/system/coolerdash.service 2>/dev/null || true
     rm -f /usr/share/man/man1/coolerdash.1 2>/dev/null || true
     rm -f /usr/bin/coolerdash 2>/dev/null || true
-    rm -f /var/run/coolerdash.pid 2>/dev/null || true
-    rm -f /usr/bin/coolerdash 2>/dev/null || true
+    rm -f /run/coolerdash/coolerdash.pid 2>/dev/null || true
     rm -rf /opt/coolerdash 2>/dev/null || true
+    rm -rf /run/coolerdash 2>/dev/null || true
+    rm -rf /tmp/coolerdash 2>/dev/null || true
+    if id -u coolerdash &>/dev/null; then
+        userdel -rf coolerdash || true
+    fi
 }
 
 post_remove() {

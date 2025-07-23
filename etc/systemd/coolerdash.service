@@ -1,3 +1,28 @@
+# -----------------------------------------------------------------------------
+# CoolerDash systemd service unit
+#
+# @brief Systemd unit for running the CoolerDash daemon (LCD temperature monitor)
+# @details
+#   - Ensures single instance, proper permissions, and correct startup order.
+#   - Starts after network and CoolerControl services are available.
+#   - See README.md and man:coolerdash(1) for details.
+#
+# @author damachine
+# @copyright Copyright (c) 2025 damachine
+# @license MIT
+# @version 0.25.07.23.2
+# @since 0.25.07.23.2
+# @note
+#   - Edit User, paths, and dependencies as needed for your system.
+#   - All comments are in English for consistency.
+# @warning
+#   - Do not run as root. Use dedicated user for security.
+#   - Ensure all required services are enabled and running.
+# @todo
+#   - Add support for additional LCD device types if required.
+# @see README.md, man:coolerdash(1)
+# -----------------------------------------------------------------------------
+
 # CoolerDash systemd service unit
 #
 # Purpose: Runs the CoolerDash daemon for LCD temperature monitoring and control.
@@ -14,7 +39,14 @@ Requires=coolercontrold.service
 
 [Service]
 Type=simple
-ExecStart=/bin/coolerdash /etc/coolerdash/config.ini
+User=coolerdash
+Environment=CONFIG_FILE=/etc/coolerdash/config.ini
+ExecStart=/bin/coolerdash $CONFIG_FILE
+RuntimeDirectory=coolerdash
+RuntimeDirectoryMode=0755
+PIDFile=/run/coolerdash/coolerdash.pid
+ReadWritePaths=/run/coolerdash /tmp/coolerdash /etc/coolerdash /opt/coolerdash
+ProtectSystem=full
 Restart=always
 RestartSec=3
 TimeoutStopSec=3

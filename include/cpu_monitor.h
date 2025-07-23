@@ -1,7 +1,42 @@
 /**
  * @file cpu_monitor.h
- * @brief CPU temperature and usage monitoring interface for CoolerDash.
+ * @brief CPU temperature monitoring interface for CoolerDash.
+ *
+ * @details
+ * Provides functions and global variables for reading CPU temperature from system sensors.
+ *
+ * @author damachine
+ * @copyright Copyright (c) 2025 damachine
+ * @license MIT
+ * @version 0.25.07.23.2
+ * @since 0.25.07.23.2
+ *
+ * @note
+ * - All code comments are written in English.
+ * - Doxygen style is used for all function comments.
+ * - See coding standards in project documentation and config.h for details.
+ * - Opening braces for functions and control structures are placed on the same line (K&R style).
+ * - Only necessary headers are included; system and local headers are separated.
+ * - Code is indented with 4 spaces, no tabs.
+ * - All functions, variables, and types follow project naming conventions (snake_case, PascalCase, UPPER_CASE).
+ * - Inline comments are used sparingly and only when necessary.
+ * - Redundant comments are avoided.
+ * - All dynamically allocated memory is freed and pointers set to NULL.
+ * - All malloc/calloc/realloc return values are checked.
+ *
+ * @warning
+ * - This file must comply with ISO/IEC 9899:1999 (C99).
+ * - Do not add obsolete or unused code.
+ *
+ * @see config.h
+ *
+ * @todo
+ * - Add support for additional sensor types if required.
+ *
+ * @example
+ * See function documentation for usage examples.
  */
+
 #ifndef CPU_MONITOR_H
 #define CPU_MONITOR_H
 
@@ -35,72 +70,6 @@ void init_cpu_sensor_path(const Config *config);
  * @endcode
  */
 float read_cpu_temp(void);
-
-// CPU Usage Functions (only for modes 1, 2, 3)
-/**
- * @brief Structure to hold CPU statistics for usage calculation.
- *
- * Holds total and idle CPU time for usage calculations.
- *
- * Example:
- * @code
- * cpu_stat_t stat;
- * get_cpu_stat(&stat);
- * @endcode
- */
-typedef struct {
-    long total; /**< Total CPU time. */
-    long idle;  /**< Idle CPU time. */
-} cpu_stat_t;
-
-/**
- * @brief Get the current CPU statistics.
- *
- * Reads the current CPU statistics from /proc/stat and fills the provided structure.
- *
- * @param[out] stat Pointer to a cpu_stat_t structure to be filled.
- * @return 1 on success, 0 on failure.
- *
- * Example:
- * @code
- * cpu_stat_t stat;
- * if (get_cpu_stat(&stat)) {
- *     // use stat
- * }
- * @endcode
- */
-int get_cpu_stat(cpu_stat_t *stat);
-
-/**
- * @brief Calculate CPU usage percentage between two samples.
- *
- * Calculates the CPU usage as a percentage between two cpu_stat_t samples.
- *
- * @param last_stat Pointer to the previous CPU statistics.
- * @param curr_stat Pointer to the current CPU statistics.
- * @return CPU usage as a percentage (0.0 - 100.0), -1.0f on error.
- *
- * Example:
- * @code
- * float usage = calculate_cpu_usage(&last, &curr);
- * @endcode
- */
-float calculate_cpu_usage(const cpu_stat_t *last_stat, const cpu_stat_t *curr_stat);
-
-// RAM Usage Functions (only for modes 1, 2, 3)
-/**
- * @brief Get the current RAM usage as a percentage.
- *
- * Reads the current RAM usage from /proc/meminfo and returns the usage as a percentage.
- *
- * @return RAM usage as a percentage (0.0 - 100.0), -1.0f on error.
- *
- * Example:
- * @code
- * float ram = get_ram_usage();
- * @endcode
- */
-float get_ram_usage(void);
 
 /**
  * @brief Path to the CPU temperature sensor file (set by init_cpu_sensor_path).

@@ -1,6 +1,40 @@
 /**
  * @file coolercontrol.h
  * @brief CoolerControl API interface for LCD device communication.
+ *
+ * @details
+ * Provides functions for initializing, authenticating, and communicating with CoolerControl LCD devices.
+ *
+ * @author damachine
+ * @copyright Copyright (c) 2025 damachine
+ * @license MIT
+ * @version 0.25.07.23.2
+ * @since 0.25.07.23.2
+ *
+ * @note
+ * - All code comments are written in English.
+ * - Doxygen style is used for all function comments.
+ * - See coding standards in project documentation and config.h for details.
+ * - Opening braces for functions and control structures are placed on the same line (K&R style).
+ * - Only necessary headers are included; system and local headers are separated.
+ * - Code is indented with 4 spaces, no tabs.
+ * - All functions, variables, and types follow project naming conventions (snake_case, PascalCase, UPPER_CASE).
+ * - Inline comments are used sparingly and only when necessary.
+ * - Redundant comments are avoided.
+ * - All dynamically allocated memory is freed and pointers set to NULL.
+ * - All malloc/calloc/realloc return values are checked.
+ *
+ * @warning
+ * - This file must comply with ISO/IEC 9899:1999 (C99).
+ * - Do not add obsolete or unused code.
+ *
+ * @see config.h
+ *
+ * @todo
+ * - Add support for additional LCD device types if required.
+ *
+ * @example
+ * See function documentation for usage examples.
  */
 #ifndef COOLERCONTROL_H
 #define COOLERCONTROL_H
@@ -69,7 +103,7 @@ int is_session_initialized(void);
  * }
  * @endcode
  */
-int get_device_name(char* name_buffer, size_t buffer_size);
+int get_device_name(const Config *config, char* name_buffer, size_t buffer_size);
 
 /**
  * @brief Retrieves the UID of the first LCD device found.
@@ -86,7 +120,7 @@ int get_device_name(char* name_buffer, size_t buffer_size);
  * }
  * @endcode
  */
-int get_device_uid(char* uid_buffer, size_t buffer_size);
+int get_device_uid(const Config *config, char* uid_buffer, size_t buffer_size);
 
 /**
  * @brief Initialize and cache the device UID at program start.
@@ -100,7 +134,7 @@ int get_device_uid(char* uid_buffer, size_t buffer_size);
  * if (!init_cached_device_uid()) { ... }
  * @endcode
  */
-int init_cached_device_uid(void);
+int init_cached_device_uid(const Config *config);
 
 /**
  * @brief Get the cached device UID (read-only).

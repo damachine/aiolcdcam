@@ -1,7 +1,42 @@
 /**
  * @file gpu_monitor.h
- * @brief GPU temperature and usage monitoring interface for CoolerDash.
+ * @brief GPU temperature monitoring interface for CoolerDash.
+ *
+ * @details
+ * Provides functions and data structures for reading GPU temperature from system sensors.
+ *
+ * @author damachine
+ * @copyright Copyright (c) 2025 damachine
+ * @license MIT
+ * @version 0.25.07.23.2
+ * @since 0.25.07.23.2
+ *
+ * @note
+ * - All code comments are written in English.
+ * - Doxygen style is used for all function comments.
+ * - See coding standards in project documentation and config.h for details.
+ * - Opening braces for functions and control structures are placed on the same line (K&R style).
+ * - Only necessary headers are included; system and local headers are separated.
+ * - Code is indented with 4 spaces, no tabs.
+ * - All functions, variables, and types follow project naming conventions (snake_case, PascalCase, UPPER_CASE).
+ * - Inline comments are used sparingly and only when necessary.
+ * - Redundant comments are avoided.
+ * - All dynamically allocated memory is freed and pointers set to NULL.
+ * - All malloc/calloc/realloc return values are checked.
+ *
+ * @warning
+ * - This file must comply with ISO/IEC 9899:1999 (C99).
+ * - Do not add obsolete or unused code.
+ *
+ * @see config.h
+ *
+ * @todo
+ * - Add support for additional GPU sensor types if required.
+ *
+ * @example
+ * See function documentation for usage examples.
  */
+
 #ifndef GPU_MONITOR_H
 #define GPU_MONITOR_H
 
@@ -11,7 +46,6 @@
  * @brief Structure to hold GPU monitoring data.
  *
  * This struct is used to aggregate all relevant GPU monitoring values (temperature, usage, memory usage).
- * It is filled by get_gpu_data_full() and can be extended for future metrics.
  *
  * @note All values are in degrees Celsius or percent (0.0 - 100.0).
  *
@@ -23,8 +57,6 @@
  */
 typedef struct {
     float temperature;   /**< GPU temperature in degrees Celsius. */
-    float usage;         /**< GPU usage as a percentage (0.0 - 100.0). */
-    float memory_usage;  /**< GPU memory usage as a percentage (0.0 - 100.0). */
 } gpu_data_t;
 
 /**
@@ -60,29 +92,9 @@ int init_gpu_monitor(const Config *config);
 float read_gpu_temp(const Config *config);
 
 /**
- * @brief Get the current GPU usage and memory usage using configuration.
+ * @brief Get GPU monitoring data.
  *
- * Reads the current GPU usage and memory usage percentages using config values.
- *
- * @param config Pointer to configuration struct (Config).
- * @param[out] usage Pointer to store the GPU usage percentage
- * @param[out] mem_usage Pointer to store the GPU memory usage percentage
- * @return 1 on success, 0 on error
- *
- * Example:
- * @code
- * float usage, mem;
- * if (get_gpu_usage_data(&config, &usage, &mem)) {
- *     // use usage and mem
- * }
- * @endcode
- */
-int get_gpu_usage_data(const Config *config, float *usage, float *mem_usage);
-
-/**
- * @brief Get all available GPU monitoring data using configuration.
- *
- * Fills a gpu_data_t structure with temperature, usage, and memory usage values using config values.
+ * Fills a gpu_data_t structure with temperature value.
  *
  * @param config Pointer to configuration struct (Config).
  * @param[out] data Pointer to a gpu_data_t structure to be filled

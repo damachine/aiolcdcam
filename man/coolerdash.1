@@ -5,16 +5,27 @@ coolerdash \- CoolerDash Temperature Monitor (Professional Modular C Daemon)
 .B coolerdash
 .br
 .B coolerdash
-[B\-hR|\fB\-\-help\fR]
+[\fB\-\-help\fR]
 .SH DESCRIPTION
 .B coolerdash
-is a high-performance, modular C-based daemon with professional systemd integration that monitors CPU and GPU temperatures and displays them graphically on the LCD display of an NZXT water cooler. The program is fully developed in modular C99 architecture for maximum efficiency, maintainability, and production stability.
+is a high-performance, modular C99-based daemon with professional systemd integration that monitors CPU and GPU temperatures and displays them graphically on the LCD display of an NZXT water cooler. The program is fully developed in modular C99 architecture for maximum efficiency, maintainability, and production stability.
 
 The program always runs in a fixed two-box layout (CPU top, GPU bottom) and does not support display mode selection. All mode logic and coolant display have been removed for simplicity and reliability.
 
 Note: Support for selectable display modes (e.g. load bars, circular diagrams) may be reintroduced in a future version if there is sufficient demand.
 
 The program communicates with the device via the native CoolerControl REST API without Python dependencies and provides detailed systemd logs for professional service management.
+
+.SH CODING STANDARDS
+The source code strictly follows ISO/IEC 9899:1999 (C99) and project coding standards:
+.TP
+- Doxygen-style comments for all functions and modules
+- Consistent naming conventions (snake_case for functions/variables, PascalCase for typedef structs)
+- Robust memory management (check malloc/calloc/realloc, free memory, set pointers to NULL)
+- Use of include guards, const/static/inline where appropriate
+- Clean code structure: separation of declarations, definitions, and implementations
+- All code comments in English
+- See PKGBUILD and Makefile for build and packaging standards
 
 .SH ARCHITECTURE
 The program follows the standard C project structure:
@@ -30,6 +41,15 @@ Compiled object files (.o)
 .TP
 .I man/
 Documentation
+.TP
+.I PKGBUILD
+Arch Linux packaging script
+.TP
+.I Makefile
+Build and install automation
+.TP
+.I etc/systemd/coolerdash.service
+Systemd service file
 .TP
 .I src/main.c
 Daemon management and sensor coordination
@@ -54,8 +74,9 @@ REST API communication and session management
 
 .SH OPTIONS
 .TP
-.BR \-h ", " \-\-help
+.BR \-\-help
 Shows help information and usage examples
+
 .SH FILES
 .TP
 .I /opt/coolerdash/bin/coolerdash
@@ -72,6 +93,16 @@ Systemd service file
 .TP
 .I /var/run/coolerdash.pid
 PID file for process management
+.TP
+.I /etc/coolerdash/config.ini
+Main runtime configuration file
+.TP
+.I PKGBUILD
+Arch Linux packaging script
+.TP
+.I Makefile
+Build and install automation
+
 .SH EXAMPLES
 .TP
 Start program (fixed two-box layout, CPU/GPU temperature only):
@@ -130,7 +161,7 @@ All important runtime and build-time settings are managed via configuration file
 Main runtime configuration file. Edit this file to change display, thresholds, colors, paths, and daemon settings without recompiling.
 After editing, restart the service with:
 .br
-Bsudo systemctl restart coolerdash.serviceR
+\fBsudo systemctl restart coolerdash.service\fR
 .br
 Values in config.ini always take precedence over those in include/config.h.
 If config.ini is missing, all settings from include/config.h are used as defaults.
@@ -152,10 +183,16 @@ Cairo (graphics), cURL (HTTP), NVIDIA-SMI (GPU data), hwmon (temperature sensors
 Installs to /opt/coolerdash/bin/ and /opt/coolerdash/images/.
 Systemd service file is installed to /etc/systemd/system/coolerdash.service.
 Default config file is installed to /etc/coolerdash/config.ini.
+.TP
+.B PKGBUILD and AUR
+Arch Linux users can build and install via PKGBUILD and AUR. See PKGBUILD for details.
 
 .SH UNINSTALL
 Removes all files from /opt/coolerdash/ and disables the service.
 The config file /etc/coolerdash/config.ini is preserved unless unchanged (Arch standard).
+.TP
+.B PKGBUILD
+Provides uninstall logic for Arch Linux packaging.
 
 .SH USAGE
 .TP
@@ -179,9 +216,13 @@ The config file /etc/coolerdash/config.ini is preserved unless unchanged (Arch s
 - After editing config.ini, restart the service to apply changes.
 - If config.ini is missing, build-time defaults from include/config.h are used.
 - No legacy mode selection, cache directories, or UID files are used.
+- All code is documented with Doxygen-style comments and follows strict coding standards.
+- See PKGBUILD and Makefile for build and packaging documentation.
 
 .SH BUGS
 Report bugs to: christkue79@gmail.com or via GitHub Issues: https://github.com/damachine/coolerdash/issues
+.TP
+- All known bugs are documented in the source code with Doxygen @bug comments.
 
 .SH AUTHOR
 Written by DAMACHINE (christkue79@gmail.com).

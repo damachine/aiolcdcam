@@ -1,6 +1,40 @@
 /**
  * @file gpu_monitor.c
- * @brief GPU temperature and usage monitoring implementation for CoolerDash.
+ * @brief GPU temperature monitoring implementation for CoolerDash.
+ *
+ * @details
+ * Implements functions for reading GPU temperature from system sensors and handling GPU availability.
+ *
+ * @author damachine
+ * @copyright Copyright (c) 2025 damachine
+ * @license MIT
+ * @version 0.25.07.23.2
+ * @since 0.25.07.23.2
+ *
+ * @note
+ * - All code comments are written in English.
+ * - Doxygen style is used for all function comments.
+ * - See coding standards in project documentation and config.h for details.
+ * - Opening braces for functions and control structures are placed on the same line (K&R style).
+ * - Only necessary headers are included; system and local headers are separated.
+ * - Code is indented with 4 spaces, no tabs.
+ * - All functions, variables, and types follow project naming conventions (snake_case, PascalCase, UPPER_CASE).
+ * - Inline comments are used sparingly and only when necessary.
+ * - Redundant comments are avoided.
+ * - All dynamically allocated memory is freed and pointers set to NULL.
+ * - All malloc/calloc/realloc return values are checked.
+ *
+ * @warning
+ * - This file must comply with ISO/IEC 9899:1999 (C99).
+ * - Do not add obsolete or unused code.
+ *
+ * @see gpu_monitor.h, config.h
+ *
+ * @todo
+ * - Add support for additional GPU sensor types if required.
+ *
+ * @example
+ * See function documentation for usage examples.
  */
 
 // Include project headers
@@ -109,59 +143,9 @@ float read_gpu_temp(const Config *config) {
 }
 
 /**
- * @brief Reads GPU usage data (for modes 1, 2, 3).
+ * @brief Reads GPU temperature only (usage and memory usage always 0).
  *
- * Reads the current GPU usage and memory usage percentages, with caching for performance.
- *
- * @param config Pointer to configuration struct (Config)
- * @param[out] usage GPU utilization in percent
- * @param[out] mem_usage GPU RAM usage in percent
- * @return 1 on success, 0 on error
- *
- * Example:
- * @code
- * float usage, mem;
- * if (get_gpu_usage_data(&config, &usage, &mem)) {
- *     // use usage and mem
- * }
- * @endcode
- */
-int get_gpu_usage_data(const Config *config, float *usage, float *mem_usage) {
-    if (!init_gpu_monitor(config) || !usage || !mem_usage) {
-        if (usage) *usage = 0.0f;
-        if (mem_usage) *mem_usage = 0.0f;
-        return 0;
-    }
-    
-    static long long last_update_ms = 0;
-    static float cached_usage = 0, cached_mem_usage = 0;
-    long long now_ms = get_current_time_ms();
-    long long cache_interval_ms = (long long)(config->gpu_cache_interval * 1000);
-    
-    if (now_ms - last_update_ms >= cache_interval_ms) {
-        FILE *fp = popen("nvidia-smi --query-gpu=utilization.gpu,memory.used,memory.total --format=csv,noheader,nounits 2>/dev/null", "r");
-        if (fp) {
-            float mem_total = 0, mem_used = 0;
-            if (fscanf(fp, "%f, %f, %f", &cached_usage, &mem_used, &mem_total) == 3) {
-                cached_mem_usage = (mem_total > 0) ? (100.0f * mem_used / mem_total) : 0.0f;
-            } else {
-                cached_usage = 0.0f;
-                cached_mem_usage = 0.0f;
-            }
-            pclose(fp);
-            last_update_ms = now_ms;
-        }
-    }
-    
-    *usage = cached_usage;
-    *mem_usage = cached_mem_usage;
-    return 1;
-}
-
-/**
- * @brief Reads all GPU data (temperature, usage, RAM usage) with caching.
- *
- * Fills a gpu_data_t structure with temperature, usage, and memory usage values.
+ * Fills a gpu_data_t structure with temperature value, usage and memory usage set to 0.
  *
  * @param config Pointer to configuration struct (Config)
  * @param[out] data Pointer to GPU data structure
@@ -176,35 +160,7 @@ int get_gpu_usage_data(const Config *config, float *usage, float *mem_usage) {
  * @endcode
  */
 int get_gpu_data_full(const Config *config, gpu_data_t *data) {
-    static long long last_update_ms = 0;
-    static gpu_data_t cached_data = {0};
-    long long now_ms = get_current_time_ms();
-    long long cache_interval_ms = (long long)(config->gpu_cache_interval * 1000);
-    
     if (!data) return 0;
-    
-    if (now_ms - last_update_ms >= cache_interval_ms) {
-        FILE *fp = popen("nvidia-smi --query-gpu=temperature.gpu,utilization.gpu,memory.used,memory.total --format=csv,noheader,nounits 2>/dev/null", "r");
-        if (fp) {
-            float mem_total = 0, mem_used = 0;
-            if (fscanf(fp, "%f, %f, %f, %f", &cached_data.temperature, &cached_data.usage, &mem_used, &mem_total) == 4) {
-                cached_data.memory_usage = (mem_total > 0) ? (100.0f * mem_used / mem_total) : 0.0f;
-            } else {
-                // Error reading - set to 0
-                cached_data.temperature = 0.0f;
-                cached_data.usage = 0.0f;
-                cached_data.memory_usage = 0.0f;
-            }
-            pclose(fp);
-            last_update_ms = now_ms;
-        } else {
-            // nvidia-smi not available
-            cached_data.temperature = 0.0f;
-            cached_data.usage = 0.0f;
-            cached_data.memory_usage = 0.0f;
-        }
-    }
-    
-    *data = cached_data;
+    data->temperature = read_gpu_temp(config);
     return 1;
 }

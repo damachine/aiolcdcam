@@ -1,6 +1,40 @@
 /**
  * @file display.h
  * @brief LCD rendering and image upload interface for CoolerDash.
+ *
+ * @details
+ * Coding and Documentation Standards for CoolerDash:
+ * - All code comments must be in English and use Doxygen style for functions.
+ * - Use @brief, @details, @param, @return, @throws, @pre, @post, @note, @warning, @bug, @todo, @see, @example, @deprecated, @since, @version, @author, @copyright, @license
+ * - Opening braces for functions and control structures on the same line (K&R style)
+ * - Comment all non-obvious code sections
+ * - Avoid redundant comments
+ * - Document complex algorithms and data structures thoroughly
+ *
+ * C99 Coding Guidelines:
+ * - Follow ISO/IEC 9899:1999 (C99)
+ * - Check return values of malloc(), calloc(), realloc()
+ * - Free dynamic memory and set pointers to NULL
+ * - Use include guards: #ifndef HEADER_H / #define HEADER_H / #endif
+ * - Only include necessary headers; separate system and local headers
+ * - Use 4 spaces for indentation, no tabs
+ * - Use const for immutable variables and parameters
+ * - Use static for file-local functions/variables
+ * - Use inline for small, frequently used functions
+ *
+ * Naming Conventions:
+ * - Functions: snake_case verbs (e.g. calculate_sum())
+ * - Variables: snake_case (e.g. user_count)
+ * - Constants/Macros: UPPER_CASE (e.g. MAX_SIZE)
+ * - Structs via typedef: PascalCase (e.g. MyStruct)
+ * - Use descriptive names, avoid abbreviations
+ * - Use enum for status/error codes
+ * - Use typedef for complex types
+ * - Consistent naming throughout the project
+ *
+ * @note All display logic is implemented in display.c. Only temperature values are used in current mode.
+ * @copyright (c) 2025 damachine
+ * @license MIT
  */
 #ifndef DISPLAY_H
 #define DISPLAY_H
@@ -24,10 +58,6 @@ typedef struct {
     float gpu_temp; /**< GPU temperature in degrees Celsius */
     /*
      * float coolant_temp; // Reserved for future multi-mode support
-     * float cpu_usage;    // Reserved for future usage bar support
-     * float ram_usage;    // Reserved for future usage bar support
-     * float gpu_usage;    // Reserved for future usage bar support
-     * float gpu_ram_usage;// Reserved for future usage bar support
      */
 } sensor_data_t;
 

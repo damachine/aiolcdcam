@@ -1,3 +1,28 @@
+# -----------------------------------------------------------------------------
+# CoolerDash Makefile
+#
+# @brief Build system for CoolerDash (C99 LCD daemon)
+# @details
+#   - Handles build, install, uninstall, debug, and service management.
+#   - All comments are in English for consistency.
+#   - See README.md and AUR-README.md for details.
+#
+# @author damachine
+# @copyright Copyright (c) 2025 damachine
+# @license MIT
+# @version 0.25.07.23.2
+# @since 0.25.07.23.2
+# @note
+#   - Edit paths, dependencies, and user as needed for your system.
+#   - All build targets follow C99 and project coding standards.
+# @warning
+#   - Do not run as root. Use dedicated user for security.
+#   - Ensure all required dependencies are installed.
+# @todo
+#   - Add support for additional platforms and packaging formats.
+# @see README.md, AUR-README.md
+# -----------------------------------------------------------------------------
+
 # Project coding standards and packaging notes (see README for details)
 #
 # Maintainer: DAMACHINE <christkue79@gmail.com>
@@ -204,6 +229,19 @@ install: check-deps-for-install $(TARGET)
 	@printf "\n"
 	@printf "$(ICON_INSTALL) $(WHITE)═══ COOLERDASH INSTALLATION ═══$(RESET)\n"
 	@printf "\n"
+	@printf "$(ICON_INFO) $(CYAN)Creating runtime directory for PID file...$(RESET)\n"
+	sudo install -d -m 0755 /run/coolerdash
+	@if ! id -u coolerdash &>/dev/null; then \
+		sudo useradd --system --no-create-home coolerdash; \
+	fi
+	sudo chown coolerdash:coolerdash /run/coolerdash
+	@printf "$(ICON_SUCCESS) $(GREEN)Runtime directory and user ready$(RESET)\n"
+	@printf "\n"
+	@printf "$(ICON_INFO) $(CYAN)Creating /tmp/coolerdash...$(RESET)\n"
+	sudo install -d -m 1777 /tmp/coolerdash
+	sudo chown coolerdash:coolerdash /tmp/coolerdash
+	@printf "$(ICON_SUCCESS) $(GREEN)/tmp/coolerdash created and permissions set$(RESET)\n"
+	@printf "\n"
 	@printf "$(ICON_SERVICE) $(CYAN)Checking running service and processes...$(RESET)\n"
 	@if sudo systemctl is-active --quiet coolerdash.service; then \
 		printf "  $(YELLOW)→$(RESET) Service running, stopping for update...\n"; \
@@ -314,8 +352,10 @@ uninstall:
 	sudo rm -rf /opt/coolerdash/images/ 2>/dev/null || true
 	sudo rm -rf /opt/coolerdash/ 2>/dev/null || true
 	sudo rm -f /usr/bin/coolerdash 2>/dev/null || true
-	sudo rm -f /var/run/coolerdash.pid 2>/dev/null || true
+	sudo rm -f /run/coolerdash/coolerdash.pid 2>/dev/null || true
+	sudo rm -rf /run/coolerdash 2>/dev/null || true
 	sudo rm -f /opt/coolerdash/VERSION 2>/dev/null || true
+	sudo rm -rf /tmp/coolerdash 2>/dev/null || true
 	# Remove any remaining files in /opt/coolerdash (catch-all, safe if dir already gone)
 	sudo rm -f /opt/coolerdash/* 2>/dev/null || true
 	@printf "  $(RED)✗$(RESET) Service: /etc/systemd/system/coolerdash.service\n"
@@ -325,8 +365,12 @@ uninstall:
 	@printf "  $(RED)✗$(RESET) Images: /opt/coolerdash/images/\n"
 	@printf "  $(RED)✗$(RESET) Installation: /opt/coolerdash/\n"
 	@printf "  $(RED)✗$(RESET) Symlink: /usr/bin/coolerdash\n"
+	@printf "  $(RED)✗$(RESET) Temp: /tmp/coolerdash\n"
 	@printf "\n"
 	@printf "$(ICON_INFO) $(CYAN)Updating system...$(RESET)\n"
+	@if id -u coolerdash &>/dev/null; then \
+        sudo userdel -rf coolerdash || true; \
+    fi
 	sudo mandb -q 2>/dev/null || true
 	sudo systemctl daemon-reload 2>/dev/null || true
 	@printf "\n"

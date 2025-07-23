@@ -1,6 +1,43 @@
 /**
  * @file display.c
  * @brief LCD rendering and image upload for CoolerDash.
+ *
+ * @details
+ * Implements all display rendering logic, including temperature bars, labels, and image upload.
+ *
+ * @author damachine
+ * @copyright Copyright (c) 2025 damachine
+ * @license MIT
+ * @version 0.25.07.23.2
+ * @since 0.25.07.23.2
+ *
+ * @note
+ * - All code comments are written in English.
+ * - Doxygen style is used for all function comments.
+ * - See coding standards in project documentation and config.h for details.
+ * - Opening braces for functions and control structures are placed on the same line (K&R style).
+ * - Only necessary headers are included; system and local headers are separated.
+ * - Code is indented with 4 spaces, no tabs.
+ * - All functions, variables, and types follow project naming conventions (snake_case, PascalCase, UPPER_CASE).
+ * - Complex algorithms and data structures are documented in detail.
+ * - Inline comments are used sparingly and only when necessary.
+ * - Redundant comments are avoided.
+ * - All dynamically allocated memory is freed and pointers set to NULL.
+ * - All malloc/calloc/realloc return values are checked.
+ * - Only temperature logic is present; all usage/statistics code has been removed.
+ * - Single instance enforcement is handled externally.
+ *
+ * @warning
+ * - This file must comply with ISO/IEC 9899:1999 (C99).
+ * - Do not add obsolete or unused code.
+ *
+ * @see config.h, display.h
+ *
+ * @todo
+ * - Add support for additional display modes if required.
+ *
+ * @example
+ * See function documentation for usage examples.
  */
 
 // Include project headers
@@ -59,7 +96,7 @@ void lerp_temp_color(const Config *config, float val, int* r, int* g, int* b) {
 static void draw_temperature_bars(cairo_t *cr, const sensor_data_t *data, const Config *config);
 static void draw_temperature_displays(cairo_t *cr, const sensor_data_t *data, const Config *config);
 static void draw_labels(cairo_t *cr, const Config *config);
-static int should_update_display(const sensor_data_t *data);
+static int should_update_display(const sensor_data_t *data, const Config *config);
 
 /**
  * @brief Render display based on sensor data (only default mode).
@@ -84,7 +121,7 @@ int render_display(const Config *config, const sensor_data_t *data) {
     int success = 0;
 
     // Only update if sensor data changed significantly
-    if (!should_update_display(data)) {
+    if (!should_update_display(data, config)) {
         return 1; // No update needed, but no error
     }
 
@@ -229,8 +266,17 @@ static void draw_temperature_bars(cairo_t *cr, const sensor_data_t *data, const 
         (cpu_val_w > config->bar_width) ? config->bar_width : cpu_val_w; // Clamp to valid range
     
     // Draw CPU bar background (rounded corners)
+    /**
+     * @brief Draws the background for the temperature bars.
+     *
+     * Uses the RGB values from config->color_bg, normalized to 0.0–1.0 for Cairo.
+     *
+     * @param cr Cairo drawing context
+     * @param config Pointer to configuration struct (Config)
+     * @return void
+     */
     double radius = 8.0; // Corner radius in px
-    cairo_set_source_rgb(cr, config->color_bg.r, config->color_bg.g, config->color_bg.b);
+    cairo_set_source_rgb(cr, config->color_bg.r / 255.0, config->color_bg.g / 255.0, config->color_bg.b / 255.0);
     cairo_new_sub_path(cr);
     cairo_arc(cr, bar_x + config->bar_width - radius, cpu_bar_y + radius, radius, -M_PI_2, 0);
     cairo_arc(cr, bar_x + config->bar_width - radius, cpu_bar_y + config->bar_height - radius, radius, 0, M_PI_2);
@@ -271,7 +317,7 @@ static void draw_temperature_bars(cairo_t *cr, const sensor_data_t *data, const 
     const int safe_gpu_val_w = (gpu_val_w < 0) ? 0 : 
         (gpu_val_w > config->bar_width) ? config->bar_width : gpu_val_w; // Clamp to valid range
     // Draw GPU bar background (rounded corners)
-    cairo_set_source_rgb(cr, config->color_bg.r, config->color_bg.g, config->color_bg.b);
+    cairo_set_source_rgb(cr, config->color_bg.r / 255.0, config->color_bg.g / 255.0, config->color_bg.b / 255.0);
     cairo_new_sub_path(cr);
     cairo_arc(cr, bar_x + config->bar_width - radius, gpu_bar_y + radius, radius, -M_PI_2, 0);
     cairo_arc(cr, bar_x + config->bar_width - radius, gpu_bar_y + config->bar_height - radius, radius, 0, M_PI_2);
@@ -338,28 +384,28 @@ static void draw_labels(cairo_t *cr, const Config *config) {
  * Compares current sensor data with last drawn values and determines if a redraw is necessary.
  *
  * @param data Pointer to current sensor data
+ * @param config Pointer to configuration struct (Config)
  * @return 1 if update is needed, 0 otherwise
  *
  * Example:
  * @code
- * if (should_update_display(&sensor_data)) {
+ * if (should_update_display(&sensor_data, config)) {
  *     // redraw
  * }
  * @endcode
  */
-static int should_update_display(const sensor_data_t *data) {
+static int should_update_display(const sensor_data_t *data, const Config *config) {
     static sensor_data_t last_data = {.cpu_temp = -1.0f, .gpu_temp = -1.0f};
     static int first_run = 1;
-    
     if (first_run) {
         first_run = 0;
         last_data = *data;
         return 1;
     }
     // Check for significant changes (only CPU/GPU temperatures)
-    // Uses >= so that a change of exactly CHANGE_TOLERANCE_TEMP triggers an update
-    if (fabsf(data->cpu_temp - last_data.cpu_temp) >= CHANGE_TOLERANCE_TEMP ||
-        fabsf(data->gpu_temp - last_data.gpu_temp) >= CHANGE_TOLERANCE_TEMP) {
+    // Uses >= so that a change of exactly config->change_tolerance_temp triggers an update
+    if (fabsf(data->cpu_temp - last_data.cpu_temp) >= config->change_tolerance_temp ||
+        fabsf(data->gpu_temp - last_data.gpu_temp) >= config->change_tolerance_temp) {
         last_data = *data;
         return 1;
     }

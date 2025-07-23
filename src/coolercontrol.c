@@ -1,6 +1,40 @@
 /**
  * @file coolercontrol.c
  * @brief CoolerControl API implementation for LCD device communication.
+ *
+ * @details
+ * Implements functions for initializing, authenticating, and communicating with CoolerControl LCD devices.
+ *
+ * @author damachine
+ * @copyright Copyright (c) 2025 damachine
+ * @license MIT
+ * @version 0.25.07.23.2
+ * @since 0.25.07.23.2
+ *
+ * @note
+ * - All code comments are written in English.
+ * - Doxygen style is used for all function comments.
+ * - See coding standards in project documentation and config.h for details.
+ * - Opening braces for functions and control structures are placed on the same line (K&R style).
+ * - Only necessary headers are included; system and local headers are separated.
+ * - Code is indented with 4 spaces, no tabs.
+ * - All functions, variables, and types follow project naming conventions (snake_case, PascalCase, UPPER_CASE).
+ * - Inline comments are used sparingly and only when necessary.
+ * - Redundant comments are avoided.
+ * - All dynamically allocated memory is freed and pointers set to NULL.
+ * - All malloc/calloc/realloc return values are checked.
+ *
+ * @warning
+ * - This file must comply with ISO/IEC 9899:1999 (C99).
+ * - Do not add obsolete or unused code.
+ *
+ * @see coolercontrol.h, config.h
+ *
+ * @todo
+ * - Add support for additional LCD device types if required.
+ *
+ * @example
+ * See function documentation for usage examples.
  */
 
 // Include project headers
@@ -47,8 +81,9 @@ int send_image_to_lcd(const Config *config, const char* image_path, const char* 
 int upload_image_to_device(const Config *config, const char* image_path, const char* device_uid);
 void cleanup_coolercontrol_session(void);
 int is_session_initialized(void);
-int get_device_name(char* name_buffer, size_t buffer_size);
-int get_device_uid(char* uid_buffer, size_t buffer_size);
+int get_device_name(const Config *config, char* name_buffer, size_t buffer_size);
+int get_device_uid(const Config *config, char* uid_buffer, size_t buffer_size);
+int init_cached_device_uid(const Config *config);
 
 static size_t write_callback(void *contents, size_t size, size_t nmemb, struct http_response *response) {
     size_t realsize = size * nmemb;
@@ -299,7 +334,7 @@ int is_session_initialized(void) {
  * parse_device_fields(name, sizeof(name), uid, sizeof(uid));
  * @endcode
  */
-static int parse_device_fields(char* name_buffer, size_t name_size, char* uid_buffer, size_t uid_size) {
+static int parse_device_fields(const Config *config, char* name_buffer, size_t name_size, char* uid_buffer, size_t uid_size) {
     // Initialize response buffer
     struct http_response response = {0};
     response.data = malloc(1);
@@ -308,7 +343,8 @@ static int parse_device_fields(char* name_buffer, size_t name_size, char* uid_bu
     
     // URL for device list
     char devices_url[128];
-    snprintf(devices_url, sizeof(devices_url), "%s/devices", DAEMON_ADDRESS);
+    // Build devices URL safely
+    snprintf(devices_url, sizeof(devices_url), "%.*s/devices", (int)(sizeof(devices_url) - 9), config->daemon_address);
     
     // Configure cURL for GET request
     curl_easy_setopt(curl_handle, CURLOPT_URL, devices_url);
@@ -404,9 +440,9 @@ static int parse_device_fields(char* name_buffer, size_t name_size, char* uid_bu
  * }
  * @endcode
  */
-int get_device_name(char* name_buffer, size_t buffer_size) {
+int get_device_name(const Config *config, char* name_buffer, size_t buffer_size) {
     if (!curl_handle || !name_buffer || buffer_size == 0 || !session_initialized) return 0;
-    return parse_device_fields(name_buffer, buffer_size, NULL, 0);
+    return parse_device_fields(config, name_buffer, buffer_size, NULL, 0);
 }
 
 /**
@@ -426,9 +462,9 @@ int get_device_name(char* name_buffer, size_t buffer_size) {
  * }
  * @endcode
  */
-int get_device_uid(char* uid_buffer, size_t buffer_size) {
+int get_device_uid(const Config *config, char* uid_buffer, size_t buffer_size) {
     if (!curl_handle || !uid_buffer || buffer_size == 0 || !session_initialized) return 0;
-    return parse_device_fields(NULL, 0, uid_buffer, buffer_size);
+    return parse_device_fields(config, NULL, 0, uid_buffer, buffer_size);
 }
 
 /**
@@ -443,8 +479,8 @@ int get_device_uid(char* uid_buffer, size_t buffer_size) {
  * if (!init_cached_device_uid()) { ... }
  * @endcode
  */
-int init_cached_device_uid(void) {
-    if (!get_device_uid(cached_device_uid, sizeof(cached_device_uid)) || !cached_device_uid[0]) {
+int init_cached_device_uid(const Config *config) {
+    if (!get_device_uid(config, cached_device_uid, sizeof(cached_device_uid)) || !cached_device_uid[0]) {
         fprintf(stderr, "[CoolerDash] Error: Could not detect LCD device UID!\n");
         return 0;
     }

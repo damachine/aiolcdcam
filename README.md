@@ -128,36 +128,15 @@ coolerdash
 There is no configuration needed.
 CoolerDash is pre-configured to use the default mode.
 
-> **Runtime configuration:** You can change most settings at runtime using `/etc/coolerdash/config.ini`. After editing the config file, restart the service with `sudo systemctl restart coolerdash.service` to apply your changes. The values in `config.ini` always take precedence over those in `include/config.h`.
+> **Runtime configuration:** All settings are managed exclusively via `/etc/coolerdash/config.ini`. After editing the config file, restart the service with `sudo systemctl restart coolerdash.service` to apply your changes.
 >
-> **If `/etc/coolerdash/config.ini` does not exist, all settings from `include/config.h` will be used as defaults.**
+> **If `/etc/coolerdash/config.ini` does not exist, CoolerDash will use built-in defaults.**
 
-### Important customizable values from `include/config.h`
+### Important customizable values
 
-Below are the most important values you can adjust in `include/config.h` before building, to customize the display and behavior:
+All relevant configuration options (display, thresholds, colors, paths, daemon settings) are set in `/etc/coolerdash/config.ini`. Edit this file to customize CoolerDash to your needs. No changes to source files are required.
 
-| Name                   | Default                | Description                                                      |
-|------------------------|-----------------------|------------------------------------------------------------------|
-| DISPLAY_WIDTH          | 240                   | LCD display width in pixels (adjust to your LCD device)          |
-| DISPLAY_HEIGHT         | 240                   | LCD display height in pixels (adjust to your LCD device)         |
-| DISPLAY_REFRESH_INTERVAL_SEC  | 3            | Display update interval (seconds)                                |
-| DISPLAY_REFRESH_INTERVAL_NSEC | 000000000             | Display update interval (nanoseconds, for sub-second refresh granularity, 500000000 ns = 0.5 seconds) |
-| TEMP_THRESHOLD_GREEN   | 55.0f                 | Temperature for green color (°C)                                 |
-| TEMP_THRESHOLD_ORANGE  | 65.0f                 | Temperature for orange color (°C)                                |
-| TEMP_THRESHOLD_RED     | 75.0f                 | Temperature for red color (°C)                                   |
-| BOX_WIDTH              | 240                   | Width of each temperature box (pixels)                           |
-| BOX_HEIGHT             | 120                   | Height of each temperature box (pixels) – should be half of DISPLAY_HEIGHT |
-| FONT_SIZE_LARGE        | 98.0                  | Font size for temperature numbers                                |
-| FONT_SIZE_LABELS       | 28.0                  | Font size for labels ("CPU", "GPU")                             |
-| FONT_FACE              | "Roboto Black"        | Font used for all display text                                   |
-| LCD_BRIGHTNESS         | 100                   | LCD brightness (0-100)                                           |
-| LCD_ORIENTATION        | "0"                   | LCD orientation for image upload ("0"=default, "1"=rotated)      |
-| GPU_CACHE_INTERVAL     | 3.0f                  | GPU data cache interval (seconds)                                |
-| CHANGE_TOLERANCE_TEMP  | 1.0f                  | Minimum temperature change to trigger update (°C)                |
-| IMAGE_PATH             | /dev/shm/coolerdash.png | Path to generated display image *(default; /dev/shm is a tmpfs in RAM for fast image access <10KiB>)*                |
-| SHUTDOWN_IMAGE_PATH    | /opt/coolerdash/images/shutdown.png | Path to shutdown image (displayed when service stops; you can change this path or imagee to use your own image) |
-
-> **Tip:** Edit these values in `include/config.h` before running `make` to change the look, update interval, thresholds, or LCD behavior to your needs.
+> **Tip:** Edit `/etc/coolerdash/config.ini` to change the look, update interval, thresholds, or LCD behavior to your needs.
 
 **For troubleshooting**, you can manually check devices:
 ```bash
@@ -277,6 +256,28 @@ make debug && coolerdash
 # 4. Check service logs
 sudo journalctl -u coolerdash.service -f
 ```
+
+## Troubleshooting: Systemd Service User Issues
+If you encounter errors like "User not found" or "Permission denied" when starting the systemd service, it may be due to a missing or misconfigured system user for CoolerDash.
+
+**Solution:**
+- CoolerDash is designed to run as a dedicated user for security. If the user was not created automatically, you can add it manually:
+  ```bash
+  sudo useradd --system --no-create-home --shell /usr/sbin/nologin coolerdash
+  ```
+- Ensure all relevant directories are owned by the `coolerdash` user:
+  ```bash
+  sudo chown -R coolerdash:coolerdash /opt/coolerdash
+  sudo chown -R coolerdash:coolerdash /run/coolerdash
+  sudo chown -R coolerdash:coolerdash /tmp/coolerdash
+  ```
+- If you use a custom config or image path, check permissions for `/etc/coolerdash/config.ini` and `/tmp/coolerdash/coolerdash.png`.
+- After creating the user and setting permissions, restart the service:
+  ```bash
+  sudo systemctl restart coolerdash.service
+  ```
+
+> **Note:** The systemd unit file expects the user `coolerdash` to exist. If you use a different username, edit `/etc/systemd/system/coolerdash.service` accordingly.
 
 ## 📄 License
 

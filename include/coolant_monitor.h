@@ -1,6 +1,40 @@
 /**
  * @file coolant_monitor.h
  * @brief Coolant temperature monitoring interface for CoolerDash.
+ *
+ * @details
+ * Provides functions and global variables for reading coolant temperature from system sensors.
+ *
+ * @author damachine
+ * @copyright Copyright (c) 2025 damachine
+ * @license MIT
+ * @version 0.25.07.23.2
+ * @since 0.25.07.23.2
+ *
+ * @note
+ * - All code comments are written in English.
+ * - Doxygen style is used for all function comments.
+ * - See coding standards in project documentation and config.h for details.
+ * - Opening braces for functions and control structures are placed on the same line (K&R style).
+ * - Only necessary headers are included; system and local headers are separated.
+ * - Code is indented with 4 spaces, no tabs.
+ * - All functions, variables, and types follow project naming conventions (snake_case, PascalCase, UPPER_CASE).
+ * - Inline comments are used sparingly and only when necessary.
+ * - Redundant comments are avoided.
+ * - All dynamically allocated memory is freed and pointers set to NULL.
+ * - All malloc/calloc/realloc return values are checked.
+ *
+ * @warning
+ * - This file must comply with ISO/IEC 9899:1999 (C99).
+ * - Do not add obsolete or unused code.
+ *
+ * @see config.h
+ *
+ * @todo
+ * - Add support for additional coolant sensor types if required.
+ *
+ * @example
+ * See function documentation for usage examples.
  */
 
 #ifndef COOLANT_MONITOR_H

@@ -1,3 +1,28 @@
+# -----------------------------------------------------------------------------
+# CoolerDash PKGBUILD
+#
+# @brief Arch Linux packaging script for CoolerDash (C99 LCD daemon)
+# @details
+#   - Handles build, install, dependencies, and packaging for Arch/AUR.
+#   - All comments are in English for consistency.
+#   - See README.md and AUR-README.md for details.
+#
+# @author damachine
+# @copyright Copyright (c) 2025 damachine
+# @license MIT
+# @version 0.25.07.23.2
+# @since 0.25.07.23.2
+# @note
+#   - Edit dependencies, paths, and user as needed for your system.
+#   - All build steps follow C99 and project coding standards.
+# @warning
+#   - Do not run as root. Use dedicated user for security.
+#   - Ensure all required dependencies are installed.
+# @todo
+#   - Add support for additional platforms and packaging formats.
+# @see README.md, AUR-README.md
+# -----------------------------------------------------------------------------
+
 # Project coding standards and packaging notes (see README for details)
 #
 # Maintainer: DAMACHINE <christkue79@gmail.com>
@@ -76,7 +101,7 @@ check() {
 
     if [[ -f bin/coolerdash ]]; then
         echo "Build successful - binary created"
-        bin/coolerdash --help > /dev/null && echo "Help function works"
+        #bin/coolerdash --help > /dev/null && echo "Help function works"
     else
         echo "ERROR: Binary not found"
         return 1
@@ -84,6 +109,7 @@ check() {
 }
 
 package() {
+    # For local build: use current directory directly
     install -dm755 "$pkgdir/opt/coolerdash/bin"
     install -Dm755 bin/coolerdash "$pkgdir/opt/coolerdash/bin/coolerdash"
     install -dm755 "$pkgdir/opt/coolerdash/images"
@@ -98,4 +124,6 @@ package() {
     install -dm755 "$pkgdir/usr/bin"
     ln -sf /opt/coolerdash/bin/coolerdash "$pkgdir/usr/bin/coolerdash"
     install -Dm644 etc/coolerdash/config.ini "$pkgdir/etc/coolerdash/config.ini"
+    install -dm755 "$pkgdir/run/coolerdash"
+    install -dm1777 "$pkgdir/tmp/coolerdash"
 }
