@@ -124,24 +124,19 @@ GPU: 2.5-second cache with nvidia-smi.
 Display updates only on significant changes (0.1°C for temperatures).
 
 .SH CONFIGURATION
-All important settings are located in the build-time configuration file \fBinclude/config.h\fR:
+All important runtime and build-time settings are managed via configuration files:
 .TP
-.B Device UID (AUTOMATIC)
-LCD device identification is automatically detected at runtime via CoolerControl API
+.B /etc/coolerdash/config.ini (RECOMMENDED)
+Main runtime configuration file. Edit this file to change display, thresholds, colors, paths, and daemon settings without recompiling.
+After editing, restart the service with:
 .br
-No manual configuration required - device UUID is discovered automatically
+Bsudo systemctl restart coolerdash.serviceR
+.br
+Values in config.ini always take precedence over those in include/config.h.
+If config.ini is missing, all settings from include/config.h are used as defaults.
 .TP
-.B API Settings
-CoolerControl daemon address (default: http://localhost:11987)
-.TP
-.B Display settings
-Resolution (240x240), update intervals, layout parameters
-.TP
-.B Temperature thresholds
-4-stage color gradient: green (≤55°C) → orange (≤65°C) → hot orange (≤75°C) → red (>75°C)
-.TP
-.B Cache intervals
-Optimization of sensor query frequency
+.B include/config.h
+Build-time defaults for all configuration values. Edit before compiling to set initial values for display, thresholds, colors, and paths.
 
 .SH DEPENDENCIES
 .TP
@@ -151,62 +146,46 @@ Must be installed and running (coolercontrold.service)
 Installation guide: https://gitlab.com/coolercontrol/coolercontrol/-/blob/main/README.md
 .TP
 .B System Libraries
-Cairo (graphics), cURL (HTTP), NVIDIA-SMI (GPU data), hwmon (temperature sensors)
+Cairo (graphics), cURL (HTTP), NVIDIA-SMI (GPU data), hwmon (temperature sensors), libinih (INI parsing)
 
-.SH COMPILATION
+.SH INSTALLATION
+Installs to /opt/coolerdash/bin/ and /opt/coolerdash/images/.
+Systemd service file is installed to /etc/systemd/system/coolerdash.service.
+Default config file is installed to /etc/coolerdash/config.ini.
+
+.SH UNINSTALL
+Removes all files from /opt/coolerdash/ and disables the service.
+The config file /etc/coolerdash/config.ini is preserved unless unchanged (Arch standard).
+
+.SH USAGE
 .TP
-.B Build Command
-.B make
-(automatically detects and installs dependencies for your Linux distribution)
+.B Start program (fixed two-box layout, CPU/GPU temperature only):
+.B coolerdash
 .TP
-.B System Installation
-.B sudo make install
-(builds, installs to /opt/coolerdash/, configures systemd service)
+.B Show help:
+.B coolerdash --help
 .TP
-.B CPU Optimization
-x86-64-v3 optimized for modern CPUs (Intel Haswell+/AMD Excavator+, 2013+)
+.B Service management:
+.B sudo systemctl start coolerdash
 .br
-For older CPUs: \fBCFLAGS=-march=x86-64 make\fR
+.B sudo systemctl status coolerdash
+.br
+.B sudo systemctl restart coolerdash
+.br
+.B journalctl -u coolerdash -f
 
-.SH PERFORMANCE
-.TP
-.B Minimal I/O
-Only temperature sensors for CPU and GPU are read (no mode logic).
-.TP
-.B Sensor Caching
-Hwmon paths cached at startup, GPU data cached for 2.5 seconds
-.TP
-.B Change Detection
-PNG regenerated only on significant temperature changes
+.SH NOTES
+- All runtime settings can be changed via /etc/coolerdash/config.ini.
+- After editing config.ini, restart the service to apply changes.
+- If config.ini is missing, build-time defaults from include/config.h are used.
+- No legacy mode selection, cache directories, or UID files are used.
 
-.SH DATA SOURCES
-.TP
-.I /sys/class/hwmon/*/temp*_input
-CPU and coolant temperatures
-.TP
-.B nvidia-smi
-GPU temperature and load (NVIDIA cards)
-.TP
-.I /proc/stat
-CPU usage percentage
-.TP
-.I /proc/meminfo
-RAM usage information
-.SH SIGNALS
-.TP
-.B SIGTERM, SIGINT
-Terminates the program gracefully
-.SH EXIT STATUS
-.TP
-.B 0
-Successfully terminated
-.TP
-.B 1
-Error in argument processing
 .SH BUGS
 Report bugs to: christkue79@gmail.com or via GitHub Issues: https://github.com/damachine/coolerdash/issues
+
 .SH AUTHOR
 Written by DAMACHINE (christkue79@gmail.com).
+
 .SH SEE ALSO
 .BR systemctl (1),
 .BR coolercontrol (1),
@@ -214,42 +193,7 @@ Written by DAMACHINE (christkue79@gmail.com).
 .BR journalctl (1)
 .br
 Project repository: https://github.com/damachine/coolerdash
+
 .SH COPYRIGHT
 Copyright © 2025 DAMACHINE. This is free software; see source for copying conditions.
 Released under MIT License.
-.SH SETUP
-Before using coolerdash, ensure CoolerControl is properly configured:
-.TP
-.B 1. Install and start CoolerControl
-Follow: https://gitlab.com/coolercontrol/coolercontrol/-/blob/main/README.md
-.br
-\fBsudo systemctl start coolercontrold\fR
-.TP
-.B 2. Configure LCD in CoolerControl GUI
-Set your LCD display to "Image" mode (not temperature mode)
-.TP
-.B 3. Build and install (automatic device detection)
-\fBsudo make install\fR
-.br
-\fBsudo systemctl enable coolerdash.service\fR
-.br
-\fBsudo systemctl start coolerdash.service\fR
-.br
-Device UUID is automatically detected at startup
-
-.TP
-.B Tested with
-NZXT Kraken 2023 (Z-Series)
-.TP
-.B Compatible with
-NZXT Kraken X-Series, Z-Series and other LCD-capable models
-.SH IMAGES
-The shutdown image is always /opt/coolerdash/images/shutdown.png (configurable via SHUTDOWN_IMAGE_PATH macro in config.h).
-No cache directories or UID files are created or used.
-
-.SH INSTALLATION
-Installs to /opt/coolerdash/bin/ and /opt/coolerdash/images/.
-
-.SH UNINSTALL
-Removes all files from /opt/coolerdash/ and disables the service.
-No cache or UID files remain after uninstall.
