@@ -125,5 +125,5 @@ package() {
     ln -sf /opt/coolerdash/bin/coolerdash "$pkgdir/usr/bin/coolerdash"
     install -Dm644 etc/coolerdash/config.ini "$pkgdir/etc/coolerdash/config.ini"
     install -dm755 "$pkgdir/run/coolerdash"
-    install -dm1777 "$pkgdir/tmp/coolerdash"
+    # @note /tmp/coolerdash is not packaged; it will be created by the service at runtime.
 }
