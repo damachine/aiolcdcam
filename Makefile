@@ -237,11 +237,6 @@ install: check-deps-for-install $(TARGET)
 	sudo chown coolerdash:coolerdash /run/coolerdash
 	@printf "$(ICON_SUCCESS) $(GREEN)Runtime directory and user ready$(RESET)\n"
 	@printf "\n"
-	@printf "$(ICON_INFO) $(CYAN)Creating /tmp/coolerdash...$(RESET)\n"
-	sudo install -d -m 1777 /tmp/coolerdash
-	sudo chown coolerdash:coolerdash /tmp/coolerdash
-	@printf "$(ICON_SUCCESS) $(GREEN)/tmp/coolerdash created and permissions set$(RESET)\n"
-	@printf "\n"
 	@printf "$(ICON_SERVICE) $(CYAN)Checking running service and processes...$(RESET)\n"
 	@if sudo systemctl is-active --quiet coolerdash.service; then \
 		printf "  $(YELLOW)→$(RESET) Service running, stopping for update...\n"; \
@@ -356,7 +351,6 @@ uninstall:
 	sudo rm -f /run/coolerdash/coolerdash.pid 2>/dev/null || true
 	sudo rm -rf /run/coolerdash 2>/dev/null || true
 	sudo rm -f /opt/coolerdash/VERSION 2>/dev/null || true
-	sudo rm -rf /tmp/coolerdash 2>/dev/null || true
 	# Remove any remaining files in /opt/coolerdash (catch-all, safe if dir already gone)
 	sudo rm -f /opt/coolerdash/* 2>/dev/null || true
 	@printf "  $(RED)✗$(RESET) Service: /etc/systemd/system/coolerdash.service\n"
@@ -366,7 +360,6 @@ uninstall:
 	@printf "  $(RED)✗$(RESET) Images: /opt/coolerdash/images/\n"
 	@printf "  $(RED)✗$(RESET) Installation: /opt/coolerdash/\n"
 	@printf "  $(RED)✗$(RESET) Symlink: /usr/bin/coolerdash\n"
-	@printf "  $(RED)✗$(RESET) Temp: /tmp/coolerdash\n"
 	@printf "\n"
 	@printf "$(ICON_INFO) $(CYAN)Updating system...$(RESET)\n"
 	@if id -u coolerdash &>/dev/null; then \
