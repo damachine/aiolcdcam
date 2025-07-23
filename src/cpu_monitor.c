@@ -3,15 +3,17 @@
  * @brief CPU temperature and usage monitoring implementation for CoolerDash.
  */
 
+// Include project headers
+#include "../include/cpu_monitor.h"
+#include "../include/config.h"
+// The config.h header is required for access to the Config struct and macro defaults.
+// cpu_monitor.h provides all function prototypes and the cpu_stat_t struct for usage calculations.
+
 // Include necessary headers
 #include <stdio.h>
 #include <string.h>
 #include <dirent.h>
 #include <stdlib.h>
-
-// Include project headers
-#include "../include/cpu_monitor.h"
-#include "../include/config.h"
 
 // Global variable for cached CPU temperature path
 char cpu_temp_path[512] = {0};
@@ -20,16 +22,18 @@ char cpu_temp_path[512] = {0};
  * @brief Initialize hwmon sensor path for CPU temperature at startup (once).
  *
  * Detects and sets the path to the CPU temperature sensor file by scanning available hwmon entries.
+ * Uses the hwmon_path from the configuration struct.
  *
+ * @param config Pointer to configuration struct (Config)
  * @return void
  *
  * Example:
  * @code
- * init_cpu_sensor_path();
+ * init_cpu_sensor_path(&config);
  * @endcode
  */
-void init_cpu_sensor_path(void) {
-    DIR *dir = opendir(HWMON_PATH);
+void init_cpu_sensor_path(const Config *config) {
+    DIR *dir = opendir(config->hwmon_path);
     if (!dir) return;
     
     struct dirent *entry;
@@ -41,7 +45,7 @@ void init_cpu_sensor_path(void) {
         
         // Check each possible temp label for the current hwmon entry
         for (int i = 1; i <= 9; ++i) {
-            snprintf(label_path, sizeof(label_path), HWMON_PATH"/%s/temp%d_label", entry->d_name, i);
+            snprintf(label_path, sizeof(label_path), "%s/%s/temp%d_label", config->hwmon_path, entry->d_name, i);
             FILE *flabel = fopen(label_path, "r");
             if (!flabel) continue;
             
@@ -49,7 +53,7 @@ void init_cpu_sensor_path(void) {
             if (fgets(label, sizeof(label), flabel)) {
                 // Cache CPU temperature path for later use
                 if (strstr(label, "Package id 0") && strlen(cpu_temp_path) == 0) {
-                    snprintf(cpu_temp_path, sizeof(cpu_temp_path), HWMON_PATH"/%s/temp%d_input", entry->d_name, i);
+                    snprintf(cpu_temp_path, sizeof(cpu_temp_path), "%s/%s/temp%d_input", config->hwmon_path, entry->d_name, i);
                     fclose(flabel);
                     closedir(dir);
                     return;

@@ -14,7 +14,7 @@ Requires=coolercontrold.service
 
 [Service]
 Type=simple
-ExecStart=/bin/coolerdash
+ExecStart=/bin/coolerdash /etc/coolerdash/config.ini
 Restart=always
 RestartSec=3
 TimeoutStopSec=3

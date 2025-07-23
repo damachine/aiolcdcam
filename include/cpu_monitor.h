@@ -5,19 +5,22 @@
 #ifndef CPU_MONITOR_H
 #define CPU_MONITOR_H
 
+#include "config.h"
+
 /**
- * @brief Initialize the CPU temperature sensor path.
+ * @brief Initialize the CPU temperature sensor path using configuration.
  *
- * Detects and sets the path to the CPU temperature sensor file.
+ * Detects and sets the path to the CPU temperature sensor file using the hwmon_path from Config.
  *
+ * @param config Pointer to configuration struct (Config).
  * @return void
  *
  * Example:
  * @code
- * init_cpu_sensor_path();
+ * init_cpu_sensor_path(&config);
  * @endcode
  */
-void init_cpu_sensor_path(void);
+void init_cpu_sensor_path(const Config *config);
 
 /**
  * @brief Read the current CPU temperature.
@@ -101,6 +104,9 @@ float get_ram_usage(void);
 
 /**
  * @brief Path to the CPU temperature sensor file (set by init_cpu_sensor_path).
+ *
+ * This global variable holds the path to the CPU temperature sensor file, which is detected and set during initialization.
+ * It is used by read_cpu_temp() to access the correct sensor file for temperature readings.
  */
 extern char cpu_temp_path[512];
 

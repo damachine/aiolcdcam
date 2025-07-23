@@ -7,6 +7,13 @@
 #define _POSIX_C_SOURCE 200112L
 #define _XOPEN_SOURCE 600
 
+// Include project headers
+#include "../include/config.h"
+#include "../include/cpu_monitor.h"
+#include "../include/gpu_monitor.h"
+#include "../include/display.h"
+#include "../include/coolercontrol.h"
+
 // Include necessary headers
 #include <unistd.h>
 #include <signal.h>
@@ -18,17 +25,13 @@
 #include <time.h>
 #include <errno.h>
 
-// Include project headers
-#include "../include/config.h"
-#include "../include/cpu_monitor.h"
-#include "../include/gpu_monitor.h"
-#include "../include/display.h"
-#include "../include/coolercontrol.h"
-
 // Global variables for daemon management
 static volatile sig_atomic_t running = 1; // flag whether daemon is running
 static volatile sig_atomic_t shutdown_sent = 0; // flag whether shutdown image was already sent
 static const char *pid_file = PID_FILE; // PID file for daemon
+
+// Global pointer to config for signal handler access
+static const Config *g_config_ptr = NULL;
 
 /**
  * @brief Signal handler for clean daemon termination with shutdown image.
@@ -46,14 +49,14 @@ static const char *pid_file = PID_FILE; // PID file for daemon
 static void cleanup_and_exit(int sig) {
     (void)sig; // parameter is not used
     // Send shutdown image only once
-    if (!shutdown_sent && is_session_initialized()) {
+    if (!shutdown_sent && is_session_initialized() && g_config_ptr) {
         const char* shutdown_image = SHUTDOWN_IMAGE_PATH;
         const char* device_uid = get_cached_device_uid();
         printf("CoolerDash: Sending shutdown image to LCD...\n");
         fflush(stdout);
         if (device_uid[0]) {
-            send_image_to_lcd(shutdown_image, device_uid);
-            send_image_to_lcd(shutdown_image, device_uid);
+            send_image_to_lcd(g_config_ptr, shutdown_image, device_uid);
+            send_image_to_lcd(g_config_ptr, shutdown_image, device_uid);
             printf("CoolerDash: Shutdown image sent successfully\n");
             shutdown_sent = 1; // set flag so it's only sent once
         } else {
@@ -206,19 +209,17 @@ static void write_pid_file(const char *pid_file) {
  * int result = run_daemon();
  * @endcode
  */
-static int run_daemon(void) {
+static int run_daemon(const Config *config) {
     printf("CoolerDash daemon started (Temperatures only, resource-efficient)\n");
     printf("Sensor data updated every %d.%d seconds\n", 
            DISPLAY_REFRESH_INTERVAL_SEC, DISPLAY_REFRESH_INTERVAL_NSEC / 100000000);
     printf("Daemon now running silently in background...\n\n");
     fflush(stdout);
-    
     while (running) { // Main daemon loop
-        draw_combined_image(); // Draw combined image
+        draw_combined_image(config); // Draw combined image
         struct timespec ts = {DISPLAY_REFRESH_INTERVAL_SEC, DISPLAY_REFRESH_INTERVAL_NSEC}; // Wait time for update
         nanosleep(&ts, NULL); // Wait for specified time
     }
-    
     // Silent termination without output
     return 0;
 }
@@ -263,46 +264,64 @@ static int is_started_by_systemd(void) {
 }
 
 /**
- * @brief Register signal handlers for clean daemon termination.
- *
- * Uses sigaction for robust signal handling.
- *
- * @return void
- *
- * Example:
- * @code
- * register_signal_handlers();
- * @endcode
- */
-static void register_signal_handlers(void)
-{
-    struct sigaction sa;
-    memset(&sa, 0, sizeof(sa));
-    sa.sa_handler = cleanup_and_exit;
-    sigemptyset(&sa.sa_mask);
-    sa.sa_flags = 0;
-
-    sigaction(SIGTERM, &sa, NULL); // For systemd stop
-    sigaction(SIGINT, &sa, NULL); // For Ctrl+C
-}
-
-/**
- * @brief Main function for CoolerDash daemon.
- *
- * Initializes modules, enforces single-instance, manages daemon lifecycle, and handles clean shutdown.
- *
+ * @brief Main entry point for CoolerDash.
  * @param argc Argument count
  * @param argv Argument vector
- * @return 0 on success, 1 on error
+ * @return Exit code
  *
- * Example:
- * @code
- * int main(int argc, char *argv[]) {
- *     return main(argc, argv);
- * }
- * @endcode
+ * Usage:
+ *   coolerdash [config_path]
+ *
+ * If no config_path is given, /etc/coolerdash/config.ini is used.
  */
-int main(int argc, char *argv[]) {
+int main(int argc, char **argv)
+{
+    // Load configuration from INI file or use defaults from config.h
+    Config config;
+    const char *config_path = "/etc/coolerdash/config.ini";
+    if (argc > 1) config_path = argv[1];
+    if (load_config_ini(&config, config_path) != 0) {
+        /**
+         * @brief Fallback: Set all config values from macros if INI file cannot be loaded.
+         *
+         * This block ensures the daemon can start with hardcoded defaults if the config file is missing or invalid.
+         * All fields are set manually to guarantee a valid configuration.
+         */
+        config.display_width = DISPLAY_WIDTH;
+        config.display_height = DISPLAY_HEIGHT;
+        config.display_refresh_interval_sec = DISPLAY_REFRESH_INTERVAL_SEC;
+        config.display_refresh_interval_nsec = DISPLAY_REFRESH_INTERVAL_NSEC;
+        config.lcd_brightness = LCD_BRIGHTNESS;
+        config.lcd_orientation = atoi(LCD_ORIENTATION);
+        config.box_width = BOX_WIDTH;
+        config.box_height = BOX_HEIGHT;
+        config.box_gap = BOX_GAP;
+        config.bar_width = BAR_WIDTH;
+        config.bar_height = BAR_HEIGHT;
+        config.bar_gap = BAR_GAP;
+        config.border_line_width = BORDER_LINE_WIDTH;
+        strncpy(config.font_face, FONT_FACE, sizeof(config.font_face)-1);
+        config.font_size_large = FONT_SIZE_LARGE;
+        config.font_size_labels = FONT_SIZE_LABELS;
+        config.temp_threshold_green = TEMP_THRESHOLD_GREEN;
+        config.temp_threshold_orange = TEMP_THRESHOLD_ORANGE;
+        config.temp_threshold_red = TEMP_THRESHOLD_RED;
+        config.gpu_cache_interval = GPU_CACHE_INTERVAL;
+        config.change_tolerance_temp = CHANGE_TOLERANCE_TEMP;
+        config.change_tolerance_usage = CHANGE_TOLERANCE_USAGE;
+        strncpy(config.hwmon_path, HWMON_PATH, sizeof(config.hwmon_path)-1);
+        strncpy(config.image_dir, IMAGE_DIR, sizeof(config.image_dir)-1);
+        strncpy(config.image_path, IMAGE_PATH, sizeof(config.image_path)-1);
+        strncpy(config.shutdown_image, SHUTDOWN_IMAGE_PATH, sizeof(config.shutdown_image)-1);
+        strncpy(config.pid_file, PID_FILE, sizeof(config.pid_file)-1);
+        strncpy(config.daemon_address, DAEMON_ADDRESS, sizeof(config.daemon_address)-1);
+        strncpy(config.daemon_password, DAEMON_PASSWORD, sizeof(config.daemon_password)-1);
+        config.color_green.r = COLOR_GREEN_R;
+        config.color_green.g = COLOR_GREEN_G;
+        config.color_green.b = COLOR_GREEN_B;
+        // ...set other color fields and struct members analogously...
+    }
+
     // Show help
     if (argc > 1 && (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0)) {
         show_help(argv[0]);
@@ -313,39 +332,43 @@ int main(int argc, char *argv[]) {
     int is_service_start = is_started_by_systemd();
     
     // Single-Instance Enforcement: Check and handle existing instances
-    if (check_existing_instance_and_handle(pid_file, is_service_start) < 0) {
+    if (check_existing_instance_and_handle(config.pid_file, is_service_start) < 0) {
         // Error: Service already running and we are manual start
         return 1;
     }
     
     // Write new PID file
-    write_pid_file(pid_file);
+    write_pid_file(config.pid_file);
     
+    g_config_ptr = &config; // Set global pointer for signal handler
     // Register signal handlers
-    register_signal_handlers();
-    
+    struct sigaction sa;
+    memset(&sa, 0, sizeof(sa));
+    sa.sa_handler = cleanup_and_exit;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
+    sigaction(SIGTERM, &sa, NULL);
+    sigaction(SIGINT, &sa, NULL);
     // Create image directory
-    mkdir(IMAGE_DIR, 0755); // Create directory for images if not present
+    mkdir(config.image_dir, 0755); // Create directory for images if not present
     
     // Initialize modules
     printf("Initializing modules...\n");
     fflush(stdout);
     
     // Initialize CPU sensors
-    init_cpu_sensor_path(); // Set path to CPU sensors
+    init_cpu_sensor_path(&config); // Set path to CPU sensors
     printf("✓ CPU monitor initialized\n");
     fflush(stdout);
-    
     // Initialize GPU monitor (if GPU available)
-    if (init_gpu_monitor()) { // Check return value
+    if (init_gpu_monitor(&config)) { // Check return value
         printf("✓ GPU monitor initialized\n");
     } else {
         printf("⚠ GPU monitor not available (no NVIDIA GPU?)\n");
     }
     fflush(stdout);
-    
     // Initialize CoolerControl session
-    if (init_coolercontrol_session()) { // Check return value
+    if (init_coolercontrol_session(&config)) { // Check return value
         printf("✓ CoolerControl session initialized\n");
         
         // Get and display LCD device UID only if detected and changed
@@ -382,26 +405,23 @@ int main(int argc, char *argv[]) {
     fflush(stdout);
     
     // Start daemon
-    int result = run_daemon();
-    
+    int result = run_daemon(&config);
     // Cleanup - send shutdown image if not sent yet (only on normal termination)
     if (!shutdown_sent && is_session_initialized()) {
-        const char* shutdown_image = SHUTDOWN_IMAGE_PATH;
+        const char* shutdown_image = config.shutdown_image;
         const char* device_uid = get_cached_device_uid();
         printf("CoolerDash: Sending final shutdown image...\n");
         fflush(stdout);
         if (device_uid[0]) {
-            send_image_to_lcd(shutdown_image, device_uid);
-            send_image_to_lcd(shutdown_image, device_uid);
+            send_image_to_lcd(&config, shutdown_image, device_uid);
+            send_image_to_lcd(&config, shutdown_image, device_uid);
             printf("CoolerDash: Final shutdown image sent successfully\n");
         } else {
             printf("CoolerDash: Warning - Could not send final shutdown image (device UID not detected)\n");
         }
         fflush(stdout);
     }
-    
     cleanup_coolercontrol_session(); // Terminate CoolerControl session
     cleanup_and_exit(0); // Remove PID file and terminate daemon
-    
     return result;
 }

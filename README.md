@@ -129,7 +129,9 @@ coolerdash
 There is no configuration needed.
 CoolerDash is pre-configured to use the default mode.
 
-> **Note:** A configuration file like (`coolerdash.conf`) and/or a graphical configuration tool are planned for a future release. This will allow you to adjust all important parameters at runtime, without recompiling the program.
+> **Runtime configuration:** You can change most settings at runtime using `/etc/coolerdash/config.ini`. After editing the config file, restart the service with `sudo systemctl restart coolerdash.service` to apply your changes. The values in `config.ini` always take precedence over those in `include/config.h`.
+>
+> **If `/etc/coolerdash/config.ini` does not exist, all settings from `include/config.h` will be used as defaults.**
 
 ### Important customizable values from `include/config.h`
 

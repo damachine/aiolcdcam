@@ -3,6 +3,10 @@
  * @brief CoolerControl API implementation for LCD device communication.
  */
 
+// Include project headers
+#include "../include/coolercontrol.h"
+#include "../include/config.h"
+
 // Include necessary headers
 #include <curl/curl.h>
 #include <stdio.h>
@@ -10,10 +14,6 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/stat.h>
-
-// Include project headers
-#include "../include/coolercontrol.h"
-#include "../include/config.h"
 
 // Response buffer structure for HTTP responses
 struct http_response {
@@ -42,9 +42,9 @@ struct http_response {
  * curl_easy_setopt(curl, CURLOPT_WRITEDATA, &resp);
  * @endcode
  */
-int init_coolercontrol_session(void);
-int send_image_to_lcd(const char* image_path, const char* device_uid);
-int upload_image_to_device(const char* image_path, const char* device_uid);
+int init_coolercontrol_session(const Config *config);
+int send_image_to_lcd(const Config *config, const char* image_path, const char* device_uid);
+int upload_image_to_device(const Config *config, const char* image_path, const char* device_uid);
 void cleanup_coolercontrol_session(void);
 int is_session_initialized(void);
 int get_device_name(char* name_buffer, size_t buffer_size);
@@ -85,36 +85,31 @@ static int session_initialized = 0;
 static char cached_device_uid[128] = {0};
 
 /**
- * @brief Initializes cURL and authenticates with the CoolerControl daemon.
+ * @brief Initializes cURL and authenticates with the CoolerControl daemon using configuration.
  *
  * Sets up the cURL handle and logs in to the CoolerControl daemon using basic authentication.
  *
+ * @param config Pointer to configuration struct (Config)
  * @return 1 on success, 0 on error
  *
  * Example:
  * @code
- * if (!init_coolercontrol_session()) {
+ * if (!init_coolercontrol_session(&config)) {
  *     // handle error
  * }
  * @endcode
  */
-int init_coolercontrol_session(void) {
+int init_coolercontrol_session(const Config *config) {
     curl_global_init(CURL_GLOBAL_DEFAULT); 
     curl_handle = curl_easy_init();
     if (!curl_handle) return 0;
-    
-    // Cookie jar for session management
     snprintf(cookie_jar, sizeof(cookie_jar), "/tmp/lcd_cookie_%d.txt", getpid());
     curl_easy_setopt(curl_handle, CURLOPT_COOKIEJAR, cookie_jar);
     curl_easy_setopt(curl_handle, CURLOPT_COOKIEFILE, cookie_jar);
-    
-    // Login to daemon
-    char login_url[128];
-    snprintf(login_url, sizeof(login_url), "%s/login", DAEMON_ADDRESS);
-    
-    char userpwd[64];
-    snprintf(userpwd, sizeof(userpwd), "CCAdmin:%s", DAEMON_PASSWORD);
-    
+    char login_url[256];
+    snprintf(login_url, sizeof(login_url), "%s/login", config->daemon_address); // Buffer size increased to avoid truncation
+    char userpwd[128];
+    snprintf(userpwd, sizeof(userpwd), "CCAdmin:%s", config->daemon_password); // Buffer size increased to avoid truncation
     curl_easy_setopt(curl_handle, CURLOPT_URL, login_url);
     curl_easy_setopt(curl_handle, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
     curl_easy_setopt(curl_handle, CURLOPT_USERPWD, userpwd);
@@ -148,13 +143,13 @@ int init_coolercontrol_session(void) {
  * send_image_to_lcd("/opt/coolerdash/images/coolerdash.png", uid);
  * @endcode
  */
-int send_image_to_lcd(const char* image_path, const char* device_uid) {
+int send_image_to_lcd(const Config *config, const char* image_path, const char* device_uid) {
     if (!curl_handle || !image_path || !device_uid || !session_initialized) return 0;
 
     // URL for LCD image upload
     char upload_url[256];
     snprintf(upload_url, sizeof(upload_url), 
-             "%s/devices/%s/settings/lcd/lcd/images", DAEMON_ADDRESS, device_uid);
+             "%s/devices/%s/settings/lcd/lcd/images", config->daemon_address, device_uid);
     
     // Determine MIME type
     const char* mime_type = "image/png";
@@ -170,15 +165,39 @@ int send_image_to_lcd(const char* image_path, const char* device_uid) {
     
     // brightness field
     char brightness_str[8];
-    snprintf(brightness_str, sizeof(brightness_str), "%d", LCD_BRIGHTNESS); // Use LCD_BRIGHTNESS from config.h
+    /**
+     * @brief Convert lcd_brightness (int) to string for curl_mime_data.
+     * @param brightness_str Buffer for string value
+     * @param config->lcd_brightness Integer brightness value
+     * @return void
+     * Example:
+     * @code
+     * snprintf(brightness_str, sizeof(brightness_str), "%d", config->lcd_brightness);
+     * curl_mime_data(field, brightness_str, CURL_ZERO_TERMINATED);
+     * @endcode
+     */
+    snprintf(brightness_str, sizeof(brightness_str), "%d", config->lcd_brightness); // Use LCD_BRIGHTNESS from config.h
     field = curl_mime_addpart(form);
     curl_mime_name(field, "brightness");
-    curl_mime_data(field, brightness_str, CURL_ZERO_TERMINATED);
+    curl_mime_data(field, brightness_str, CURL_ZERO_TERMINATED); // Always pass string, never int
     
     // orientation field
+    char orientation_str[8];
+    /**
+     * @brief Convert lcd_orientation (int) to string for curl_mime_data.
+     * @param orientation_str Buffer for string value
+     * @param config->lcd_orientation Integer orientation value
+     * @return void
+     * Example:
+     * @code
+     * snprintf(orientation_str, sizeof(orientation_str), "%d", config->lcd_orientation);
+     * curl_mime_data(field, orientation_str, CURL_ZERO_TERMINATED);
+     * @endcode
+     */
+    snprintf(orientation_str, sizeof(orientation_str), "%d", config->lcd_orientation);
     field = curl_mime_addpart(form);
     curl_mime_name(field, "orientation");
-    curl_mime_data(field, LCD_ORIENTATION, CURL_ZERO_TERMINATED); // Use LCD_ORIENTATION from config.h
+    curl_mime_data(field, orientation_str, CURL_ZERO_TERMINATED); // Always pass string, never int
     
     // images[] field (the actual image)
     field = curl_mime_addpart(form);
@@ -217,8 +236,8 @@ int send_image_to_lcd(const char* image_path, const char* device_uid) {
  * upload_image_to_device("/opt/coolerdash/images/coolerdash.png", uid);
  * @endcode
  */
-int upload_image_to_device(const char* image_path, const char* device_uid) {
-    return send_image_to_lcd(image_path, device_uid);
+int upload_image_to_device(const Config *config, const char* image_path, const char* device_uid) {
+    return send_image_to_lcd(config, image_path, device_uid);
 }
 
 /**
@@ -353,13 +372,14 @@ static int parse_device_fields(char* name_buffer, size_t name_size, char* uid_bu
                             }
                         }
                     }
-                    // Wenn mindestens eins gefunden, abbrechen
+                    // If at least one field was found, break out of the loop
                     if (found) break;
                 }
             }
             search_pos = device_end;
         }
     }
+    // Free response buffer after parsing
     if (response.data) {
         free(response.data);
         response.data = NULL;

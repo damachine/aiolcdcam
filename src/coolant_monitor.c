@@ -3,33 +3,35 @@
  * @brief Coolant temperature monitoring implementation for CoolerDash.
  */
 
+// Include project headers
+#include "../include/coolant_monitor.h"
+#include "../include/config.h"
+
 // Include necessary headers
 #include <stdio.h>
 #include <string.h>
 #include <dirent.h>
 #include <stdlib.h>
 
-// Include project headers
-#include "../include/coolant_monitor.h"
-#include "../include/config.h"
-
 // Global variable for cached coolant temperature path
-char coolant_temp_path[512] = {0};
+char coolant_temp_path[512] = {0}; // Holds the detected sensor file path for coolant temperature
 
 /**
  * @brief Initializes the hwmon sensor path for coolant temperature at startup (once).
  *
  * Detects and sets the path to the coolant temperature sensor file by scanning available hwmon entries.
+ * Uses the hwmon_path from the configuration struct.
  *
+ * @param config Pointer to configuration struct (Config)
  * @return void
  *
  * Example:
  * @code
- * init_coolant_sensor_path();
+ * init_coolant_sensor_path(&config);
  * @endcode
  */
-void init_coolant_sensor_path(void) {
-    DIR *dir = opendir(HWMON_PATH);
+void init_coolant_sensor_path(const Config *config) {
+    DIR *dir = opendir(config->hwmon_path);
     if (!dir) return;
     
     struct dirent *entry;
@@ -39,14 +41,14 @@ void init_coolant_sensor_path(void) {
         if (entry->d_name[0] == '.') continue;
         
         for (int i = 1; i <= 9; ++i) {
-            snprintf(label_path, sizeof(label_path), HWMON_PATH"/%s/temp%d_label", entry->d_name, i);
+            snprintf(label_path, sizeof(label_path), "%s/%s/temp%d_label", config->hwmon_path, entry->d_name, i);
             FILE *flabel = fopen(label_path, "r");
             if (!flabel) continue;
             
             if (fgets(label, sizeof(label), flabel)) {
                 // Cache coolant temperature path
                 if ((strstr(label, "Coolant") || strstr(label, "coolant")) && strlen(coolant_temp_path) == 0) {
-                    snprintf(coolant_temp_path, sizeof(coolant_temp_path), HWMON_PATH"/%s/temp%d_input", entry->d_name, i);
+                    snprintf(coolant_temp_path, sizeof(coolant_temp_path), "%s/%s/temp%d_input", config->hwmon_path, entry->d_name, i);
                     fclose(flabel);
                     closedir(dir);
                     return;

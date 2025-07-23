@@ -16,11 +16,11 @@ pkgdesc="CoolerDash - LCD dashboard for CoolerControl"
 arch=('x86_64')
 url="https://github.com/damachine/coolerdash"
 license=('MIT')
-depends=('cairo' 'libcurl-gnutls' 'coolercontrol' 'ttf-roboto')
+depends=('cairo' 'libcurl-gnutls' 'libinih' 'coolercontrol' 'ttf-roboto')
 makedepends=('gcc' 'make' 'pkg-config')
 optdepends=('nvidia-utils: for GPU temperature monitoring'
             'lm_sensors: for additional hardware monitoring')
-backup=()
+backup=('etc/coolerdash/config.ini')
 install=coolerdash.install
 source=()
 sha256sums=()
@@ -65,6 +65,8 @@ build() {
     cp -a systemd/coolerdash.service "$srcdir/systemd/coolerdash.service"
     mkdir -p "$srcdir/man"
     cp -a man/coolerdash.1 "$srcdir/man/coolerdash.1"
+    mkdir -p "$srcdir/etc/coolerdash"
+    cp -a etc/coolerdash/config.ini "$srcdir/etc/coolerdash/config.ini"
     echo "================================================================"
 }
 
@@ -95,4 +97,5 @@ package() {
     install -Dm644 AUR-README.md "$pkgdir/opt/coolerdash/AUR-README.md"
     install -dm755 "$pkgdir/usr/bin"
     ln -sf /opt/coolerdash/bin/coolerdash "$pkgdir/usr/bin/coolerdash"
+    install -Dm644 etc/coolerdash/config.ini "$pkgdir/etc/coolerdash/config.ini"
 }

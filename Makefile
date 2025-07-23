@@ -3,7 +3,7 @@
 # Maintainer: DAMACHINE <christkue79@gmail.com>
 #
 # --- Dependency notes ---
-# - 'cairo', 'libcurl-gnutls', 'coolercontrol' are required for core functionality
+# - 'cairo', 'libcurl-gnutls', 'libinih', 'coolercontrol' are required for core functionality
 # - 'nvidia-utils' and 'lm_sensors' are optional for extended hardware monitoring
 # - 'ttf-roboto' is required for proper font rendering on the LCD
 # - All dependencies are documented in README and AUR-README
@@ -13,7 +13,7 @@ VERSION := $(shell cat VERSION)
 
 CC = gcc
 CFLAGS = -Wall -Wextra -O2 -std=c99 -march=x86-64-v3 -Iinclude $(shell pkg-config --cflags cairo)
-LIBS = $(shell pkg-config --libs cairo) -lcurl -lm
+LIBS = $(shell pkg-config --libs cairo) -lcurl -lm -linih
 TARGET = coolerdash
 
 # Directories
@@ -24,10 +24,10 @@ BINDIR = bin
 
 # Source code files
 MAIN_SOURCE = $(SRCDIR)/main.c
-MODULES = $(SRCDIR)/cpu_monitor.c $(SRCDIR)/gpu_monitor.c $(SRCDIR)/display.c $(SRCDIR)/coolercontrol.c
+SRC_MODULES = $(SRCDIR)/config.c $(SRCDIR)/cpu_monitor.c $(SRCDIR)/gpu_monitor.c $(SRCDIR)/display.c $(SRCDIR)/coolercontrol.c
 HEADERS = $(INCDIR)/config.h $(INCDIR)/cpu_monitor.h $(INCDIR)/gpu_monitor.h $(INCDIR)/display.h $(INCDIR)/coolercontrol.h
-OBJECTS = $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(MODULES))
-ALL_SOURCES = $(MAIN_SOURCE) $(MODULES)
+OBJECTS = $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(SRC_MODULES))
+ALL_SOURCES = $(MAIN_SOURCE) $(SRC_MODULES)
 
 SERVICE = systemd/coolerdash.service
 MANPAGE = man/coolerdash.1
@@ -72,7 +72,7 @@ $(OBJDIR):
 $(BINDIR):
 	@mkdir -p $(BINDIR)
 
-# Compile object files (with correct paths)
+# Compile object files from src/
 $(OBJDIR)/%.o: $(SRCDIR)/%.c $(INCDIR)/%.h $(INCDIR)/config.h | $(OBJDIR)
 	@printf "$(ICON_BUILD) $(YELLOW)Compiling module: $<$(RESET)\n"
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -109,41 +109,41 @@ install-deps:
 	case $$DISTRO in \
 		arch) \
 			printf "$(ICON_INSTALL) $(GREEN)Installing dependencies for Arch Linux/Manjaro...$(RESET)\n"; \
-			sudo pacman -S --needed cairo libcurl-gnutls gcc make pkg-config ttf-roboto || { \
+			sudo pacman -S --needed cairo libcurl-gnutls libinih gcc make pkg-config ttf-roboto || { \
 				printf "$(ICON_WARNING) $(RED)Error installing dependencies!$(RESET)\n"; \
-				printf "$(YELLOW)Please run manually:$(RESET) sudo pacman -S cairo libcurl-gnutls gcc make pkg-config ttf-roboto\n"; \
+				printf "$(YELLOW)Please run manually:$(RESET) sudo pacman -S cairo libcurl-gnutls libinih gcc make pkg-config ttf-roboto\n"; \
 				exit 1; \
 			}; \
 			;; \
 		debian) \
 			printf "$(ICON_INSTALL) $(GREEN)Installing dependencies for Ubuntu/Debian...$(RESET)\n"; \
-			sudo apt update && sudo apt install -y libcairo2-dev libcurl4-openssl-dev gcc make pkg-config fonts-roboto || { \
+			sudo apt update && sudo apt install -y libcairo2-dev libcurl4-openssl-dev libinih-dev gcc make pkg-config fonts-roboto || { \
 				printf "$(ICON_WARNING) $(RED)Error installing dependencies!$(RESET)\n"; \
-				printf "$(YELLOW)Please run manually:$(RESET) sudo apt install libcairo2-dev libcurl4-openssl-dev gcc make pkg-config fonts-roboto\n"; \
+				printf "$(YELLOW)Please run manually:$(RESET) sudo apt install libcairo2-dev libcurl4-openssl-dev libinih-dev gcc make pkg-config fonts-roboto\n"; \
 				exit 1; \
 			}; \
 			;; \
 		fedora) \
 			printf "$(ICON_INSTALL) $(GREEN)Installing dependencies for Fedora...$(RESET)\n"; \
-			sudo dnf install -y cairo-devel libcurl-devel gcc make pkg-config google-roboto-fonts || { \
+			sudo dnf install -y cairo-devel libcurl-devel inih-devel gcc make pkg-config google-roboto-fonts || { \
 				printf "$(ICON_WARNING) $(RED)Error installing dependencies!$(RESET)\n"; \
-				printf "$(YELLOW)Please run manually:$(RESET) sudo dnf install cairo-devel libcurl-devel gcc make pkg-config google-roboto-fonts\n"; \
+				printf "$(YELLOW)Please run manually:$(RESET) sudo dnf install cairo-devel libcurl-devel inih-devel gcc make pkg-config google-roboto-fonts\n"; \
 				exit 1; \
 			}; \
 			;; \
 		rhel) \
 			printf "$(ICON_INSTALL) $(GREEN)Installing dependencies for RHEL/CentOS...$(RESET)\n"; \
-			sudo yum install -y cairo-devel libcurl-devel gcc make pkg-config google-roboto-fonts || { \
+			sudo yum install -y cairo-devel libcurl-devel inih-devel gcc make pkg-config google-roboto-fonts || { \
 				printf "$(ICON_WARNING) $(RED)Error installing dependencies!$(RESET)\n"; \
-				printf "$(YELLOW)Please run manually:$(RESET) sudo yum install cairo-devel libcurl-devel gcc make pkg-config google-roboto-fonts\n"; \
+				printf "$(YELLOW)Please run manually:$(RESET) sudo yum install cairo-devel libcurl-devel inih-devel gcc make pkg-config google-roboto-fonts\n"; \
 				exit 1; \
 			}; \
 			;; \
 		opensuse) \
 			printf "$(ICON_INSTALL) $(GREEN)Installing dependencies for openSUSE...$(RESET)\n"; \
-			sudo zypper install -y cairo-devel libcurl-devel gcc make pkg-config google-roboto-fonts || { \
+			sudo zypper install -y cairo-devel libcurl-devel inih-devel gcc make pkg-config google-roboto-fonts || { \
 				printf "$(ICON_WARNING) $(RED)Error installing dependencies!$(RESET)\n"; \
-				printf "$(YELLOW)Please run manually:$(RESET) sudo zypper install cairo-devel libcurl-devel gcc make pkg-config google-roboto-fonts\n"; \
+				printf "$(YELLOW)Please run manually:$(RESET) sudo zypper install cairo-devel libcurl-devel inih-devel gcc make pkg-config google-roboto-fonts\n"; \
 				exit 1; \
 			}; \
 			;; \
@@ -153,19 +153,19 @@ install-deps:
 			printf "$(YELLOW)Please install the following dependencies manually:$(RESET)\n"; \
 			printf "\n"; \
 			printf "$(WHITE)Arch Linux / Manjaro:$(RESET)\n"; \
-			printf "  sudo pacman -S cairo libcurl-gnutls gcc make pkg-config ttf-roboto\n"; \
+			printf "  sudo pacman -S cairo libcurl-gnutls libinih gcc make pkg-config ttf-roboto\n"; \
 			printf "\n"; \
 			printf "$(WHITE)Ubuntu / Debian:$(RESET)\n"; \
-			printf "  sudo apt install libcairo2-dev libcurl4-openssl-dev gcc make pkg-config fonts-roboto\n"; \
+			printf "  sudo apt install libcairo2-dev libcurl4-openssl-dev libinih-dev gcc make pkg-config fonts-roboto\n"; \
 			printf "\n"; \
 			printf "$(WHITE)Fedora:$(RESET)\n"; \
-			printf "  sudo dnf install cairo-devel libcurl-devel gcc make pkg-config google-roboto-fonts\n"; \
+			printf "  sudo dnf install cairo-devel libcurl-devel inih-devel gcc make pkg-config google-roboto-fonts\n"; \
 			printf "\n"; \
 			printf "$(WHITE)RHEL / CentOS:$(RESET)\n"; \
-			printf "  sudo yum install cairo-devel libcurl-devel gcc make pkg-config google-roboto-fonts\n"; \
+			printf "  sudo yum install cairo-devel libcurl-devel inih-devel gcc make pkg-config google-roboto-fonts\n"; \
 			printf "\n"; \
 			printf "$(WHITE)openSUSE:$(RESET)\n"; \
-			printf "  sudo zypper install cairo-devel libcurl-devel gcc make pkg-config google-roboto-fonts\n"; \
+			printf "  sudo zypper install cairo-devel libcurl-devel inih-devel gcc make pkg-config google-roboto-fonts\n"; \
 			printf "\n"; \
 			exit 1; \
 			;; \
@@ -179,6 +179,9 @@ check-deps-for-install:
 	fi; \
 	if ! pkg-config --exists libcurl >/dev/null 2>&1; then \
 		MISSING="$$MISSING libcurl"; \
+	fi; \
+	if ! pkg-config --exists inih >/dev/null 2>&1; then \
+		MISSING="$$MISSING libinih"; \
 	fi; \
 	if ! command -v gcc >/dev/null 2>&1; then \
 		MISSING="$$MISSING gcc"; \
@@ -239,6 +242,15 @@ install: check-deps-for-install $(TARGET)
 	sudo cp LICENSE /opt/coolerdash/ 2>/dev/null || true
 	sudo cp CHANGELOG.md /opt/coolerdash/ 2>/dev/null || true
 	sudo cp VERSION /opt/coolerdash/ 2>/dev/null || true
+	@printf "$(ICON_INFO) $(CYAN)Installing default config...$(RESET)\n"
+	@if [ ! -f /etc/coolerdash/config.ini ]; then \
+		sudo mkdir -p /etc/coolerdash/; \
+		sudo cp etc/coolerdash/config.ini /etc/coolerdash/config.ini; \
+		printf "  $(GREEN)→$(RESET) Default config installed: /etc/coolerdash/config.ini\n"; \
+	else \
+		printf "  $(YELLOW)→$(RESET) Config already exists: /etc/coolerdash/config.ini\n"; \
+	fi
+	@printf "\n"
 	@printf "  $(GREEN)→$(RESET) Program: /opt/coolerdash/bin/$(TARGET)\n"
 	@printf "  $(GREEN)→$(RESET) Symlink: /usr/bin/coolerdash → /opt/coolerdash/bin/$(TARGET)\n"
 	@printf "  $(GREEN)→$(RESET) Shutdown image: /opt/coolerdash/images/shutdown.png\n"

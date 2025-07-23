@@ -6,22 +6,24 @@
 #define COOLERCONTROL_H
 
 #include <stddef.h>  // For size_t
+#include "config.h"
 
 /**
- * @brief Initializes a CoolerControl session and authenticates with the daemon.
+ * @brief Initializes a CoolerControl session and authenticates with the daemon using configuration.
  *
  * Must be called before any other CoolerControl API function.
  *
+ * @param config Pointer to configuration struct (Config).
  * @return 1 on success, 0 on error
  *
  * Example:
  * @code
- * if (!init_coolercontrol_session()) {
+ * if (!init_coolercontrol_session(&config)) {
  *     // handle error
  * }
  * @endcode
  */
-int init_coolercontrol_session(void);
+int init_coolercontrol_session(const Config *config);
 
 /**
  * @brief Cleans up and terminates the CoolerControl session.
@@ -115,33 +117,37 @@ const char* get_cached_device_uid(void);
 
 // --- Image Upload ---
 /**
- * @brief Sends an image directly to the LCD of the CoolerControl device.
+ * @brief Sends an image directly to the LCD of the CoolerControl device using configuration.
  *
  * Uploads an image to the LCD display.
  *
+ * @param config Pointer to configuration struct (Config).
  * @param image_path Path to the image file (PNG/JPEG/GIF)
  * @param device_uid Device UID string
  * @return 1 on success, 0 on error
  *
  * Example:
  * @code
- * send_image_to_lcd("/opt/coolerdash/images/coolerdash.png", uuid);
+ * send_image_to_lcd(&config, "/opt/coolerdash/images/coolerdash.png", uuid);
  * @endcode
  */
-int send_image_to_lcd(const char* image_path, const char* device_uid);
+int send_image_to_lcd(const Config *config, const char* image_path, const char* device_uid);
 
 /**
  * @brief Alias for send_image_to_lcd for API compatibility.
  *
+ * This function is provided for compatibility with other APIs and simply calls send_image_to_lcd().
+ *
+ * @param config Pointer to configuration struct (Config).
  * @param image_path Path to the image file
  * @param device_uid Device UID string
  * @return 1 on success, 0 on error
  *
  * Example:
  * @code
- * upload_image_to_device("/opt/coolerdash/images/coolerdash.png", uuid);
+ * upload_image_to_device(&config, "/opt/coolerdash/images/coolerdash.png", uuid);
  * @endcode
  */
-int upload_image_to_device(const char* image_path, const char* device_uid);
+int upload_image_to_device(const Config *config, const char* image_path, const char* device_uid);
 
 #endif // COOLERCONTROL_H
