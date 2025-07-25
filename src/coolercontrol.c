@@ -72,24 +72,25 @@ static size_t write_callback(void *contents, size_t size, size_t nmemb, struct h
     return realsize;
 }
 
-// Global variables for HTTP session
 /**
- * @brief Global variables for HTTP session management.
- * @details Used internally for cURL session, cookie storage, and session state.
+ * @brief Session state struct for CoolerControl API.
+ * @details Encapsulates all internal session variables (cURL handle, cookie jar, session state, cached UID) for safe and modular access. Avoids global variables and improves maintainability.
  * @example
- *     // Not intended for direct use; managed by API functions.
+ *     static CoolerControlSession cc_session = {0};
  */
-static CURL *curl_handle = NULL;
-static char cookie_jar[256] = {0};
-static int session_initialized = 0;
+typedef struct {
+    CURL *curl_handle;
+    char cookie_jar[256];
+    int session_initialized;
+    char cached_device_uid[128];
+} CoolerControlSession;
 
-/**
- * @brief Global cached UID for LCD device.
- * @details Stores the UID of the detected LCD device for fast access.
- * @example
- *     // Not intended for direct use; use get_cached_device_uid().
- */
-static char cached_device_uid[128] = {0};
+static CoolerControlSession cc_session = {
+    .curl_handle = NULL,
+    .cookie_jar = {0},
+    .session_initialized = 0,
+    .cached_device_uid = {0}
+};
 
 /**
  * @brief Initializes cURL and authenticates with the CoolerControl daemon using configuration.
@@ -101,28 +102,28 @@ static char cached_device_uid[128] = {0};
  */
 int init_coolercontrol_session(const Config *config) {
     curl_global_init(CURL_GLOBAL_DEFAULT); 
-    curl_handle = curl_easy_init();
-    if (!curl_handle) return 0;
-    snprintf(cookie_jar, sizeof(cookie_jar), "/tmp/lcd_cookie_%d.txt", getpid());
-    curl_easy_setopt(curl_handle, CURLOPT_COOKIEJAR, cookie_jar);
-    curl_easy_setopt(curl_handle, CURLOPT_COOKIEFILE, cookie_jar);
+    cc_session.curl_handle = curl_easy_init();
+    if (!cc_session.curl_handle) return 0;
+    snprintf(cc_session.cookie_jar, sizeof(cc_session.cookie_jar), "/tmp/lcd_cookie_%d.txt", getpid());
+    curl_easy_setopt(cc_session.curl_handle, CURLOPT_COOKIEJAR, cc_session.cookie_jar);
+    curl_easy_setopt(cc_session.curl_handle, CURLOPT_COOKIEFILE, cc_session.cookie_jar);
     char login_url[256];
-    snprintf(login_url, sizeof(login_url), "%s/login", config->daemon_address); // Buffer size increased to avoid truncation
+    snprintf(login_url, sizeof(login_url), "%s/login", config->daemon_address);
     char userpwd[128];
-    snprintf(userpwd, sizeof(userpwd), "CCAdmin:%s", config->daemon_password); // Buffer size increased to avoid truncation
-    curl_easy_setopt(curl_handle, CURLOPT_URL, login_url);
-    curl_easy_setopt(curl_handle, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-    curl_easy_setopt(curl_handle, CURLOPT_USERPWD, userpwd);
-    curl_easy_setopt(curl_handle, CURLOPT_POST, 1L);
-    curl_easy_setopt(curl_handle, CURLOPT_POSTFIELDS, "");
-    curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, NULL); // Ignore response
+    snprintf(userpwd, sizeof(userpwd), "CCAdmin:%s", config->daemon_password);
+    curl_easy_setopt(cc_session.curl_handle, CURLOPT_URL, login_url);
+    curl_easy_setopt(cc_session.curl_handle, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+    curl_easy_setopt(cc_session.curl_handle, CURLOPT_USERPWD, userpwd);
+    curl_easy_setopt(cc_session.curl_handle, CURLOPT_POST, 1L);
+    curl_easy_setopt(cc_session.curl_handle, CURLOPT_POSTFIELDS, "");
+    curl_easy_setopt(cc_session.curl_handle, CURLOPT_WRITEFUNCTION, NULL); // Ignore response
     
-    CURLcode res = curl_easy_perform(curl_handle);
+    CURLcode res = curl_easy_perform(cc_session.curl_handle);
     long response_code = 0;
-    curl_easy_getinfo(curl_handle, CURLINFO_RESPONSE_CODE, &response_code);
+    curl_easy_getinfo(cc_session.curl_handle, CURLINFO_RESPONSE_CODE, &response_code);
     
     if (res == CURLE_OK && (response_code == 200 || response_code == 204)) {
-        session_initialized = 1;
+        cc_session.session_initialized = 1;
         return 1;
     }
     
@@ -136,7 +137,7 @@ int init_coolercontrol_session(const Config *config) {
  *     send_image_to_lcd(&config, "/opt/coolerdash/images/coolerdash.png", uid);
  */
 int send_image_to_lcd(const Config *config, const char* image_path, const char* device_uid) {
-    if (!curl_handle || !image_path || !device_uid || !session_initialized) return 0;
+    if (!cc_session.curl_handle || !image_path || !device_uid || !cc_session.session_initialized) return 0;
 
     // URL for LCD image upload
     char upload_url[256];
@@ -147,7 +148,7 @@ int send_image_to_lcd(const Config *config, const char* image_path, const char* 
     const char* mime_type = "image/png";
 
     // Create multipart form
-    curl_mime *form = curl_mime_init(curl_handle);
+    curl_mime *form = curl_mime_init(cc_session.curl_handle);
     curl_mimepart *field;
     
     // mode field
@@ -157,39 +158,17 @@ int send_image_to_lcd(const Config *config, const char* image_path, const char* 
     
     // brightness field
     char brightness_str[8];
-    /**
-     * @brief Convert lcd_brightness (int) to string for curl_mime_data.
-     * @param brightness_str Buffer for string value
-     * @param config->lcd_brightness Integer brightness value
-     * @return void
-     * Example:
-     * @code
-     * snprintf(brightness_str, sizeof(brightness_str), "%d", config->lcd_brightness);
-     * curl_mime_data(field, brightness_str, CURL_ZERO_TERMINATED);
-     * @endcode
-     */
-    snprintf(brightness_str, sizeof(brightness_str), "%d", config->lcd_brightness); // Use LCD_BRIGHTNESS from config.h
+    snprintf(brightness_str, sizeof(brightness_str), "%d", config->lcd_brightness);
     field = curl_mime_addpart(form);
     curl_mime_name(field, "brightness");
-    curl_mime_data(field, brightness_str, CURL_ZERO_TERMINATED); // Always pass string, never int
+    curl_mime_data(field, brightness_str, CURL_ZERO_TERMINATED);
     
     // orientation field
     char orientation_str[8];
-    /**
-     * @brief Convert lcd_orientation (int) to string for curl_mime_data.
-     * @param orientation_str Buffer for string value
-     * @param config->lcd_orientation Integer orientation value
-     * @return void
-     * Example:
-     * @code
-     * snprintf(orientation_str, sizeof(orientation_str), "%d", config->lcd_orientation);
-     * curl_mime_data(field, orientation_str, CURL_ZERO_TERMINATED);
-     * @endcode
-     */
     snprintf(orientation_str, sizeof(orientation_str), "%d", config->lcd_orientation);
     field = curl_mime_addpart(form);
     curl_mime_name(field, "orientation");
-    curl_mime_data(field, orientation_str, CURL_ZERO_TERMINATED); // Always pass string, never int
+    curl_mime_data(field, orientation_str, CURL_ZERO_TERMINATED);
     
     // images[] field (the actual image)
     field = curl_mime_addpart(form);
@@ -198,20 +177,20 @@ int send_image_to_lcd(const Config *config, const char* image_path, const char* 
     curl_mime_type(field, mime_type);
     
     // Configure cURL
-    curl_easy_setopt(curl_handle, CURLOPT_URL, upload_url);
-    curl_easy_setopt(curl_handle, CURLOPT_MIMEPOST, form);
-    curl_easy_setopt(curl_handle, CURLOPT_CUSTOMREQUEST, "PUT");
+    curl_easy_setopt(cc_session.curl_handle, CURLOPT_URL, upload_url);
+    curl_easy_setopt(cc_session.curl_handle, CURLOPT_MIMEPOST, form);
+    curl_easy_setopt(cc_session.curl_handle, CURLOPT_CUSTOMREQUEST, "PUT");
     
     // Execute request
-    CURLcode res = curl_easy_perform(curl_handle);
+    CURLcode res = curl_easy_perform(cc_session.curl_handle);
     long response_code = 0;
-    curl_easy_getinfo(curl_handle, CURLINFO_RESPONSE_CODE, &response_code);
+    curl_easy_getinfo(cc_session.curl_handle, CURLINFO_RESPONSE_CODE, &response_code);
     
     // Cleanup
     curl_mime_free(form);
-    curl_easy_setopt(curl_handle, CURLOPT_MIMEPOST, NULL);
-    curl_easy_setopt(curl_handle, CURLOPT_CUSTOMREQUEST, NULL);
-    curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, NULL);
+    curl_easy_setopt(cc_session.curl_handle, CURLOPT_MIMEPOST, NULL);
+    curl_easy_setopt(cc_session.curl_handle, CURLOPT_CUSTOMREQUEST, NULL);
+    curl_easy_setopt(cc_session.curl_handle, CURLOPT_WRITEFUNCTION, NULL);
     
     return (res == CURLE_OK && response_code == 200);
 }
@@ -236,15 +215,15 @@ void cleanup_coolercontrol_session(void) {
     static int cleanup_done = 0;
     if (cleanup_done) return;
     int all_cleaned = 1;
-    if (curl_handle) {
-        curl_easy_cleanup(curl_handle);
-        curl_handle = NULL;
+    if (cc_session.curl_handle) {
+        curl_easy_cleanup(cc_session.curl_handle);
+        cc_session.curl_handle = NULL;
     }
     curl_global_cleanup();
-    if (unlink(cookie_jar) != 0) {
+    if (unlink(cc_session.cookie_jar) != 0) {
         all_cleaned = 0;
     }
-    session_initialized = 0;
+    cc_session.session_initialized = 0;
     if (all_cleaned) cleanup_done = 1;
 }
 
@@ -257,7 +236,7 @@ void cleanup_coolercontrol_session(void) {
  *     }
  */
 int is_session_initialized(void) {
-    return session_initialized;
+    return cc_session.session_initialized;
 }
 
 /**
@@ -280,21 +259,21 @@ static int parse_device_fields(const Config *config, char* name_buffer, size_t n
     snprintf(devices_url, sizeof(devices_url), "%.*s/devices", (int)(sizeof(devices_url) - 9), config->daemon_address);
     
     // Configure cURL for GET request
-    curl_easy_setopt(curl_handle, CURLOPT_URL, devices_url);
-    curl_easy_setopt(curl_handle, CURLOPT_HTTPGET, 1L);
-    curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, write_callback);
-    curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, &response);
+    curl_easy_setopt(cc_session.curl_handle, CURLOPT_URL, devices_url);
+    curl_easy_setopt(cc_session.curl_handle, CURLOPT_HTTPGET, 1L);
+    curl_easy_setopt(cc_session.curl_handle, CURLOPT_WRITEFUNCTION, write_callback);
+    curl_easy_setopt(cc_session.curl_handle, CURLOPT_WRITEDATA, &response);
     
-    CURLcode res = curl_easy_perform(curl_handle);
+    CURLcode res = curl_easy_perform(cc_session.curl_handle);
     if (res != CURLE_OK) {
         fprintf(stderr, "[CoolerDash] cURL request failed: %s\n", curl_easy_strerror(res));
     }
     long response_code = 0;
-    if (curl_easy_getinfo(curl_handle, CURLINFO_RESPONSE_CODE, &response_code) != CURLE_OK) {
+    if (curl_easy_getinfo(cc_session.curl_handle, CURLINFO_RESPONSE_CODE, &response_code) != CURLE_OK) {
         fprintf(stderr, "[CoolerDash] Failed to get HTTP response code.\n");
     }
-    curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, NULL);
-    curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, NULL);
+    curl_easy_setopt(cc_session.curl_handle, CURLOPT_WRITEFUNCTION, NULL);
+    curl_easy_setopt(cc_session.curl_handle, CURLOPT_WRITEDATA, NULL);
     int found = 0;
     if (res == CURLE_OK && response_code == 200 && response.data) {
         char *search_pos = response.data;
@@ -366,7 +345,7 @@ static int parse_device_fields(const Config *config, char* name_buffer, size_t n
  *     }
  */
 int get_device_name(const Config *config, char* name_buffer, size_t buffer_size) {
-    if (!curl_handle || !name_buffer || buffer_size == 0 || !session_initialized) return 0;
+    if (!cc_session.curl_handle || !name_buffer || buffer_size == 0 || !cc_session.session_initialized) return 0;
     return parse_device_fields(config, name_buffer, buffer_size, NULL, 0);
 }
 
@@ -380,7 +359,7 @@ int get_device_name(const Config *config, char* name_buffer, size_t buffer_size)
  *     }
  */
 int get_device_uid(const Config *config, char* uid_buffer, size_t buffer_size) {
-    if (!curl_handle || !uid_buffer || buffer_size == 0 || !session_initialized) return 0;
+    if (!cc_session.curl_handle || !uid_buffer || buffer_size == 0 || !cc_session.session_initialized) return 0;
     return parse_device_fields(config, NULL, 0, uid_buffer, buffer_size);
 }
 
@@ -391,7 +370,7 @@ int get_device_uid(const Config *config, char* uid_buffer, size_t buffer_size) {
  *     if (!init_cached_device_uid(&config)) { ... }
  */
 int init_cached_device_uid(const Config *config) {
-    if (!get_device_uid(config, cached_device_uid, sizeof(cached_device_uid)) || !cached_device_uid[0]) {
+    if (!get_device_uid(config, cc_session.cached_device_uid, sizeof(cc_session.cached_device_uid)) || !cc_session.cached_device_uid[0]) {
         fprintf(stderr, "[CoolerDash] Error: Could not detect LCD device UID!\n");
         return 0;
     }
@@ -406,5 +385,5 @@ int init_cached_device_uid(const Config *config) {
  *     if (uid[0]) { ... }
  */
 const char* get_cached_device_uid(void) {
-    return cached_device_uid;
+    return cc_session.cached_device_uid;
 }
