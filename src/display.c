@@ -54,7 +54,12 @@ void lerp_temp_color(const Config *config, float val, int* r, int* g, int* b) {
     }
 }
 
-// Forward declarations for internal functions
+/**
+ * @brief Forward declarations for internal display rendering functions.
+ * @details These functions are only used internally in display.c for modular rendering logic.
+ * @example
+ *     // Not intended for direct use; see render_display() and draw_combined_image().
+ */
 static void draw_temperature_bars(cairo_t *cr, const sensor_data_t *data, const Config *config);
 static void draw_temperature_displays(cairo_t *cr, const sensor_data_t *data, const Config *config);
 static void draw_labels(cairo_t *cr, const Config *config);

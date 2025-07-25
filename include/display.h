@@ -57,4 +57,4 @@ void draw_combined_image(const Config *config);
  */
 void lerp_temp_color(const Config *config, float val, int *r, int *g, int *b);
 
-#endif /* DISPLAY_H */
+#endif // DISPLAY_H

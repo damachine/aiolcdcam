@@ -23,6 +23,12 @@
 #include <dirent.h>
 #include <stdlib.h>
 
+/**
+ * @brief Cached path to CPU temperature sensor file.
+ * @details Set by init_cpu_sensor_path() and used by read_cpu_temp().
+ * @example
+ *     // Not intended for direct use; managed by module functions.
+ */
 char cpu_temp_path[512] = {0};
 
 /**

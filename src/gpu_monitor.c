@@ -21,7 +21,12 @@
 #include <stdio.h>
 #include <sys/time.h>
 
-// Global variable for GPU availability
+/**
+ * @brief Global variable for GPU availability.
+ * @details Indicates if an NVIDIA GPU is available: -1 = unknown, 0 = not available, 1 = available.
+ * @example
+ *     // Not intended for direct use; managed by init_gpu_monitor().
+ */
 static int gpu_available = -1;  // -1 = unknown, 0 = not available, 1 = available
 
 /**

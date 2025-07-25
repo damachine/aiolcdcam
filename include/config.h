@@ -24,6 +24,10 @@
 /**
  * @brief Color struct for RGB values (0-255).
  * @details Used for all color configuration values in CoolerDash.
+ * @example
+ *     Color green = {0, 255, 0};
+ *     Color red = {255, 0, 0};
+ *     // Use in config: cfg.color_green = green;
  */
 typedef struct {
     int r; // Red value (0-255)
@@ -34,6 +38,11 @@ typedef struct {
 /**
  * @brief Structure for runtime configuration loaded from INI file.
  * @details All fields are loaded from the INI file.
+ * @example
+ *     Config cfg;
+ *     if (load_config_ini(&cfg, "/etc/coolerdash/config.ini") == 0) {
+ *         // Use cfg fields, e.g. cfg.display_width
+ *     }
  */
 typedef struct Config {
     int display_width;           // Display width in pixels

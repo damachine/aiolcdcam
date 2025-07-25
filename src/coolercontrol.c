@@ -25,7 +25,15 @@
 #include <sys/stat.h>
 #include <curl/curl.h>
 
-// Response buffer structure for HTTP responses
+/**
+ * @brief Response buffer structure for HTTP responses.
+ * @details Used to store dynamically allocated HTTP response data and its size for cURL operations.
+ * @example
+ *     struct http_response resp = {0};
+ *     resp.data = malloc(1);
+ *     resp.size = 0;
+ *     // Use with cURL: curl_easy_setopt(curl, CURLOPT_WRITEDATA, &resp);
+ */
 struct http_response {
     char *data;
     size_t size;
@@ -65,11 +73,22 @@ static size_t write_callback(void *contents, size_t size, size_t nmemb, struct h
 }
 
 // Global variables for HTTP session
+/**
+ * @brief Global variables for HTTP session management.
+ * @details Used internally for cURL session, cookie storage, and session state.
+ * @example
+ *     // Not intended for direct use; managed by API functions.
+ */
 static CURL *curl_handle = NULL;
 static char cookie_jar[256] = {0};
 static int session_initialized = 0;
 
-// Global cached UID for LCD device
+/**
+ * @brief Global cached UID for LCD device.
+ * @details Stores the UID of the detected LCD device for fast access.
+ * @example
+ *     // Not intended for direct use; use get_cached_device_uid().
+ */
 static char cached_device_uid[128] = {0};
 
 /**

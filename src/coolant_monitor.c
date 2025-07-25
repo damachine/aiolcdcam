@@ -23,7 +23,12 @@
 #include <dirent.h>
 #include <stdlib.h>
 
-// Global variable for cached coolant temperature path
+/**
+ * @brief Cached path to coolant temperature sensor file.
+ * @details Set by init_coolant_sensor_path() and used by read_coolant_temp().
+ * @example
+ *     // Not intended for direct use; managed by module functions.
+ */
 char coolant_temp_path[512] = {0}; // Holds the detected sensor file path for coolant temperature
 
 /**

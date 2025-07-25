@@ -36,7 +36,12 @@ void init_coolant_sensor_path(const Config *config);
  */
 float read_coolant_temp(void);
 
-// Path to the coolant temperature sensor file (set by init_coolant_sensor_path)
+/**
+ * @brief Path to the coolant temperature sensor file.
+ * @details Set by init_coolant_sensor_path() and used by read_coolant_temp().
+ * @example
+ *     // Not intended for direct use; managed by module functions.
+ */
 extern char coolant_temp_path[512];
 
 #endif // COOLANT_MONITOR_H

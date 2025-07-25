@@ -36,11 +36,21 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 
-// Global variables for daemon management
+/**
+ * @brief Global variables for daemon management.
+ * @details Used for controlling the main daemon loop and shutdown image logic.
+ * @example
+ *     // Not intended for direct use; managed by main and signal handler.
+ */
 static volatile sig_atomic_t running = 1; // flag whether daemon is running
 static volatile sig_atomic_t shutdown_sent = 0; // flag whether shutdown image was already sent
 
-// Global pointer to config for signal handler access
+/**
+ * @brief Global pointer to config for signal handler access.
+ * @details Allows the signal handler to access configuration data for cleanup and shutdown image.
+ * @example
+ *     // Not intended for direct use; set in main().
+ */
 static const Config *g_config_ptr = NULL;
 
 /**
