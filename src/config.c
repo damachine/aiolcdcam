@@ -1,77 +1,30 @@
 /*
- * @note All configuration values are loaded exclusively from the INI file at runtime.
- * @author damachine
+ * @author damachine (christkue79@gmail.com)
+ * @website https://github.com/damachine
  * @copyright (c) 2025 damachine
  * @license MIT
  * @version 1.0
  */
+
 /**
- * @file config.c
- * @brief Central configuration implementation for CoolerDash.
- *
- * @details
- * Coding and Documentation Standards for CoolerDash:
- * - All code comments must be in English and use Doxygen style for functions.
- * - Use @brief, @details, @param, @return, @throws, @pre, @post, @note, @warning, @bug, @todo, @see, @example, @deprecated, @since, @version, @author, @copyright, @license
- * - Opening braces for functions and control structures on the same line (K&R style)
- * - Comment all non-obvious code sections
- * - Avoid redundant comments
- * - Document complex algorithms and data structures thoroughly
- *
- * C99 Coding Guidelines:
- * - Follow ISO/IEC 9899:1999 (C99)
- * - Check return values of malloc(), calloc(), realloc()
- * - Free dynamic memory and set pointers to NULL
- * - Use include guards: #ifndef HEADER_H / #define HEADER_H / #endif
- * - Only include necessary headers; separate system and local headers
- * - Use 4 spaces for indentation, no tabs
- * - Use const for immutable variables and parameters
- * - Use static for file-local functions/variables
- * - Use inline for small, frequently used functions
- *
- * Naming Conventions:
- * - Functions: snake_case verbs (e.g. calculate_sum())
- * - Variables: snake_case (e.g. user_count)
- * - Constants/Macros: UPPER_CASE (e.g. MAX_SIZE)
- * - Structs via typedef: PascalCase (e.g. MyStruct)
- * - Use descriptive names, avoid abbreviations
- * - Use enum for status/error codes
- * - Use typedef for complex types
- * - Consistent naming throughout the project
- *
- * @note All configuration values are loaded exclusively from the INI file at runtime.
- * @copyright (c) 2025 damachine
- * @license MIT
+ * @brief INI parser handler for CoolerDash configuration.
+ * @details Parses the configuration file and sets values in the Config struct.
+ * @example
+ *     See function documentation for usage examples.
  */
-#include <ini.h>           // External INI parser
-#include "../include/config.h" // Project config header
+
+// Include project headers
+#include "../include/config.h"
+ 
+// Include necessary headers
+#include <ini.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
 /**
  * @brief INI parser handler, sets values in Config struct.
- *
- * @details
- * Called for each key-value pair in the INI file. Matches section and key names and sets the corresponding field in the Config struct.
- * Complex mapping logic: Each section and key is mapped to a specific field in the Config struct. Unrecognized keys are ignored.
- *
- * @param[in,out] user Pointer to Config struct
- * @param[in] section Current section name
- * @param[in] name Current key name
- * @param[in] value Current value as string
- * @pre user must not be NULL.
- * @pre section, name, value must be valid strings.
- * @post Config struct is updated with the parsed value if recognized.
- * @return 1 on success, 0 on error
- * @note This function is used as a callback for ini_parse().
- * @warning Unrecognized keys are ignored silently.
- * @see load_config_ini
- * @author damachine
- * @copyright (c) 2025 damachine
- * @license MIT
- * @since 0.25.07.23.5-1
- * @version 1.0
+ * @details Called for each key-value pair in the INI file. Matches section and key names and sets the corresponding field in the Config struct. Unrecognized keys are ignored.
  * @example
  *     ini_parse("/etc/coolerdash/config.ini", inih_config_handler, &cfg);
  */
@@ -79,7 +32,6 @@ static int inih_config_handler(void *user, const char *section, const char *name
 {
     Config *config = (Config *)user;
 
-    // Display section
     if (strcmp(section, "display") == 0) {
         if (strcmp(name, "width") == 0) config->display_width = atoi(value);
         else if (strcmp(name, "height") == 0) config->display_height = atoi(value);
@@ -88,7 +40,6 @@ static int inih_config_handler(void *user, const char *section, const char *name
         else if (strcmp(name, "brightness") == 0) config->lcd_brightness = atoi(value);
         else if (strcmp(name, "orientation") == 0) config->lcd_orientation = atoi(value);
     }
-    // Layout section
     else if (strcmp(section, "layout") == 0) {
         if (strcmp(name, "box_width") == 0) config->box_width = atoi(value);
         else if (strcmp(name, "box_height") == 0) config->box_height = atoi(value);
@@ -98,24 +49,20 @@ static int inih_config_handler(void *user, const char *section, const char *name
         else if (strcmp(name, "bar_gap") == 0) config->bar_gap = atoi(value);
         else if (strcmp(name, "border_line_width") == 0) config->border_line_width = (float)atof(value);
     }
-    // Font section
     else if (strcmp(section, "font") == 0) {
         if (strcmp(name, "face") == 0) strncpy(config->font_face, value, sizeof(config->font_face) - 1);
         else if (strcmp(name, "size_large") == 0) config->font_size_large = (float)atof(value);
         else if (strcmp(name, "size_labels") == 0) config->font_size_labels = (float)atof(value);
     }
-    // Temperature section
     else if (strcmp(section, "temperature") == 0) {
         if (strcmp(name, "threshold_green") == 0) config->temp_threshold_green = (float)atof(value);
         else if (strcmp(name, "threshold_orange") == 0) config->temp_threshold_orange = (float)atof(value);
         else if (strcmp(name, "threshold_red") == 0) config->temp_threshold_red = (float)atof(value);
     }
-    // Cache section
     else if (strcmp(section, "cache") == 0) {
         if (strcmp(name, "gpu_interval") == 0) config->gpu_cache_interval = (float)atof(value);
         else if (strcmp(name, "change_tolerance_temp") == 0) config->change_tolerance_temp = (float)atof(value);
     }
-    // Paths section
     else if (strcmp(section, "paths") == 0) {
         if (strcmp(name, "hwmon") == 0) strncpy(config->hwmon_path, value, sizeof(config->hwmon_path) - 1);
         else if (strcmp(name, "image_dir") == 0) strncpy(config->image_dir, value, sizeof(config->image_dir) - 1);
@@ -123,12 +70,10 @@ static int inih_config_handler(void *user, const char *section, const char *name
         else if (strcmp(name, "shutdown_image") == 0) strncpy(config->shutdown_image, value, sizeof(config->shutdown_image) - 1);
         else if (strcmp(name, "pid_file") == 0) strncpy(config->pid_file, value, sizeof(config->pid_file) - 1);
     }
-    // Daemon section
     else if (strcmp(section, "daemon") == 0) {
         if (strcmp(name, "address") == 0) strncpy(config->daemon_address, value, sizeof(config->daemon_address) - 1);
         else if (strcmp(name, "password") == 0) strncpy(config->daemon_password, value, sizeof(config->daemon_password) - 1);
     }
-    // Color sections
     else if (strcmp(section, "color_green") == 0) {
         if (strcmp(name, "r") == 0) config->color_green.r = atoi(value);
         else if (strcmp(name, "g") == 0) config->color_green.g = atoi(value);
@@ -169,46 +114,23 @@ static int inih_config_handler(void *user, const char *section, const char *name
         else if (strcmp(name, "g") == 0) config->color_border.g = atoi(value);
         else if (strcmp(name, "b") == 0) config->color_border.b = atoi(value);
     }
-    return 1; // success
+    return 1;
 }
 
 /**
  * @brief Loads configuration from INI file.
- *
- * @details
- * Parses the INI file and fills the Config struct. If the file cannot be read, returns error.
- * All fields are loaded at runtime; no static defaults are used.
- *
- * @param[in,out] config Pointer to Config struct to fill
- * @param[in] path Path to INI file
- * @pre config must not be NULL.
- * @pre path must point to a valid, readable INI file.
- * @post config is filled with values from the INI file if return is 0.
- * @return 0 on success, -1 on error
- * @throws No exceptions, but returns -1 on file or parse errors.
- * @note All configuration values are loaded at runtime.
- * @warning If the INI file is malformed or missing fields, the function may leave config in an undefined state.
- * @bug Does not validate all field ranges; see issue #42.
- * @todo Add validation for all numeric fields.
- * @see Config
+ * @details Parses the INI file and fills the Config struct.
  * @example
  *     Config cfg;
  *     if (load_config_ini(&cfg, "/etc/coolerdash/config.ini") != 0) {
  *         // handle error
  *     }
- * @deprecated Use load_config_yaml() for YAML support.
- * @since 0.25.07.23.5-1
- * @version 1.0
- * @author damachine
- * @copyright (c) 2025 damachine
- * @license MIT
  */
 int load_config_ini(Config *config, const char *path)
 {
     if (!config || !path) return -1;
     int error = ini_parse(path, inih_config_handler, config);
     if (error < 0) {
-        // File not found or parse error
         return -1;
     }
     return 0;

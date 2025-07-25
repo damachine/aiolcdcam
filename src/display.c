@@ -1,58 +1,16 @@
 /*
- * @note All display logic is implemented in display.c. Only temperature values are used in current mode.
- * @author damachine
+ * @author damachine (christkue79@gmail.com)
+ * @website https://github.com/damachine
  * @copyright (c) 2025 damachine
  * @license MIT
  * @version 1.0
  */
+
 /**
- * @file display.c
  * @brief LCD rendering and image upload for CoolerDash.
- *
- * @details
- * Implements all display rendering logic, including temperature bars, labels, and image upload.
- *
- * Coding and Documentation Standards for CoolerDash:
- * - All code comments are written in English.
- * - Doxygen style is used for all function comments.
- * - See coding standards in project documentation and config.h for details.
- * - Opening braces for functions and control structures are placed on the same line (K&R style).
- * - Only necessary headers are included; system and local headers are separated.
- * - Code is indented with 4 spaces, no tabs.
- * - All functions, variables, and types follow project naming conventions (snake_case, PascalCase, UPPER_CASE).
- * - Complex algorithms and data structures are documented in detail.
- * - Inline comments are used sparingly and only when necessary.
- * - Redundant comments are avoided.
- * - All dynamically allocated memory is freed and pointers set to NULL.
- * - All malloc/calloc/realloc return values are checked.
- * - Only temperature logic is present; all usage/statistics code has been removed.
- * - Single instance enforcement is handled externally.
- *
- * C99 Coding Guidelines:
- * - Follow ISO/IEC 9899:1999 (C99)
- * - Check return values of malloc(), calloc(), realloc()
- * - Free dynamic memory and set pointers to NULL
- * - Use include guards: #ifndef HEADER_H / #define HEADER_H / #endif
- * - Only include necessary headers; separate system and local headers
- * - Use 4 spaces for indentation, no tabs
- * - Use const for immutable variables and parameters
- * - Use static for file-local functions/variables
- * - Use inline for small, frequently used functions
- *
- * Naming Conventions:
- * - Functions: snake_case verbs (e.g. calculate_sum())
- * - Variables: snake_case (e.g. user_count)
- * - Constants/Macros: UPPER_CASE (e.g. MAX_SIZE)
- * - Structs via typedef: PascalCase (e.g. MyStruct)
- * - Use descriptive names, avoid abbreviations
- * - Use enum for status/error codes
- * - Use typedef for complex types
- * - Consistent naming throughout the project
- *
- * @warning This file must comply with ISO/IEC 9899:1999 (C99).
- * @see config.h, display.h
- * @todo Add support for additional display modes if required.
- * @example See function documentation for usage examples.
+ * @details Implements all display rendering logic, including temperature bars, labels, and image upload.
+ * @example
+ *     See function documentation for usage examples.
  */
 
 // Include project headers
@@ -62,12 +20,12 @@
 #include "../include/cpu_monitor.h"
 #include "../include/gpu_monitor.h"
 
- // Include necessary headers
-#include <cairo/cairo.h>
-#include <sys/stat.h>
+// Include necessary headers
 #include <math.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <sys/stat.h>
+#include <cairo/cairo.h>
 
 // Constants for display layout
 #ifndef M_PI
@@ -79,21 +37,10 @@
 
 /**
  * @brief Calculate color gradient for temperature bars (green → orange → red).
- *
- * Determines the RGB color for a given temperature value according to the defined thresholds from config.
- *
- * @param config Pointer to configuration struct (Config)
- * @param val Temperature value
- * @param[out] r Red component (0-255)
- * @param[out] g Green component (0-255)
- * @param[out] b Blue component (0-255)
- * @return void
- *
- * Example:
- * @code
- * int r, g, b;
- * lerp_temp_color(&config, 65.0f, &r, &g, &b);
- * @endcode
+ * @details Determines the RGB color for a given temperature value according to the defined thresholds from config.
+ * @example
+ *     int r, g, b;
+ *     lerp_temp_color(&config, 65.0f, &r, &g, &b);
  */
 void lerp_temp_color(const Config *config, float val, int* r, int* g, int* b) {
     if (val <= config->temp_threshold_green) { 
@@ -115,18 +62,9 @@ static int should_update_display(const sensor_data_t *data, const Config *config
 
 /**
  * @brief Render display based on sensor data (only default mode).
- *
- * Renders the LCD display image using the provided sensor data. Handles drawing, saving, and uploading the image.
- * Checks if an update is needed, creates the Cairo surface, draws all elements, saves the PNG, and uploads to LCD if available.
- *
- * @param config Pointer to configuration struct (Config)
- * @param data Pointer to sensor data
- * @return 1 on success, 0 on error
- *
- * Example:
- * @code
- * int result = render_display(&config, &sensor_data);
- * @endcode
+ * @details Renders the LCD display image using the provided sensor data. Handles drawing, saving, and uploading the image.
+ * @example
+ *     int result = render_display(&config, &sensor_data);
  */
 int render_display(const Config *config, const sensor_data_t *data) {
     if (!data || !config) return 0;
@@ -202,18 +140,9 @@ cleanup:
 
 /**
  * @brief Draw temperature displays (large numbers for CPU, GPU).
- *
- * Draws the temperature values for CPU and GPU in their respective boxes according to the 240x240px layout. CPU and GPU temperatures are centered in their boxes.
- *
- * @param cr Cairo drawing context
- * @param data Pointer to sensor data (temperatures)
- * @param config Pointer to configuration struct (Config)
- * @return void
- *
- * Example:
- * @code
- * draw_temperature_displays(cr, &sensor_data);
- * @endcode
+ * @details Draws the temperature values for CPU and GPU in their respective boxes according to the 240x240px layout. CPU and GPU temperatures are centered in their boxes.
+ * @example
+ *     draw_temperature_displays(cr, &sensor_data);
  */
 static void draw_temperature_displays(cairo_t *cr, const sensor_data_t *data, const Config *config) {
     // Box positions for 240x240 layout, two boxes (top/bottom)
@@ -252,18 +181,9 @@ static void draw_temperature_displays(cairo_t *cr, const sensor_data_t *data, co
 
 /**
  * @brief Draw temperature bars (CPU and GPU).
- *
- * Draws horizontal bars representing CPU and GPU temperatures, with color gradient according to temperature value.
- *
- * @param cr Cairo drawing context
- * @param data Pointer to sensor data (temperatures)
- * @param config Pointer to configuration struct (Config)
- * @return void
- *
- * Example:
- * @code
- * draw_temperature_bars(cr, &sensor_data);
- * @endcode
+ * @details Draws horizontal bars representing CPU and GPU temperatures, with color gradient according to temperature value.
+ * @example
+ *     draw_temperature_bars(cr, &sensor_data);
  */
 static void draw_temperature_bars(cairo_t *cr, const sensor_data_t *data, const Config *config) {
     // Calculate horizontal position (centered)
@@ -281,25 +201,6 @@ static void draw_temperature_bars(cairo_t *cr, const sensor_data_t *data, const 
         (cpu_val_w > config->bar_width) ? config->bar_width : cpu_val_w; // Clamp to valid range
     
     // Draw CPU bar background (rounded corners)
-    /**
-     * @brief Draws the background for the temperature bars.
-     *
-     * @details
-     * Uses the RGB values from config->color_bg, normalized to 0.0–1.0 for Cairo.
-     *
-     * @param[in] cr Cairo drawing context
-     * @param[in] config Pointer to configuration struct (Config)
-     * @pre cr must not be NULL.
-     * @pre config must not be NULL.
-     * @post Background is drawn for the temperature bars.
-     * @return void
-     * @author damachine
-     * @copyright (c) 2025 damachine
-     * @license MIT
-     * @since 0.25.07.23.5-1
-     * @version 1.0
-     * @note This is an internal helper for draw_temperature_bars.
-     */
     double radius = 8.0; // Corner radius in px
     cairo_set_source_rgb(cr, config->color_bg.r / 255.0, config->color_bg.g / 255.0, config->color_bg.b / 255.0);
     cairo_new_sub_path(cr);
@@ -378,17 +279,9 @@ static void draw_temperature_bars(cairo_t *cr, const sensor_data_t *data, const 
 
 /**
  * @brief Draw CPU/GPU labels (default mode only).
- *
- * Draws text labels for CPU and GPU in the default style.
- *
- * @param cr Cairo drawing context
- * @param config Pointer to configuration struct (Config)
- * @return void
- *
- * Example:
- * @code
- * draw_labels(cr);
- * @endcode
+ * @details Draws text labels for CPU and GPU in the default style.
+ * @example
+ *     draw_labels(cr);
  */
 static void draw_labels(cairo_t *cr, const Config *config) {
     // Set font and size
@@ -405,19 +298,12 @@ static void draw_labels(cairo_t *cr, const Config *config) {
 
 /**
  * @brief Check if display update is needed (change detection).
- *
- * Compares current sensor data with last drawn values and determines if a redraw is necessary.
- *
- * @param data Pointer to current sensor data
- * @param config Pointer to configuration struct (Config)
- * @return 1 if update is needed, 0 otherwise
- *
- * Example:
- * @code
- * if (should_update_display(&sensor_data, config)) {
- *     // redraw
- * }
- * @endcode
+ * @details Compares current sensor data with last drawn values and determines if a redraw is necessary.
+ * @example
+ *     // Redraw if needed
+ *     if (should_update_display(&sensor_data, config)) {
+ *         // redraw
+ *     }
  */
 static int should_update_display(const sensor_data_t *data, const Config *config) {
     static sensor_data_t last_data = {.cpu_temp = -1.0f, .gpu_temp = -1.0f};
@@ -439,25 +325,9 @@ static int should_update_display(const sensor_data_t *data, const Config *config
 
 /**
  * @brief Collects sensor data and renders display (default mode only).
- *
- * @details
- * Reads all relevant sensor data (CPU and GPU temperatures) and renders the display image. Also uploads the image to the device if available.
- * This function is the main entry point for display updates in default mode.
- *
- * @param[in] config Pointer to configuration struct (Config)
- * @pre config must not be NULL.
- * @post Display image is rendered and uploaded if successful.
- * @return void
- * @note Silent continuation on render errors; no error reporting to caller.
- * @see render_display
- * @author damachine
- * @copyright (c) 2025 damachine
- * @license MIT
- * @since 0.25.07.23.5-1
- * @version 1.0
+ * @details Reads all relevant sensor data (CPU and GPU temperatures) and renders the display image. Also uploads the image to the device if available. This function is the main entry point for display updates in default mode.
  * @example
  *     draw_combined_image(&config);
- * @todo Add support for additional display modes and error reporting.
  */
 void draw_combined_image(const Config *config) {
     sensor_data_t sensor_data = {0};

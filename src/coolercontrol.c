@@ -1,59 +1,16 @@
 /*
- * @note Must be initialized before calling read_cpu_temp().
- * @author damachine
+ * @author damachine (christkue79@gmail.com)
+ * @website https://github.com/damachine
  * @copyright (c) 2025 damachine
  * @license MIT
  * @version 1.0
  */
+
 /**
- * @file coolercontrol.c
  * @brief CoolerControl API implementation for LCD device communication.
- *
- * @details
- * Implements functions for initializing, authenticating, and communicating with CoolerControl LCD devices.
- *
- * Coding and Documentation Standards for CoolerDash:
- * - All code comments are written in English.
- * - Doxygen style is used for all function comments.
- * - See coding standards in project documentation and config.h for details.
- * - Opening braces for functions and control structures are placed on the same line (K&R style).
- * - Only necessary headers are included; system and local headers are separated.
- * - Code is indented with 4 spaces, no tabs.
- * - All functions, variables, and types follow project naming conventions (snake_case, PascalCase, UPPER_CASE).
- * - Inline comments are used sparingly and only when necessary.
- * - Redundant comments are avoided.
- * - All dynamically allocated memory is freed and pointers set to NULL.
- * - All malloc/calloc/realloc return values are checked.
- *
- * C99 Coding Guidelines:
- * - Follow ISO/IEC 9899:1999 (C99)
- * - Check return values of malloc(), calloc(), realloc()
- * - Free dynamic memory and set pointers to NULL
- * - Use include guards: #ifndef HEADER_H / #define HEADER_H / #endif
- * - Only include necessary headers; separate system and local headers
- * - Use 4 spaces for indentation, no tabs
- * - Use const for immutable variables and parameters
- * - Use static for file-local functions/variables
- * - Use inline for small, frequently used functions
- *
- * Naming Conventions:
- * - Functions: snake_case verbs (e.g. calculate_sum())
- * - Variables: snake_case (e.g. user_count)
- * - Constants/Macros: UPPER_CASE (e.g. MAX_SIZE)
- * - Structs via typedef: PascalCase (e.g. MyStruct)
- * - Use descriptive names, avoid abbreviations
- * - Use enum for status/error codes
- * - Use typedef for complex types
- * - Consistent naming throughout the project
- *
- * @warning This file must comply with ISO/IEC 9899:1999 (C99).
- * @see coolercontrol.h, config.h
- * @todo Add support for additional LCD device types if required.
- * @example See function documentation for usage examples.
- * @author damachine
- * @copyright (c) 2025 damachine
- * @license MIT
- * @version 1.0
+ * @details Implements functions for initializing, authenticating, and communicating with CoolerControl LCD devices.
+ * @example
+ *     See function documentation for usage examples.
  */
 
 // Include project headers
@@ -61,12 +18,12 @@
 #include "../include/config.h"
 
 // Include necessary headers
-#include <curl/curl.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/stat.h>
+#include <curl/curl.h>
 
 // Response buffer structure for HTTP responses
 struct http_response {
@@ -76,24 +33,14 @@ struct http_response {
 
 /**
  * @brief Callback function to write HTTP response data.
- *
- * Writes received HTTP response data into a dynamically growing buffer.
- *
- * @param contents Pointer to the data received
- * @param size Size of each data element
- * @param nmemb Number of data elements
- * @param response Pointer to http_response struct to write into
- * @return Number of bytes actually handled
- *
- * Example:
- * @code
- * struct http_response resp = {0};
- * resp.data = malloc(1);
- * resp.size = 0;
- * // ...
- * curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
- * curl_easy_setopt(curl, CURLOPT_WRITEDATA, &resp);
- * @endcode
+ * @details Writes received HTTP response data into a dynamically growing buffer.
+ * @example
+ *     struct http_response resp = {0};
+ *     resp.data = malloc(1);
+ *     resp.size = 0;
+ *     // ...
+ *     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
+ *     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &resp);
  */
 int init_coolercontrol_session(const Config *config);
 int send_image_to_lcd(const Config *config, const char* image_path, const char* device_uid);
@@ -123,35 +70,15 @@ static char cookie_jar[256] = {0};
 static int session_initialized = 0;
 
 // Global cached UID for LCD device
-/**
- * @brief Global buffer for the cached LCD device UID.
- *
- * This buffer is filled by init_cached_device_uid() and returned by get_cached_device_uid().
- * It is guaranteed to be a valid, null-terminated string or an empty string if not initialized.
- *
- * Example:
- * @code
- * if (!init_cached_device_uid()) { ... }
- * const char* uid = get_cached_device_uid();
- * if (uid[0]) { ... }
- * @endcode
- */
 static char cached_device_uid[128] = {0};
 
 /**
  * @brief Initializes cURL and authenticates with the CoolerControl daemon using configuration.
- *
- * Sets up the cURL handle and logs in to the CoolerControl daemon using basic authentication.
- *
- * @param config Pointer to configuration struct (Config)
- * @return 1 on success, 0 on error
- *
- * Example:
- * @code
- * if (!init_coolercontrol_session(&config)) {
- *     // handle error
- * }
- * @endcode
+ * @details Sets up the cURL handle and logs in to the CoolerControl daemon using basic authentication.
+ * @example
+ *     if (!init_coolercontrol_session(&config)) {
+ *         // handle error
+ *     }
  */
 int init_coolercontrol_session(const Config *config) {
     curl_global_init(CURL_GLOBAL_DEFAULT); 
@@ -185,17 +112,9 @@ int init_coolercontrol_session(const Config *config) {
 
 /**
  * @brief Sends an image directly to the LCD of the CoolerControl device.
- *
- * Uploads an image to the LCD display using a multipart HTTP PUT request.
- *
- * @param image_path Path to the image
- * @param device_uid Device UID
- * @return 1 on success, 0 on error
- *
- * Example:
- * @code
- * send_image_to_lcd("/opt/coolerdash/images/coolerdash.png", uid);
- * @endcode
+ * @details Uploads an image to the LCD display using a multipart HTTP PUT request.
+ * @example
+ *     send_image_to_lcd(&config, "/opt/coolerdash/images/coolerdash.png", uid);
  */
 int send_image_to_lcd(const Config *config, const char* image_path, const char* device_uid) {
     if (!curl_handle || !image_path || !device_uid || !session_initialized) return 0;
@@ -280,15 +199,9 @@ int send_image_to_lcd(const Config *config, const char* image_path, const char* 
 
 /**
  * @brief Alias function for send_image_to_lcd (for better API compatibility).
- *
- * @param image_path Path to the image
- * @param device_uid Device UID
- * @return 1 on success, 0 on error
- *
- * Example:
- * @code
- * upload_image_to_device("/opt/coolerdash/images/coolerdash.png", uid);
- * @endcode
+ * @details Calls send_image_to_lcd for API compatibility.
+ * @example
+ *     upload_image_to_device(&config, "/opt/coolerdash/images/coolerdash.png", uid);
  */
 int upload_image_to_device(const Config *config, const char* image_path, const char* device_uid) {
     return send_image_to_lcd(config, image_path, device_uid);
@@ -296,15 +209,9 @@ int upload_image_to_device(const Config *config, const char* image_path, const c
 
 /**
  * @brief Terminates the CoolerControl session and cleans up.
- *
- * Frees all resources, cleans up cURL, and removes the session cookie file.
- *
- * @return void
- *
- * Example:
- * @code
- * cleanup_coolercontrol_session();
- * @endcode
+ * @details Frees all resources, cleans up cURL, and removes the session cookie file.
+ * @example
+ *     cleanup_coolercontrol_session();
  */
 void cleanup_coolercontrol_session(void) {
     static int cleanup_done = 0;
@@ -324,15 +231,11 @@ void cleanup_coolercontrol_session(void) {
 
 /**
  * @brief Returns whether the session is initialized.
- *
- * @return 1 if initialized, 0 if not
- *
- * Example:
- * @code
- * if (is_session_initialized()) {
- *     // session is ready
- * }
- * @endcode
+ * @details Checks if the session is ready for communication.
+ * @example
+ *     if (is_session_initialized()) {
+ *         // session is ready
+ *     }
  */
 int is_session_initialized(void) {
     return session_initialized;
@@ -340,18 +243,10 @@ int is_session_initialized(void) {
 
 /**
  * @brief Parses the first Liquidctl device and extracts name and/or uid.
- *
- * @param name_buffer Buffer for the device name (can be NULL if not needed)
- * @param name_size Size of the name buffer
- * @param uid_buffer Buffer for the device UID (can be NULL if not needed)
- * @param uid_size Size of the uid buffer
- * @return 1 on success, 0 on error
- *
- * Example:
- * @code
- * char name[128], uid[128];
- * parse_device_fields(name, sizeof(name), uid, sizeof(uid));
- * @endcode
+ * @details Parses the device list and extracts the name and/or uid of the first Liquidctl device.
+ * @example
+ *     char name[128], uid[128];
+ *     parse_device_fields(&config, name, sizeof(name), uid, sizeof(uid));
  */
 static int parse_device_fields(const Config *config, char* name_buffer, size_t name_size, char* uid_buffer, size_t uid_size) {
     // Initialize response buffer
@@ -444,20 +339,12 @@ static int parse_device_fields(const Config *config, char* name_buffer, size_t n
 
 /**
  * @brief Retrieves the full name of the LCD device.
- *
- * Queries the CoolerControl API for the device name and writes it to the provided buffer.
- *
- * @param name_buffer Buffer for the device name
- * @param buffer_size Size of the buffer
- * @return 1 on success, 0 on error
- *
- * Example:
- * @code
- * char name[128];
- * if (get_device_name(name, sizeof(name))) {
- *     // use name
- * }
- * @endcode
+ * @details Queries the CoolerControl API for the device name and writes it to the provided buffer.
+ * @example
+ *     char name[128];
+ *     if (get_device_name(&config, name, sizeof(name))) {
+ *         // use name
+ *     }
  */
 int get_device_name(const Config *config, char* name_buffer, size_t buffer_size) {
     if (!curl_handle || !name_buffer || buffer_size == 0 || !session_initialized) return 0;
@@ -466,20 +353,12 @@ int get_device_name(const Config *config, char* name_buffer, size_t buffer_size)
 
 /**
  * @brief Retrieves the UID of the first LCD device found.
- *
- * Queries the CoolerControl API for the device UID and writes it to the provided buffer.
- *
- * @param uid_buffer Buffer for the device UID
- * @param buffer_size Size of the buffer
- * @return 1 on success, 0 on error
- *
- * Example:
- * @code
- * char uid[128];
- * if (get_device_uid(uid, sizeof(uid))) {
- *     // use uid
- * }
- * @endcode
+ * @details Queries the CoolerControl API for the device UID and writes it to the provided buffer.
+ * @example
+ *     char uid[128];
+ *     if (get_device_uid(&config, uid, sizeof(uid))) {
+ *         // use uid
+ *     }
  */
 int get_device_uid(const Config *config, char* uid_buffer, size_t buffer_size) {
     if (!curl_handle || !uid_buffer || buffer_size == 0 || !session_initialized) return 0;
@@ -488,15 +367,9 @@ int get_device_uid(const Config *config, char* uid_buffer, size_t buffer_size) {
 
 /**
  * @brief Initialize and cache the device UID at program start.
- *
- * This function must be called once after session initialization.
- *
- * @return 1 on success, 0 on error
- *
- * Example:
- * @code
- * if (!init_cached_device_uid()) { ... }
- * @endcode
+ * @details This function must be called once after session initialization.
+ * @example
+ *     if (!init_cached_device_uid(&config)) { ... }
  */
 int init_cached_device_uid(const Config *config) {
     if (!get_device_uid(config, cached_device_uid, sizeof(cached_device_uid)) || !cached_device_uid[0]) {
@@ -508,14 +381,10 @@ int init_cached_device_uid(const Config *config) {
 
 /**
  * @brief Get the cached device UID (read-only).
- *
- * @return Pointer to cached UID string (empty string if not initialized)
- *
- * Example:
- * @code
- * const char* uid = get_cached_device_uid();
- * if (uid[0]) { ... }
- * @endcode
+ * @details Returns a pointer to the cached UID string (empty string if not initialized).
+ * @example
+ *     const char* uid = get_cached_device_uid();
+ *     if (uid[0]) { ... }
  */
 const char* get_cached_device_uid(void) {
     return cached_device_uid;

@@ -1,61 +1,16 @@
 /*
- * @note Main entry point for CoolerDash daemon. Must be initialized before starting daemon loop.
- * @author damachine
+ * @author damachine (christkue79@gmail.com)
+ * @website https://github.com/damachine
  * @copyright (c) 2025 damachine
  * @license MIT
  * @version 1.0
  */
+
 /**
- * @file main.c
  * @brief Main entry point for CoolerDash daemon.
- *
- * @details
- * Implements the main daemon logic, including initialization, single-instance enforcement, signal handling, and main loop.
- *
- * Coding and Documentation Standards for CoolerDash:
- * - All code comments are written in English.
- * - Doxygen style is used for all function comments.
- * - See coding standards in project documentation and config.h for details.
- * - Opening braces for functions and control structures are placed on the same line (K&R style).
- * - Only necessary headers are included; system and local headers are separated.
- * - Code is indented with 4 spaces, no tabs.
- * - All functions, variables, and types follow project naming conventions (snake_case, PascalCase, UPPER_CASE).
- * - Complex algorithms and data structures are documented in detail.
- * - Inline comments are used sparingly and only when necessary.
- * - Redundant comments are avoided.
- * - All dynamically allocated memory is freed and pointers set to NULL.
- * - All malloc/calloc/realloc return values are checked.
- * - Single instance enforcement is handled via systemctl and pgrep.
- *
- * C99 Coding Guidelines:
- * - Follow ISO/IEC 9899:1999 (C99)
- * - Check return values of malloc(), calloc(), realloc()
- * - Free dynamic memory and set pointers to NULL
- * - Use include guards: #ifndef HEADER_H / #define HEADER_H / #endif
- * - Only include necessary headers; separate system and local headers
- * - Use 4 spaces for indentation, no tabs
- * - Use const for immutable variables and parameters
- * - Use static for file-local functions/variables
- * - Use inline for small, frequently used functions
- *
- * Naming Conventions:
- * - Functions: snake_case verbs (e.g. calculate_sum())
- * - Variables: snake_case (e.g. user_count)
- * - Constants/Macros: UPPER_CASE (e.g. MAX_SIZE)
- * - Structs via typedef: PascalCase (e.g. MyStruct)
- * - Use descriptive names, avoid abbreviations
- * - Use enum for status/error codes
- * - Use typedef for complex types
- * - Consistent naming throughout the project
- *
- * @warning This file must comply with ISO/IEC 9899:1999 (C99).
- * @see config.h, display.h
- * @todo Add support for additional command line options if required.
- * @example See function documentation for usage examples.
- * @author damachine
- * @copyright (c) 2025 damachine
- * @license MIT
- * @version 1.0
+ * @details Implements the main daemon logic, including initialization, single-instance enforcement, signal handling, and main loop.
+ * @example
+ *     See function documentation for usage examples.
  */
 
 // Function prototypes
@@ -64,21 +19,21 @@
 
 // Include project headers
 #include "../include/config.h"
+#include "../include/coolercontrol.h"
 #include "../include/cpu_monitor.h"
 #include "../include/gpu_monitor.h"
 #include "../include/display.h"
-#include "../include/coolercontrol.h"
 
 // Include necessary headers
 #include <unistd.h>
 #include <signal.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <errno.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/wait.h>
 
 // Global variables for daemon management
@@ -90,22 +45,7 @@ static const Config *g_config_ptr = NULL;
 
 /**
  * @brief Signal handler for clean daemon termination with shutdown image.
- *
- * @details
- * Sends a shutdown image to the LCD (if not already sent), removes the PID file, and sets the running flag to 0 for clean termination.
- * Ensures that the shutdown image is only sent once per session.
- *
- * @param[in] sig Signal number (unused)
- * @pre g_config_ptr must be initialized and point to a valid Config struct.
- * @post Daemon is terminated, shutdown image sent, PID file removed.
- * @return void
- * @note This function is registered as a signal handler for SIGTERM and SIGINT.
- * @warning If device UID is not detected, shutdown image will not be sent.
- * @see send_image_to_lcd, unlink
- * @author damachine
- * @copyright (c) 2025 damachine
- * @license MIT
- * @version 1.0
+ * @details Sends a shutdown image to the LCD (if not already sent), removes the PID file, and sets the running flag to 0 for clean termination.
  * @example
  *     signal(SIGTERM, cleanup_and_exit);
  */
@@ -133,9 +73,9 @@ static void cleanup_and_exit(int sig) {
 
 /**
  * @brief Check if another instance of CoolerDash is running (systemd or process).
- *
- * Uses systemctl and pgrep to detect running service or process.
- * Returns -1 if another instance is active, 0 otherwise.
+ * @details Uses systemctl and pgrep to detect running service or process. Returns -1 if another instance is active, 0 otherwise.
+ * @example
+ *     check_existing_instance_and_handle(config.pid_file, is_service_start);
  */
 static int check_existing_instance_and_handle(const char *pid_file, int is_service_start) {
     (void)pid_file;
@@ -171,16 +111,9 @@ static int check_existing_instance_and_handle(const char *pid_file, int is_servi
 
 /**
  * @brief Write current PID to PID file.
- *
- * Writes the current process ID to the specified PID file for single-instance enforcement.
- *
- * @param pid_file Path to the PID file
- * @return void
- *
- * Example:
- * @code
- * write_pid_file("/var/run/coolerdash.pid");
- * @endcode
+ * @details Writes the current process ID to the specified PID file for single-instance enforcement.
+ * @example
+ *     write_pid_file("/var/run/coolerdash.pid");
  */
 static void write_pid_file(const char *pid_file) {
     FILE *f = fopen(pid_file, "w");
@@ -192,15 +125,9 @@ static void write_pid_file(const char *pid_file) {
 
 /**
  * @brief Main daemon loop.
- *
- * Runs the main loop of the daemon, periodically updating the display with sensor data until termination is requested.
- *
- * @return 0 on normal termination
- *
- * Example:
- * @code
- * int result = run_daemon();
- * @endcode
+ * @details Runs the main loop of the daemon, periodically updating the display with sensor data until termination is requested.
+ * @example
+ *     int result = run_daemon(&config);
  */
 static int run_daemon(const Config *config) {
     printf("CoolerDash daemon started\n");
@@ -219,16 +146,9 @@ static int run_daemon(const Config *config) {
 
 /**
  * @brief Show help and explain program usage.
- *
- * Prints usage information and help text to stdout.
- *
- * @param program_name Name of the executable
- * @return void
- *
- * Example:
- * @code
- * show_help(argv[0]);
- * @endcode
+ * @details Prints usage information and help text to stdout.
+ * @example
+ *     show_help(argv[0], &config);
  */
 static void show_help(const char *program_name, const Config *config) {
     printf("CoolerDash - Complete LCD Temperature Monitor\n\n");
@@ -241,15 +161,9 @@ static void show_help(const char *program_name, const Config *config) {
 
 /**
  * @brief Detect if we were started by systemd.
- *
- * Checks if the parent process is PID 1 (systemd/init).
- *
- * @return 1 if started by systemd, 0 otherwise
- *
- * Example:
- * @code
- * int is_service = is_started_by_systemd();
- * @endcode
+ * @details Checks if the parent process is PID 1 (systemd/init). Returns 1 if started by systemd, 0 otherwise.
+ * @example
+ *     int is_service = is_started_by_systemd();
  */
 static int is_started_by_systemd(void) {
     // Simple and reliable method: Check if our parent process is PID 1 (init/systemd)
@@ -258,14 +172,9 @@ static int is_started_by_systemd(void) {
 
 /**
  * @brief Main entry point for CoolerDash.
- * @param argc Argument count
- * @param argv Argument vector
- * @return Exit code
- *
- * Usage:
- *   coolerdash [config_path]
- *
- * If no config_path is given, /etc/coolerdash/config.ini is used.
+ * @details Loads configuration, initializes modules, and starts the main daemon loop.
+ * @example
+ *     coolerdash [config_path]
  */
 int main(int argc, char **argv)
 {
