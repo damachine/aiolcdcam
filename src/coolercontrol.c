@@ -13,6 +13,14 @@
  *     See function documentation for usage examples.
  */
 
+// Buffer size constants
+#define CC_UID_SIZE      128
+#define CC_NAME_SIZE     128
+#define CC_COOKIE_SIZE   256
+#define CC_URL_SIZE      256
+#define CC_USERPWD_SIZE  128
+#define CC_DEVICE_SECTION_SIZE 4096
+
 // Include project headers
 #include "../include/coolercontrol.h"
 #include "../include/config.h"
@@ -80,9 +88,9 @@ static size_t write_callback(void *contents, size_t size, size_t nmemb, struct h
  */
 typedef struct {
     CURL *curl_handle;
-    char cookie_jar[256];
+    char cookie_jar[CC_COOKIE_SIZE];
     int session_initialized;
-    char cached_device_uid[128];
+    char cached_device_uid[CC_UID_SIZE];
 } CoolerControlSession;
 
 static CoolerControlSession cc_session = {
@@ -107,9 +115,9 @@ int init_coolercontrol_session(const Config *config) {
     snprintf(cc_session.cookie_jar, sizeof(cc_session.cookie_jar), "/tmp/lcd_cookie_%d.txt", getpid());
     curl_easy_setopt(cc_session.curl_handle, CURLOPT_COOKIEJAR, cc_session.cookie_jar);
     curl_easy_setopt(cc_session.curl_handle, CURLOPT_COOKIEFILE, cc_session.cookie_jar);
-    char login_url[256];
+    char login_url[CC_URL_SIZE];
     snprintf(login_url, sizeof(login_url), "%s/login", config->daemon_address);
-    char userpwd[128];
+    char userpwd[CC_USERPWD_SIZE];
     snprintf(userpwd, sizeof(userpwd), "CCAdmin:%s", config->daemon_password);
     curl_easy_setopt(cc_session.curl_handle, CURLOPT_URL, login_url);
     curl_easy_setopt(cc_session.curl_handle, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
@@ -140,7 +148,7 @@ int send_image_to_lcd(const Config *config, const char* image_path, const char* 
     if (!cc_session.curl_handle || !image_path || !device_uid || !cc_session.session_initialized) return 0;
 
     // URL for LCD image upload
-    char upload_url[256];
+    char upload_url[CC_URL_SIZE];
     snprintf(upload_url, sizeof(upload_url), 
              "%s/devices/%s/settings/lcd/lcd/images", config->daemon_address, device_uid);
     
@@ -254,7 +262,7 @@ static int parse_device_fields(const Config *config, char* name_buffer, size_t n
     if (!response.data) return 0;
     
     // URL for device list
-    char devices_url[128];
+    char devices_url[CC_URL_SIZE];
     // Build devices URL safely
     snprintf(devices_url, sizeof(devices_url), "%.*s/devices", (int)(sizeof(devices_url) - 9), config->daemon_address);
     
@@ -282,7 +290,7 @@ static int parse_device_fields(const Config *config, char* name_buffer, size_t n
             while (device_start > response.data && *device_start != '{') device_start--;
             char *device_end = strchr(search_pos, '}');
             if (!device_end) device_end = response.data + response.size;
-            char device_section[4096];
+            char device_section[CC_DEVICE_SECTION_SIZE];
             size_t section_length = device_end - device_start;
             if (section_length < sizeof(device_section)) {
                 strncpy(device_section, device_start, section_length);
