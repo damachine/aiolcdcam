@@ -7,8 +7,8 @@
  */
 
 /**
- * @brief LCD rendering and image upload for CoolerDash.
- * @details Implements all display rendering logic, including temperature bars, labels, and image upload.
+ * @brief LCD rendering and image upload interface for CoolerDash.
+ * @details Interface for all display rendering logic, including temperature bars, labels, and image upload.
  * @example
  *     See function documentation for usage examples.
  */

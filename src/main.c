@@ -89,7 +89,7 @@ static void cleanup_and_exit(int sig) {
  */
 static int check_existing_instance_and_handle(const char *pid_file, int is_service_start) {
     (void)pid_file;
-    // Wenn durch systemd gestartet, Dienstprüfung überspringen
+    // Skip service check if started by systemd
     if (!is_service_start) {
         int status = system("systemctl is-active --quiet coolerdash.service");
         if (status == 0) {
@@ -98,7 +98,7 @@ static int check_existing_instance_and_handle(const char *pid_file, int is_servi
             return -1;
         }
     }
-    // Check for running process
+    // Check for running process using pgrep
     FILE *fp = popen("pgrep -x coolerdash", "r");
     int found_pid = 0;
     if (fp) {
@@ -161,12 +161,15 @@ static int run_daemon(const Config *config) {
  *     show_help(argv[0], &config);
  */
 static void show_help(const char *program_name, const Config *config) {
-    printf("CoolerDash - Complete LCD Temperature Monitor\n\n");
-    printf("Usage: %s\n\n", program_name);
-    printf("This version only supports the default mode.\n");
-    printf("The daemon runs in background and updates the LCD every %d.%d seconds.\n",
-           config->display_refresh_interval_sec, config->display_refresh_interval_nsec / 100000000);
-    printf("To stop: sudo systemctl stop coolerdash\n");
+    (void)config; // Mark parameter as unused to avoid compiler warning
+    printf("\033[1mCoolerDash - LCD dashboard for CoolerControl\033[0m\n");
+    printf("This program is a daemon that displays CPU and GPU temperatures on an LCD screen.\n");
+    printf("For help, use: man coolerdash\n");
+    printf("For help, refer to the documentation at README.md\n\n");
+    printf("Usage: %s\n", program_name);
+    printf("To start service: sudo systemctl start coolerdash\n");
+    printf("To start manually: %s [config_path]\n", program_name);
+
 }
 
 /**
@@ -188,6 +191,12 @@ static int is_started_by_systemd(void) {
  */
 int main(int argc, char **argv)
 {
+    // Check for help argument
+    if (argc > 1 && (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0)) {
+        show_help(argv[0], NULL);
+        return 0;
+    }
+
     // Load configuration from INI file
     Config config;
     const char *config_path = "/etc/coolerdash/config.ini";
@@ -196,11 +205,7 @@ int main(int argc, char **argv)
         fprintf(stderr, "Error: Could not load config file '%s'\n", config_path);
         return 1;
     }
-    // Show help
-    if (argc > 1 && (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0)) {
-        show_help(argv[0], &config);
-        return 0;
-    }
+    
     // Check if we were started by systemd
     int is_service_start = is_started_by_systemd();
     // Single-Instance Enforcement: Check and handle existing instances

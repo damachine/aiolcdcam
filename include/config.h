@@ -59,7 +59,7 @@ typedef struct Config {
     int bar_gap;                 // Gap between bars in pixels
     float border_line_width;     // Border line width in pixels
     char font_face[64];          // Font face for display text
-    float font_size_large;       // Large font size
+    float font_size_temp;        // Temperature font size
     float font_size_labels;      // Label font size
     float temp_threshold_green;  // Green threshold (°C)
     float temp_threshold_orange; // Orange threshold (°C)

@@ -7,7 +7,7 @@
  */
 
 /**
- * @brief LCD rendering and image upload for CoolerDash.
+ * @brief LCD rendering and image upload implementation for CoolerDash.
  * @details Implements all display rendering logic, including temperature bars, labels, and image upload.
  * @example
  *     See function documentation for usage examples.
@@ -165,7 +165,7 @@ static void draw_temperature_displays(cairo_t *cr, const sensor_data_t *data, co
 
     // CPU temperature display (number + degree symbol in one string)
     snprintf(temp_str, sizeof(temp_str), "%d\xC2\xB0", (int)data->cpu_temp);
-    cairo_set_font_size(cr, config->font_size_large);
+    cairo_set_font_size(cr, config->font_size_temp);
     cairo_text_extents(cr, temp_str, &ext);
     // Centered in top box (no bearing correction)
     const double cpu_temp_x = cpu_box_x + (config->box_width - ext.width) / 2 + 22;
@@ -175,7 +175,7 @@ static void draw_temperature_displays(cairo_t *cr, const sensor_data_t *data, co
 
     // GPU temperature display (number + degree symbol in one string)
     snprintf(temp_str, sizeof(temp_str), "%d\xC2\xB0", (int)data->gpu_temp);
-    cairo_set_font_size(cr, config->font_size_large);
+    cairo_set_font_size(cr, config->font_size_temp);
     cairo_text_extents(cr, temp_str, &ext);
     // Centered in bottom box (no bearing correction)
     const double gpu_temp_x = gpu_box_x + (config->box_width - ext.width) / 2 + 22;
