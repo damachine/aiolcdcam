@@ -186,7 +186,7 @@ static void draw_temperature_displays(cairo_t *cr, const sensor_data_t *data, co
 
 /**
  * @brief Draw temperature bars (CPU and GPU).
- * @details Draws horizontal bars representing CPU and GPU temperatures, with color gradient according to temperature value.
+ * @details Draws horizontal bars representing CPU and GPU temperatures, with color gradient according to temperature value. Uses cairo for drawing, clamps values to valid range, and handles rounded corners. No resources are allocated in this function.
  * @example
  *     draw_temperature_bars(cr, &sensor_data);
  */
@@ -284,7 +284,7 @@ static void draw_temperature_bars(cairo_t *cr, const sensor_data_t *data, const 
 
 /**
  * @brief Draw CPU/GPU labels (default mode only).
- * @details Draws text labels for CPU and GPU in the default style.
+ * @details Draws text labels for CPU and GPU in the default style. Uses cairo for font and color settings. No resources are allocated in this function.
  * @example
  *     draw_labels(cr);
  */
@@ -303,9 +303,8 @@ static void draw_labels(cairo_t *cr, const Config *config) {
 
 /**
  * @brief Check if display update is needed (change detection).
- * @details Compares current sensor data with last drawn values and determines if a redraw is necessary.
+ * @details Compares current sensor data with last drawn values and determines if a redraw is necessary. Uses static variables for last data and first run detection. Returns 1 if update is needed, 0 otherwise.
  * @example
- *     // Redraw if needed
  *     if (should_update_display(&sensor_data, config)) {
  *         // redraw
  *     }
@@ -330,7 +329,7 @@ static int should_update_display(const sensor_data_t *data, const Config *config
 
 /**
  * @brief Collects sensor data and renders display (default mode only).
- * @details Reads all relevant sensor data (CPU and GPU temperatures) and renders the display image. Also uploads the image to the device if available. This function is the main entry point for display updates in default mode.
+ * @details Reads all relevant sensor data (CPU and GPU temperatures) and renders the display image. Also uploads the image to the device if available. Handles errors silently and frees all resources. Main entry point for display updates in default mode.
  * @example
  *     draw_combined_image(&config);
  */
