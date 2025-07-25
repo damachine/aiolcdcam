@@ -135,7 +135,7 @@ static void write_pid_file(const char *pid_file) {
 
 /**
  * @brief Main daemon loop.
- * @details Runs the main loop of the daemon, periodically updating the display with sensor data until termination is requested.
+ * @details Runs the main loop of the daemon, periodically updating the display with sensor data until termination is requested. Uses draw_combined_image(), nanosleep(). Checks the running flag for termination. Returns 0 on normal exit.
  * @example
  *     int result = run_daemon(&config);
  */
@@ -156,7 +156,7 @@ static int run_daemon(const Config *config) {
 
 /**
  * @brief Show help and explain program usage.
- * @details Prints usage information and help text to stdout.
+ * @details Prints usage information and help text to stdout. Uses printf().
  * @example
  *     show_help(argv[0], &config);
  */
@@ -169,7 +169,6 @@ static void show_help(const char *program_name, const Config *config) {
     printf("Usage: %s\n", program_name);
     printf("To start service: sudo systemctl start coolerdash\n");
     printf("To start manually: %s [config_path]\n", program_name);
-
 }
 
 /**
