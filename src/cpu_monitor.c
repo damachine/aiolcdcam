@@ -33,7 +33,7 @@ char cpu_temp_path[512] = {0};
 
 /**
  * @brief Initialize hwmon sensor path for CPU temperature at startup (once).
- * @details Detects and sets the path to the CPU temperature sensor file by scanning available hwmon entries. Uses the hwmon_path from the configuration struct.
+ * @details Detects and sets the path to the CPU temperature sensor file by scanning available hwmon entries. Uses the hwmon_path from the configuration struct. Internally uses opendir(), readdir(), fopen(), fclose(), closedir(). Always checks and frees resources. Returns nothing; path is cached in cpu_temp_path.
  * @example
  *     init_cpu_sensor_path(&config);
  */
@@ -72,7 +72,7 @@ void init_cpu_sensor_path(const Config *config) {
 
 /**
  * @brief Read CPU temperature from cached hwmon path.
- * @details Reads the temperature from the CPU sensor file set by init_cpu_sensor_path().
+ * @details Reads the temperature from the CPU sensor file set by init_cpu_sensor_path(). Uses fopen(), fscanf(), fclose(). Always checks and frees resources. Returns 0.0f on error or if no path is cached.
  * @example
  *     float temp = read_cpu_temp();
  */
