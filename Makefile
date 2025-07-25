@@ -1,38 +1,35 @@
 # -----------------------------------------------------------------------------
-# CoolerDash Makefile
+# author: damachine (christkue79@gmail.com)
+# website: https://github.com/damachine
+# copyright: (c) 2025 damachine
+# license: MIT
+# version: 1.0
 #
-# @brief Build system for CoolerDash (C99 LCD daemon)
-# @details
-#   - Handles build, install, uninstall, debug, and service management.
-#   - All comments are in English for consistency.
-#   - See README.md and AUR-README.md for details.
-#
-# @author damachine
-# @copyright Copyright (c) 2025 damachine
-# @license MIT
-# @version 0.25.07.23.2
-# @since 0.25.07.23.2
-# @note
-#   - Edit paths, dependencies, and user as needed for your system.
-#   - All build targets follow C99 and project coding standards.
-# @warning
-#   - Do not run as root. Use dedicated user for security.
-#   - Ensure all required dependencies are installed.
-# @todo
-#   - Add support for additional platforms and packaging formats.
-# @see README.md, AUR-README.md
-# -----------------------------------------------------------------------------
-
-# Project coding standards and packaging notes (see README for details)
-#
-# Maintainer: DAMACHINE <christkue79@gmail.com>
+# brief:
+# 	CoolerDash Makefile
+#   Build system for CoolerDash (C99 LCD daemon)
+#	Project coding standards and packaging notes (see README for details)
+# 	Maintainer: DAMACHINE <christkue79@gmail.com>
+# details:
+#   This Makefile handles build, install, uninstall, debug, and service management for CoolerDash.
+#   Edit dependencies, paths, and user as needed for your system.
+#   Do not run as root. Use dedicated user for security.
+#   Ensure all required dependencies are installed.
+#   It uses color output and Unicode icons for better readability. All paths and dependencies are configurable.
+#   See README.md and AUR-README.md for further details.
+# example:
+#   make clean
+#   make
+#   make install
+#   make uninstall
+#   make debug
 #
 # --- Dependency notes ---
-# - 'cairo', 'libcurl-gnutls', 'libinih', 'coolercontrol' are required for core functionality
-# - 'nvidia-utils' and 'lm_sensors' are optional for extended hardware monitoring
-# - 'ttf-roboto' is required for proper font rendering on the LCD
-# - All dependencies are documented in README and AUR-README
-# ------------------------
+# -		'cairo', 'libcurl-gnutls', 'libinih', 'coolercontrol' are required for core functionality
+# - 	'nvidia-utils' and 'lm_sensors' are optional for extended hardware monitoring
+# - 	'ttf-roboto' is required for proper font rendering on the LCD
+# - All dependencies are documented in README.md and AUR-README.md
+# -----------------------------------------------------------------------------
 
 VERSION := $(shell cat VERSION)
 

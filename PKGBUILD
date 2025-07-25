@@ -1,39 +1,34 @@
 # -----------------------------------------------------------------------------
-# CoolerDash PKGBUILD
+# author: damachine (christkue79@gmail.com)
+# website: https://github.com/damachine
+# copyright: (c) 2025 damachine
+# license: MIT
+# version: 1.0
 #
-# @brief Arch Linux packaging script for CoolerDash (C99 LCD daemon)
-# @details
-#   - Handles build, install, dependencies, and packaging for Arch/AUR.
-#   - All comments are in English for consistency.
-#   - See README.md and AUR-README.md for details.
-#
-# @author damachine
-# @copyright Copyright (c) 2025 damachine
-# @license MIT
-# @version 0.25.07.23.2
-# @since 0.25.07.23.2
-# @note
-#   - Edit dependencies, paths, and user as needed for your system.
-#   - All build steps follow C99 and project coding standards.
-# @warning
-#   - Do not run as root. Use dedicated user for security.
-#   - Ensure all required dependencies are installed.
-# @todo
-#   - Add support for additional platforms and packaging formats.
-# @see README.md, AUR-README.md
-# -----------------------------------------------------------------------------
-
-# Project coding standards and packaging notes (see README for details)
-#
-# Maintainer: DAMACHINE <christkue79@gmail.com>
+# brief:
+# 	CoolerDash PKGBUILD
+#   Build system for CoolerDash (C99 LCD daemon)
+#	Project coding standards and packaging notes (see README for details)
+# 	Maintainer: DAMACHINE <christkue79@gmail.com>
+# details:
+#   This PKGBUILD handles build, install, dependencies, and packaging for Arch/AUR.
+#   Edit dependencies, paths, and user as needed for your system.
+#   Do not run as root. Use dedicated user for security.
+#   Ensure all required dependencies are installed.
+#   It uses color output and Unicode icons for better readability. All paths and dependencies are configurable.
+#   See README.md and AUR-README.md for further details.
+# example:
+#   makepkg -si
+#   makepkg -s
+#   makepkg -c
+#   makepkg -f
 #
 # --- Dependency notes ---
-# - 'cairo', 'libcurl-gnutls', 'coolercontrol' are required for core functionality
-# - 'nvidia-utils' and 'lm_sensors' are optional for extended hardware monitoring
-# - 'ttf-roboto' is required for proper font rendering on the LCD
-# - All dependencies are documented in README and AUR-README
-# ------------------------
-
+# -		'cairo', 'libcurl-gnutls', 'libinih', 'coolercontrol' are required for core functionality
+# - 	'nvidia-utils' and 'lm_sensors' are optional for extended hardware monitoring
+# - 	'ttf-roboto' is required for proper font rendering on the LCD
+# - All dependencies are documented in README.md and AUR-README.md
+# -----------------------------------------------------------------------------
 pkgname=coolerdash
 pkgver=$(cat VERSION)
 pkgrel=1

@@ -7,10 +7,6 @@ post_install() {
     fi
     chown coolerdash:coolerdash /run/coolerdash || true
 
-    # Create tmp directory for PNG file
-    install -d -m 0777 /tmp/coolerdash
-    chown coolerdash:coolerdash /tmp/coolerdash
-    
     # Stop service before install or update
     if systemctl is-active --quiet coolerdash.service; then
         echo "Stopping coolerdash service..."
@@ -23,7 +19,7 @@ post_install() {
 }
 
 pre_remove() {
-    # Stop service before removal
+    # Stop and disable systemd service before removal
     if systemctl is-active --quiet coolerdash.service; then
         echo "Stopping coolerdash service..."
         systemctl stop coolerdash.service 2>/dev/null || true
@@ -34,17 +30,16 @@ pre_remove() {
         systemctl disable coolerdash.service 2>/dev/null || true
     fi
     
-    # Remove all installed files and directories (safety, in case pacman leaves anything)
-    rm -f /etc/systemd/system/coolerdash.service 2>/dev/null || true
-    rm -f /usr/share/man/man1/coolerdash.1 2>/dev/null || true
-    rm -f /usr/bin/coolerdash 2>/dev/null || true
-    rm -f /run/coolerdash/coolerdash.pid 2>/dev/null || true
-    rm -rf /opt/coolerdash 2>/dev/null || true
-    rm -rf /run/coolerdash 2>/dev/null || true
-    rm -rf /tmp/coolerdash 2>/dev/null || true
+    # Remove all installed users, files and directories
     if id -u coolerdash &>/dev/null; then
         userdel -rf coolerdash || true
     fi
+
+    rm -f /etc/systemd/system/coolerdash.service 2>/dev/null || true
+    rm -f /usr/share/man/man1/coolerdash.1 2>/dev/null || true
+    rm -f /usr/bin/coolerdash 2>/dev/null || true
+    rm -rf /run/coolerdash 2>/dev/null || true
+    rm -rf /opt/coolerdash 2>/dev/null || true
 }
 
 post_remove() {
