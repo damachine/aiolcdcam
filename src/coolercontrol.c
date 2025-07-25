@@ -112,13 +112,16 @@ int init_coolercontrol_session(const Config *config) {
     curl_global_init(CURL_GLOBAL_DEFAULT); 
     cc_session.curl_handle = curl_easy_init();
     if (!cc_session.curl_handle) return 0;
-    snprintf(cc_session.cookie_jar, sizeof(cc_session.cookie_jar), "/tmp/lcd_cookie_%d.txt", getpid());
+    int written_cookie = snprintf(cc_session.cookie_jar, sizeof(cc_session.cookie_jar), "/tmp/lcd_cookie_%d.txt", getpid());
+    if (written_cookie < 0 || (size_t)written_cookie >= sizeof(cc_session.cookie_jar)) cc_session.cookie_jar[sizeof(cc_session.cookie_jar)-1] = '\0';
     curl_easy_setopt(cc_session.curl_handle, CURLOPT_COOKIEJAR, cc_session.cookie_jar);
     curl_easy_setopt(cc_session.curl_handle, CURLOPT_COOKIEFILE, cc_session.cookie_jar);
     char login_url[CC_URL_SIZE];
-    snprintf(login_url, sizeof(login_url), "%s/login", config->daemon_address);
+    int written_url = snprintf(login_url, sizeof(login_url), "%s/login", config->daemon_address);
+    if (written_url < 0 || (size_t)written_url >= sizeof(login_url)) login_url[sizeof(login_url)-1] = '\0';
     char userpwd[CC_USERPWD_SIZE];
-    snprintf(userpwd, sizeof(userpwd), "CCAdmin:%s", config->daemon_password);
+    int written_pwd = snprintf(userpwd, sizeof(userpwd), "CCAdmin:%s", config->daemon_password);
+    if (written_pwd < 0 || (size_t)written_pwd >= sizeof(userpwd)) userpwd[sizeof(userpwd)-1] = '\0';
     curl_easy_setopt(cc_session.curl_handle, CURLOPT_URL, login_url);
     curl_easy_setopt(cc_session.curl_handle, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
     curl_easy_setopt(cc_session.curl_handle, CURLOPT_USERPWD, userpwd);
@@ -293,7 +296,7 @@ static int parse_device_fields(const Config *config, char* name_buffer, size_t n
             char device_section[CC_DEVICE_SECTION_SIZE];
             size_t section_length = device_end - device_start;
             if (section_length < sizeof(device_section)) {
-                strncpy(device_section, device_start, section_length);
+                memcpy(device_section, device_start, section_length);
                 device_section[section_length] = '\0';
                 if (strstr(device_section, "\"type\":\"Liquidctl\"")) {
                     // Extract name if requested
@@ -307,8 +310,11 @@ static int parse_device_fields(const Config *config, char* name_buffer, size_t n
                                 if (name_length < name_size) {
                                     strncpy(name_buffer, name_pos, name_length);
                                     name_buffer[name_length] = '\0';
-                                    found = 1;
+                                } else {
+                                    strncpy(name_buffer, name_pos, name_size - 1);
+                                    name_buffer[name_size - 1] = '\0';
                                 }
+                                found = 1;
                             }
                         }
                     }
@@ -323,8 +329,11 @@ static int parse_device_fields(const Config *config, char* name_buffer, size_t n
                                 if (uid_length < uid_size) {
                                     strncpy(uid_buffer, uid_pos, uid_length);
                                     uid_buffer[uid_length] = '\0';
-                                    found = 1;
+                                } else {
+                                    strncpy(uid_buffer, uid_pos, uid_size - 1);
+                                    uid_buffer[uid_size - 1] = '\0';
                                 }
+                                found = 1;
                             }
                         }
                     }
