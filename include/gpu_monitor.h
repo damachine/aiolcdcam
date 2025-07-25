@@ -51,7 +51,7 @@ float read_gpu_temp(const Config *config);
 
 /**
  * @brief Get GPU monitoring data.
- * @details Fills a gpu_data_t structure with temperature value.
+ * @details Fills a gpu_data_t structure with temperature value. Returns 1 on success, 0 on failure. Always check the return value and ensure the pointer is valid.
  * @example
  *     gpu_data_t data;
  *     if (get_gpu_data_full(&config, &data)) {

@@ -70,13 +70,18 @@ int init_cached_device_uid(const Config *config);
 static size_t write_callback(void *contents, size_t size, size_t nmemb, struct http_response *response) {
     size_t realsize = size * nmemb;
     char *ptr = realloc(response->data, response->size + realsize + 1);
-    if (!ptr) return 0;  // Out of memory
-    
+    if (!ptr) {
+        fprintf(stderr, "[CoolerDash] Error: realloc failed for response->data\n");
+        if (response->data) {
+            free(response->data);
+            response->data = NULL;
+        }
+        return 0;  // Out of memory
+    }
     response->data = ptr;
     memcpy(&(response->data[response->size]), contents, realsize);
     response->size += realsize;
     response->data[response->size] = 0;  // Null-terminate
-    
     return realsize;
 }
 
@@ -261,6 +266,10 @@ static int parse_device_fields(const Config *config, char* name_buffer, size_t n
     // Initialize response buffer
     struct http_response response = {0};
     response.data = malloc(1);
+    if (!response.data) {
+        fprintf(stderr, "[CoolerDash] Error: malloc failed for response.data\n");
+        return 0;
+    }
     response.size = 0;
     if (!response.data) return 0;
     

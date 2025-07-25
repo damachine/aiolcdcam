@@ -43,7 +43,7 @@ static long long get_current_time_ms(void) {
 
 /**
  * @brief Checks GPU availability and initializes GPU monitoring using configuration.
- * @details Checks if an NVIDIA GPU is available and initializes the monitoring backend. Uses config values for cache interval etc.
+ * @details Checks if an NVIDIA GPU is available and initializes the monitoring backend. Uses config values for cache interval etc. Internally uses popen() to check for nvidia-smi. Always checks and frees resources with pclose().
  * @example
  *     if (init_gpu_monitor(&config)) {
  *         // GPU available
@@ -74,7 +74,7 @@ int init_gpu_monitor(const Config *config) {
 
 /**
  * @brief Reads only GPU temperature (optimized for mode "def").
- * @details Reads the current temperature from the GPU sensor, with caching for performance.
+ * @details Reads the current temperature from the GPU sensor, with caching for performance. Uses popen() and fscanf() to read the value. Always checks and frees resources with pclose(). Returns 0.0f if no GPU is available or on error.
  * @example
  *     float temp = read_gpu_temp(&config);
  */
@@ -101,7 +101,7 @@ float read_gpu_temp(const Config *config) {
 
 /**
  * @brief Reads GPU temperature only (usage and memory usage always 0).
- * @details Fills a gpu_data_t structure with temperature value, usage and memory usage set to 0.
+ * @details Fills a gpu_data_t structure with temperature value, usage and memory usage set to 0. Returns 1 on success, 0 on failure. Always check the return value and ensure the pointer is valid.
  * @example
  *     gpu_data_t data;
  *     if (get_gpu_data_full(&config, &data)) {
