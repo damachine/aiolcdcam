@@ -85,7 +85,7 @@ typedef struct Config {
 
 /**
  * @brief Loads configuration from INI file.
- * @details Loads all configuration values from the specified INI file and populates the given Config structure.
+ * @details Loads all configuration values from the specified INI file and populates the given Config structure. Returns 0 on success, -1 on error. Always check the return value.
  * @example
  *     Config cfg;
  *     if (load_config_ini(&cfg, "/etc/coolerdash/config.ini") != 0) {
