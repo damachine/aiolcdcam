@@ -98,45 +98,45 @@ static int inih_config_handler(void *user, const char *section, const char *name
             config->daemon_password[sizeof(config->daemon_password) - 1] = '\0';
         }
     }
-    else if (strcmp(section, "color_green") == 0) {
-        if (strcmp(name, "r") == 0) config->color_green.r = atoi(value);
-        else if (strcmp(name, "g") == 0) config->color_green.g = atoi(value);
-        else if (strcmp(name, "b") == 0) config->color_green.b = atoi(value);
+    else if (strcmp(section, "color_txt_temp") == 0) {
+        if (strcmp(name, "r") == 0) config->color_txt_temp.r = atoi(value);
+        else if (strcmp(name, "g") == 0) config->color_txt_temp.g = atoi(value);
+        else if (strcmp(name, "b") == 0) config->color_txt_temp.b = atoi(value);
     }
-    else if (strcmp(section, "color_orange") == 0) {
-        if (strcmp(name, "r") == 0) config->color_orange.r = atoi(value);
-        else if (strcmp(name, "g") == 0) config->color_orange.g = atoi(value);
-        else if (strcmp(name, "b") == 0) config->color_orange.b = atoi(value);
+    else if (strcmp(section, "color_txt_label") == 0) {
+        if (strcmp(name, "r") == 0) config->color_txt_label.r = atoi(value);
+        else if (strcmp(name, "g") == 0) config->color_txt_label.g = atoi(value);
+        else if (strcmp(name, "b") == 0) config->color_txt_label.b = atoi(value);
     }
-    else if (strcmp(section, "color_hot_orange") == 0) {
-        if (strcmp(name, "r") == 0) config->color_hot_orange.r = atoi(value);
-        else if (strcmp(name, "g") == 0) config->color_hot_orange.g = atoi(value);
-        else if (strcmp(name, "b") == 0) config->color_hot_orange.b = atoi(value);
+    else if (strcmp(section, "color_temp1_bar") == 0) {
+        if (strcmp(name, "r") == 0) config->color_temp1_bar.r = atoi(value);
+        else if (strcmp(name, "g") == 0) config->color_temp1_bar.g = atoi(value);
+        else if (strcmp(name, "b") == 0) config->color_temp1_bar.b = atoi(value);
     }
-    else if (strcmp(section, "color_red") == 0) {
-        if (strcmp(name, "r") == 0) config->color_red.r = atoi(value);
-        else if (strcmp(name, "g") == 0) config->color_red.g = atoi(value);
-        else if (strcmp(name, "b") == 0) config->color_red.b = atoi(value);
+    else if (strcmp(section, "color_temp2_bar") == 0) {
+        if (strcmp(name, "r") == 0) config->color_temp2_bar.r = atoi(value);
+        else if (strcmp(name, "g") == 0) config->color_temp2_bar.g = atoi(value);
+        else if (strcmp(name, "b") == 0) config->color_temp2_bar.b = atoi(value);
     }
-    else if (strcmp(section, "color_temp") == 0) {
-        if (strcmp(name, "r") == 0) config->color_temp.r = atoi(value);
-        else if (strcmp(name, "g") == 0) config->color_temp.g = atoi(value);
-        else if (strcmp(name, "b") == 0) config->color_temp.b = atoi(value);
+    else if (strcmp(section, "color_temp3_bar") == 0) {
+        if (strcmp(name, "r") == 0) config->color_temp3_bar.r = atoi(value);
+        else if (strcmp(name, "g") == 0) config->color_temp3_bar.g = atoi(value);
+        else if (strcmp(name, "b") == 0) config->color_temp3_bar.b = atoi(value);
     }
-    else if (strcmp(section, "color_label") == 0) {
-        if (strcmp(name, "r") == 0) config->color_label.r = atoi(value);
-        else if (strcmp(name, "g") == 0) config->color_label.g = atoi(value);
-        else if (strcmp(name, "b") == 0) config->color_label.b = atoi(value);
+    else if (strcmp(section, "color_temp4_bar") == 0) {
+        if (strcmp(name, "r") == 0) config->color_temp4_bar.r = atoi(value);
+        else if (strcmp(name, "g") == 0) config->color_temp4_bar.g = atoi(value);
+        else if (strcmp(name, "b") == 0) config->color_temp4_bar.b = atoi(value);
     }
-    else if (strcmp(section, "color_bg") == 0) {
-        if (strcmp(name, "r") == 0) config->color_bg.r = atoi(value);
-        else if (strcmp(name, "g") == 0) config->color_bg.g = atoi(value);
-        else if (strcmp(name, "b") == 0) config->color_bg.b = atoi(value);
+    else if (strcmp(section, "color_bg_bar") == 0) {
+        if (strcmp(name, "r") == 0) config->color_bg_bar.r = atoi(value);
+        else if (strcmp(name, "g") == 0) config->color_bg_bar.g = atoi(value);
+        else if (strcmp(name, "b") == 0) config->color_bg_bar.b = atoi(value);
     }
-    else if (strcmp(section, "color_border") == 0) {
-        if (strcmp(name, "r") == 0) config->color_border.r = atoi(value);
-        else if (strcmp(name, "g") == 0) config->color_border.g = atoi(value);
-        else if (strcmp(name, "b") == 0) config->color_border.b = atoi(value);
+    else if (strcmp(section, "color_border_bar") == 0) {
+        if (strcmp(name, "r") == 0) config->color_border_bar.r = atoi(value);
+        else if (strcmp(name, "g") == 0) config->color_border_bar.g = atoi(value);
+        else if (strcmp(name, "b") == 0) config->color_border_bar.b = atoi(value);
     }
     return 1;
 }

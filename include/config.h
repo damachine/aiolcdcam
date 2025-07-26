@@ -73,14 +73,14 @@ typedef struct Config {
     char pid_file[128];          // Path for PID file
     char daemon_address[128];    // Daemon address
     char daemon_password[64];    // Daemon password
-    Color color_green;        // RGB for green bar
-    Color color_orange;       // RGB for orange bar
-    Color color_hot_orange;   // RGB for hot orange bar
-    Color color_red;          // RGB for red bar
-    Color color_temp;         // RGB for temperature text
-    Color color_label;        // RGB for label text
-    Color color_bg;           // RGB for background
-    Color color_border;       // RGB for border
+    Color color_txt_temp;     // RGB for temperature text
+    Color color_txt_label;    // RGB for label text
+    Color color_temp1_bar;    // RGB for green bar
+    Color color_temp2_bar;    // RGB for orange bar
+    Color color_temp3_bar;    // RGB for hot orange bar
+    Color color_temp4_bar;    // RGB for red bar
+    Color color_bg_bar;       // RGB for bar background
+    Color color_border_bar;   // RGB for bar border
 } Config;
 
 /**

@@ -44,13 +44,13 @@
  */
 void lerp_temp_color(const Config *config, float val, int* r, int* g, int* b) {
     if (val <= config->temp_threshold_green) { 
-        *r = config->color_green.r; *g = config->color_green.g; *b = config->color_green.b; 
+        *r = config->color_temp1_bar.r; *g = config->color_temp1_bar.g; *b = config->color_temp1_bar.b; 
     } else if (val <= config->temp_threshold_orange) { 
-        *r = config->color_orange.r; *g = config->color_orange.g; *b = config->color_orange.b; 
+        *r = config->color_temp2_bar.r; *g = config->color_temp2_bar.g; *b = config->color_temp2_bar.b; 
     } else if (val <= config->temp_threshold_red) { 
-        *r = config->color_hot_orange.r; *g = config->color_hot_orange.g; *b = config->color_hot_orange.b; 
+        *r = config->color_temp3_bar.r; *g = config->color_temp3_bar.g; *b = config->color_temp3_bar.b; 
     } else { 
-        *r = config->color_red.r; *g = config->color_red.g; *b = config->color_red.b; 
+        *r = config->color_temp4_bar.r; *g = config->color_temp4_bar.g; *b = config->color_temp4_bar.b; 
     }
 }
 
@@ -158,7 +158,7 @@ static void draw_temperature_displays(cairo_t *cr, const sensor_data_t *data, co
     
     // Set font and size
     cairo_select_font_face(cr, config->font_face, CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-    cairo_set_source_rgb(cr, config->color_temp.r / 255.0, config->color_temp.g / 255.0, config->color_temp.b / 255.0);
+    cairo_set_source_rgb(cr, config->color_txt_temp.r / 255.0, config->color_txt_temp.g / 255.0, config->color_txt_temp.b / 255.0);
 
     char temp_str[8];
     cairo_text_extents_t ext;
@@ -207,7 +207,7 @@ static void draw_temperature_bars(cairo_t *cr, const sensor_data_t *data, const 
     
     // Draw CPU bar background (rounded corners)
     double radius = 8.0; // Corner radius in px
-    cairo_set_source_rgb(cr, config->color_bg.r / 255.0, config->color_bg.g / 255.0, config->color_bg.b / 255.0);
+    cairo_set_source_rgb(cr, config->color_bg_bar.r / 255.0, config->color_bg_bar.g / 255.0, config->color_bg_bar.b / 255.0);
     cairo_new_sub_path(cr);
     cairo_arc(cr, bar_x + config->bar_width - radius, cpu_bar_y + radius, radius, -M_PI_2, 0);
     cairo_arc(cr, bar_x + config->bar_width - radius, cpu_bar_y + config->bar_height - radius, radius, 0, M_PI_2);
@@ -232,7 +232,7 @@ static void draw_temperature_bars(cairo_t *cr, const sensor_data_t *data, const 
     cairo_fill(cr);
     // Draw CPU bar border (rounded)
     cairo_set_line_width(cr, config->border_line_width);
-    cairo_set_source_rgb(cr, config->color_border.r / 255.0, config->color_border.g / 255.0, config->color_border.b / 255.0);
+    cairo_set_source_rgb(cr, config->color_border_bar.r / 255.0, config->color_border_bar.g / 255.0, config->color_border_bar.b / 255.0);
     cairo_new_sub_path(cr);
     cairo_arc(cr, bar_x + config->bar_width - radius, cpu_bar_y + radius, radius, -M_PI_2, 0);
     cairo_arc(cr, bar_x + config->bar_width - radius, cpu_bar_y + config->bar_height - radius, radius, 0, M_PI_2);
@@ -248,7 +248,7 @@ static void draw_temperature_bars(cairo_t *cr, const sensor_data_t *data, const 
     const int safe_gpu_val_w = (gpu_val_w < 0) ? 0 : 
         (gpu_val_w > config->bar_width) ? config->bar_width : gpu_val_w; // Clamp to valid range
     // Draw GPU bar background (rounded corners)
-    cairo_set_source_rgb(cr, config->color_bg.r / 255.0, config->color_bg.g / 255.0, config->color_bg.b / 255.0);
+    cairo_set_source_rgb(cr, config->color_bg_bar.r / 255.0, config->color_bg_bar.g / 255.0, config->color_bg_bar.b / 255.0);
     cairo_new_sub_path(cr);
     cairo_arc(cr, bar_x + config->bar_width - radius, gpu_bar_y + radius, radius, -M_PI_2, 0);
     cairo_arc(cr, bar_x + config->bar_width - radius, gpu_bar_y + config->bar_height - radius, radius, 0, M_PI_2);
@@ -272,7 +272,7 @@ static void draw_temperature_bars(cairo_t *cr, const sensor_data_t *data, const 
     cairo_fill(cr);
     // Draw GPU bar border (rounded)
     cairo_set_line_width(cr, config->border_line_width);
-    cairo_set_source_rgb(cr, config->color_border.r / 255.0, config->color_border.g / 255.0, config->color_border.b / 255.0);
+    cairo_set_source_rgb(cr, config->color_border_bar.r / 255.0, config->color_border_bar.g / 255.0, config->color_border_bar.b / 255.0);
     cairo_new_sub_path(cr);
     cairo_arc(cr, bar_x + config->bar_width - radius, gpu_bar_y + radius, radius, -M_PI_2, 0);
     cairo_arc(cr, bar_x + config->bar_width - radius, gpu_bar_y + config->bar_height - radius, radius, 0, M_PI_2);
@@ -292,7 +292,7 @@ static void draw_labels(cairo_t *cr, const Config *config) {
     // Set font and size
     cairo_select_font_face(cr, config->font_face, CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
     cairo_set_font_size(cr, config->font_size_labels);
-    cairo_set_source_rgb(cr, config->color_label.r / 255.0, config->color_label.g / 255.0, config->color_label.b / 255.0);
+    cairo_set_source_rgb(cr, config->color_txt_label.r / 255.0, config->color_txt_label.g / 255.0, config->color_txt_label.b / 255.0);
     // CPU label: left in top box
     cairo_move_to(cr, + 0, config->box_height / 2 + config->font_size_labels / 2 + 9);
     cairo_show_text(cr, "CPU");
